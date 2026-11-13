@@ -53,8 +53,12 @@ export const NetworkCanvas = () => {
 
       for (let i = 0; i < pts.length; i++) {
         const a = pts[i];
+        if (!a) continue;
+
         for (let j = i + 1; j < pts.length; j++) {
           const b = pts[j];
+          if (!b) continue;
+
           const d = Math.hypot((a.x - b.x) * w, (a.y - b.y) * h);
           if (d < 170) {
             ctx.strokeStyle = `rgba(100,189,183,${0.14 * (1 - d / 170)})`;

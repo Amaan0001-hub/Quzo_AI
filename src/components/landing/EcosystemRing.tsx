@@ -155,10 +155,14 @@ type ModuleProps = {
 
 const Module = ({ it, i, on, select, reduce }: ModuleProps) => {
   const Icon = it.icon;
+  const position = CARDS[i];
+
+  if (!position) return null;
+
   return (
     <div
       className="absolute z-10 w-[27%] -translate-x-1/2 -translate-y-1/2"
-      style={pct(CARDS[i])}
+      style={pct(position)}
     >
       <motion.div
         initial={reduce ? false : { opacity: 0, y: 14, scale: 0.95 }}

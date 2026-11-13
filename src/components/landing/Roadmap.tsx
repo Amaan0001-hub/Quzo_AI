@@ -9,7 +9,7 @@ type Phase = {
   items: string[];
 };
 
-const PHASES: Phase[] = [
+const PHASES = [
   {
     name: "Foundation",
     items: [
@@ -60,13 +60,13 @@ const PHASES: Phase[] = [
       "Develop governance participation.",
     ],
   },
-];
+] satisfies [Phase, ...Phase[]];
 
 const ease: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
 export const Roadmap = () => {
   const [active, setActive] = useState<number>(0);
-  const p = PHASES[active];
+  const p = PHASES[active] ?? PHASES[0];
 
   return (
     <section
