@@ -1,7 +1,16 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
+import { FormProvider, useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import {
+  forgotPasswordSchema,
+  type ForgotPasswordFormValues,
+} from "@/features/auth/schemas/auth.schema";
+import { useForgotPassword } from "@/features/auth/hooks/useForgotPassword";
+import { cn } from "@/lib/utils";
 import {
   User,
   Mail,
@@ -10,9 +19,9 @@ import {
   ShieldCheck,
   Lock,
   ArrowLeft,
+  Loader2,
   type LucideIcon,
 } from "lucide-react";
-import type { FormEvent } from "react";
 import { HeroBackground } from "@/components/landing/HeroBackground";
 
 type TrustItem = { icon: LucideIcon; text: string };
@@ -26,10 +35,21 @@ const TRUST_ITEMS: TrustItem[] = [
 const ease: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
 export function ForgotPassword() {
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    console.log("Reset link sent");
-  };
+  const [isSubmitted, setIsSubmitted] = useState(false);
+
+  // Form Setup (API Logic)
+  const form = useForm<ForgotPasswordFormValues>({
+    resolver: zodResolver(forgotPasswordSchema),
+    defaultValues: { UserId: "", Email: "" },
+  });
+
+  const forgotPassword = useForgotPassword();
+
+  const onSubmit = form.handleSubmit((values) => {
+    forgotPassword.mutate(values, {
+      onSuccess: () => setIsSubmitted(true),
+    });
+  });
 
   const inputWrapper =
     "relative flex items-center rounded-xl border border-white/10 bg-[#031B23]/80 backdrop-blur-md transition-all duration-300 focus-within:border-[#19D8D0] focus-within:ring-2 focus-within:ring-[#19D8D0]/30 hover:border-white/20";
@@ -104,59 +124,123 @@ export function ForgotPassword() {
             </p>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-6">
-            {/* User ID */}
-            <div>
-              <label className="mb-2 block text-xs font-medium text-slate-300">
-                User ID <span className="text-[#19D8D0]">*</span>
-              </label>
-              <div className={inputWrapper}>
-                <User size={20} className="absolute left-4 text-slate-500" />
-                <input
-                  type="text"
-                  placeholder="Enter your User ID"
-                  className={inputField}
-                  required
-                />
+          {/* API Logic Integrated Here */}
+          {isSubmitted ? (
+            // Success State (Theme matched with Quzo)
+            <div className="flex flex-col items-center text-center py-6">
+              <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-[#19D8D0] to-[#64BDB7] shadow-[0_0_30px_rgba(25,216,208,0.5)]">
+                <ShieldCheck className="h-8 w-8 text-[#031B23]" />
               </div>
-            </div>
-
-            {/* Email */}
-            <div>
-              <label className="mb-2 block text-xs font-medium text-slate-300">
-                Email Address <span className="text-[#19D8D0]">*</span>
-              </label>
-              <div className={inputWrapper}>
-                <Mail size={20} className="absolute left-4 text-slate-500" />
-                <input
-                  type="email"
-                  placeholder="Enter your registered email"
-                  className={inputField}
-                  required
-                />
-              </div>
-            </div>
-
-            <button
-              type="submit"
-              className="q-focus group flex w-full items-center justify-center gap-2 rounded-xl bg-[#19D8D0] py-4 text-[#031B23] text-base font-semibold shadow-[0_0_20px_rgba(25,216,208,0.3)] transition-all duration-300 hover:bg-[#7FF3EC] hover:shadow-[0_0_40px_rgba(25,216,208,0.6)] mt-2"
-            >
-              SEND RESET LINK{" "}
-              <ArrowRight size={20} className="transition-transform group-hover:translate-x-1" />
-            </button>
-          </form>
-
-          <div className="mt-8 flex flex-col items-center lg:items-start">
-            <p className="text-sm text-slate-400">
-              Back to{" "}
+              <h3 className="mb-2 text-xl font-semibold text-white">Check Your Email</h3>
+              <p className="mb-6 text-sm text-slate-400">
+                We&apos;ve sent a password reset link to your email address.
+              </p>
               <Link
                 href="/login"
-                className="font-medium text-[#19D8D0] hover:text-[#7FF3EC] transition-colors ml-1 inline-flex items-center gap-1"
+                className="group flex items-center justify-center gap-2 rounded-xl bg-[#19D8D0] px-6 py-3 text-sm font-semibold text-[#031B23] shadow-[0_0_20px_rgba(25,216,208,0.3)] transition-all duration-300 hover:bg-[#7FF3EC] hover:shadow-[0_0_40px_rgba(25,216,208,0.6)]"
               >
-                <ArrowLeft size={14} /> Sign In
+                <ArrowLeft size={16} className="transition-transform group-hover:-translate-x-1" />
+                Back to Login
               </Link>
-            </p>
-          </div>
+            </div>
+          ) : (
+            // Form State
+            <FormProvider {...form}>
+              <form onSubmit={onSubmit} className="space-y-6" autoComplete="off">
+                {/* User ID */}
+                <div>
+                  <label className="mb-2 block text-xs font-medium text-slate-300">
+                    User ID <span className="text-[#19D8D0]">*</span>
+                  </label>
+                  <div
+                    className={cn(
+                      inputWrapper,
+                      form.formState.errors.UserId &&
+                        "border-red-500/60 focus-within:border-red-500 focus-within:ring-red-500/30 hover:border-red-500/60"
+                    )}
+                  >
+                    <User size={20} className="absolute left-4 text-slate-500" />
+                    <input
+                      {...form.register("UserId")}
+                      type="text"
+                      autoComplete="username"
+                      placeholder="Enter your User ID"
+                      className={inputField}
+                    />
+                  </div>
+                  {form.formState.errors.UserId && (
+                    <p className="mt-1.5 text-xs text-red-400">
+                      {form.formState.errors.UserId.message}
+                    </p>
+                  )}
+                </div>
+
+                {/* Email */}
+                <div>
+                  <label className="mb-2 block text-xs font-medium text-slate-300">
+                    Email Address <span className="text-[#19D8D0]">*</span>
+                  </label>
+                  <div
+                    className={cn(
+                      inputWrapper,
+                      form.formState.errors.Email &&
+                        "border-red-500/60 focus-within:border-red-500 focus-within:ring-red-500/30 hover:border-red-500/60"
+                    )}
+                  >
+                    <Mail size={20} className="absolute left-4 text-slate-500" />
+                    <input
+                      {...form.register("Email")}
+                      type="email"
+                      autoComplete="email"
+                      placeholder="Enter your registered email"
+                      className={inputField}
+                    />
+                  </div>
+                  {form.formState.errors.Email && (
+                    <p className="mt-1.5 text-xs text-red-400">
+                      {form.formState.errors.Email.message}
+                    </p>
+                  )}
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={forgotPassword.isPending}
+                  className="q-focus group flex w-full items-center justify-center gap-2 rounded-xl bg-[#19D8D0] py-4 text-[#031B23] text-base font-semibold shadow-[0_0_20px_rgba(25,216,208,0.3)] transition-all duration-300 hover:bg-[#7FF3EC] hover:shadow-[0_0_40px_rgba(25,216,208,0.6)] mt-2 disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:bg-[#19D8D0]"
+                >
+                  {forgotPassword.isPending ? (
+                    <>
+                      <Loader2 size={20} className="animate-spin" />
+                      SENDING LINK...
+                    </>
+                  ) : (
+                    <>
+                      SEND RESET LINK{" "}
+                      <ArrowRight
+                        size={20}
+                        className="transition-transform group-hover:translate-x-1"
+                      />
+                    </>
+                  )}
+                </button>
+              </form>
+            </FormProvider>
+          )}
+
+          {/* Footer - Only shows when form is not submitted */}
+          {!isSubmitted && (
+            <div className="mt-8 flex flex-col items-center lg:items-start">
+              <p className="text-sm text-slate-400">
+                Back to{" "}
+                <Link
+                  href="/login"
+                  className="font-medium text-[#19D8D0] hover:text-[#7FF3EC] transition-colors ml-1 inline-flex items-center gap-1"
+                >
+                  <ArrowLeft size={14} /> Sign In
+                </Link>
+              </p>
+            </div>
+          )}
         </div>
       </motion.div>
     </div>

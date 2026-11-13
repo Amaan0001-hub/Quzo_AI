@@ -1,4 +1,4 @@
 export const siteConfig = {
-  name: "Quzo",
-  description: "Production-ready Next.js admin frontend.",
+  name: "QUZO",
+description: "Next-gen AI and Web3 ecosystem for decentralized finance."
 } as const;
