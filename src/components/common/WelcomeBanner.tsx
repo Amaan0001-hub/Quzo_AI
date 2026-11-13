@@ -22,41 +22,48 @@ export const WelcomeBanner = () => {
   const getInitials = (fullName: string) => {
     if (!fullName) return "";
     const names = fullName.trim().split(/\s+/).filter(Boolean);
-    return names.map((name: string) => name[0]).join("").toUpperCase();
+    return names
+      .map((name: string) => name[0])
+      .join("")
+      .toUpperCase();
   };
 
   const initials = getInitials(fullName);
 
+  if (pathname === "/dashboard") return null;
+
   return (
-    <div className="relative px-1 py-2 transition-colors duration-300 sm:px-2 md:px-3 lg:px-4 sm:py-3">
-      <div className="relative overflow-hidden transition-all duration-300 border shadow-lg bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm border-blue-200/70 dark:border-blue-900/50 rounded-2xl sm:rounded-3xl hover:-translate-y-0.5 hover:shadow-xl hover:shadow-blue-500/20">
+    <div className="relative px-1 py-2 transition-colors duration-300 sm:px-2 sm:py-3 md:px-3 lg:px-4">
+      <div className="relative overflow-hidden rounded-2xl border border-blue-200/70 bg-white/90 shadow-lg backdrop-blur-sm transition-all duration-300 hover:-translate-y-0.5 hover:shadow-xl hover:shadow-blue-500/20 dark:border-blue-900/50 dark:bg-gray-800/90 sm:rounded-3xl">
         {/* Decorative gradient overlay */}
-        <div className="absolute inset-0 pointer-events-none opacity-30">
-          <div className="absolute w-64 h-64 rounded-full -top-20 -right-20 bg-blue-400/10 dark:bg-blue-500/5 blur-3xl"></div>
-          <div className="absolute w-64 h-64 rounded-full -bottom-20 -left-20 bg-purple-400/10 dark:bg-purple-500/5 blur-3xl"></div>
+        <div className="pointer-events-none absolute inset-0 opacity-30">
+          <div className="absolute -right-20 -top-20 h-64 w-64 rounded-full bg-blue-400/10 blur-3xl dark:bg-blue-500/5"></div>
+          <div className="absolute -bottom-20 -left-20 h-64 w-64 rounded-full bg-purple-400/10 blur-3xl dark:bg-purple-500/5"></div>
         </div>
 
         {/* Gradient line at top */}
-        <div className="absolute top-0 left-0 w-full h-0.5 bg-gradient-to-r from-[#1680ff] via-[#25c6e8] to-[#7d75ff]"></div>
+        <div className="absolute left-0 top-0 h-0.5 w-full bg-gradient-to-r from-[#1680ff] via-[#25c6e8] to-[#7d75ff]"></div>
 
         <div className="relative p-3 sm:p-4 md:p-5 lg:p-6">
-          <div className="flex flex-wrap items-center justify-between gap-y-3 gap-x-4">
+          <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-3">
             {/* Left Section - User Info */}
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-3 mb-2">
+            <div className="min-w-0 flex-1">
+              <div className="mb-2 flex items-center gap-3">
                 <div className="relative flex-shrink-0">
-                  <div className="flex items-center justify-center w-10 h-10 text-sm font-bold text-white rounded-full shadow-lg sm:w-12 sm:h-12 bg-gradient-to-r from-[#1680ff] via-[#25c6e8] to-[#7d75ff] sm:text-base shadow-blue-500/25">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-r from-[#1680ff] via-[#25c6e8] to-[#7d75ff] text-sm font-bold text-white shadow-lg shadow-blue-500/25 sm:h-12 sm:w-12 sm:text-base">
                     {initials || "U"}
                   </div>
-                  <div className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-emerald-500 rounded-full border-2 border-white dark:border-gray-800 animate-pulse"></div>
+                  <div className="absolute -bottom-0.5 -right-0.5 h-3.5 w-3.5 animate-pulse rounded-full border-2 border-white bg-emerald-500 dark:border-gray-800"></div>
                 </div>
                 <div>
-                  <span className="text-xs font-medium text-gray-500 dark:text-gray-400">Welcome back</span>
+                  <span className="text-xs font-medium text-gray-500 dark:text-gray-400">
+                    Welcome back
+                  </span>
                   <div className="flex flex-wrap items-center gap-2">
                     <span className="text-sm font-bold capitalize text-gray-800 dark:text-white sm:text-base">
                       {fullName || "User"}
                     </span>
-                    <span className="text-xs px-2 py-0.5 rounded-full bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-cyan-300 font-mono border border-blue-200 dark:border-blue-800/50">
+                    <span className="rounded-full border border-blue-200 bg-blue-50 px-2 py-0.5 font-mono text-xs text-blue-700 dark:border-blue-800/50 dark:bg-blue-900/30 dark:text-cyan-300">
                       {authLogin || "N/A"}
                     </span>
                   </div>
@@ -68,20 +75,26 @@ export const WelcomeBanner = () => {
             <div className="flex-shrink-0">
               {pathname === "/buy-agent-license" ? (
                 <button
-                  onClick={() => router.push('/ai-tools')}
-                  className="group flex items-center gap-2 px-4 sm:px-6 py-2.5 sm:py-3 text-xs sm:text-sm font-semibold text-white transition-all duration-300 rounded-xl bg-gradient-to-r from-[#1680ff] via-[#25c6e8] to-[#7d75ff] hover:brightness-110 shadow-lg shadow-blue-500/25 hover:shadow-xl hover:shadow-blue-500/30 transform hover:scale-[1.02] active:scale-[0.98] relative overflow-hidden"
+                  onClick={() => router.push("/ai-tools")}
+                  className="group relative flex transform items-center gap-2 overflow-hidden rounded-xl bg-gradient-to-r from-[#1680ff] via-[#25c6e8] to-[#7d75ff] px-4 py-2.5 text-xs font-semibold text-white shadow-lg shadow-blue-500/25 transition-all duration-300 hover:scale-[1.02] hover:shadow-xl hover:shadow-blue-500/30 hover:brightness-110 active:scale-[0.98] sm:px-6 sm:py-3 sm:text-sm"
                 >
-                  <span className="absolute inset-0 w-full h-full transition-transform duration-1000 -translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent group-hover:translate-x-full"></span>
-                  <RiBrainLine size={18} className="transition-transform duration-300 group-hover:rotate-12" />
+                  <span className="absolute inset-0 h-full w-full -translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent transition-transform duration-1000 group-hover:translate-x-full"></span>
+                  <RiBrainLine
+                    size={18}
+                    className="transition-transform duration-300 group-hover:rotate-12"
+                  />
                   Ai Tools Demo
                 </button>
               ) : (
                 <button
                   onClick={() => setIsOpen(true)}
-                  className="inline-flex items-center justify-center gap-2 px-4 sm:px-6 py-2.5 sm:py-3 rounded-xl text-xs sm:text-sm font-semibold text-white bg-gradient-to-r from-[#1680ff] via-[#25c6e8] to-[#7d75ff] shadow-md shadow-blue-500/25 hover:shadow-lg hover:shadow-blue-500/40 hover:-translate-y-0.5 transition-all duration-300 relative overflow-hidden group"
+                  className="group relative inline-flex items-center justify-center gap-2 overflow-hidden rounded-xl bg-gradient-to-r from-[#1680ff] via-[#25c6e8] to-[#7d75ff] px-4 py-2.5 text-xs font-semibold text-white shadow-md shadow-blue-500/25 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-blue-500/40 sm:px-6 sm:py-3 sm:text-sm"
                 >
-                  <span className="absolute inset-0 w-full h-full transition-transform duration-1000 -translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent group-hover:translate-x-full"></span>
-                  <FiUserPlus size={18} className="transition-transform duration-300 group-hover:scale-110" />
+                  <span className="absolute inset-0 h-full w-full -translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent transition-transform duration-1000 group-hover:translate-x-full"></span>
+                  <FiUserPlus
+                    size={18}
+                    className="transition-transform duration-300 group-hover:scale-110"
+                  />
                   Invite Friends
                 </button>
               )}
@@ -92,35 +105,40 @@ export const WelcomeBanner = () => {
 
       {/* Modal - Premium */}
       {isOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center min-h-screen px-4 bg-black/60 dark:bg-black/70 backdrop-blur-sm animate-in fade-in duration-300">
-          <div className="relative w-full max-w-lg p-6 bg-white border shadow-2xl sm:p-8 dark:bg-gray-800 rounded-3xl border-gray-200/50 dark:border-gray-700/50 animate-in slide-in-from-top-4 duration-300">
+        <div className="animate-in fade-in fixed inset-0 z-50 flex min-h-screen items-center justify-center bg-black/60 px-4 backdrop-blur-sm duration-300 dark:bg-black/70">
+          <div className="animate-in slide-in-from-top-4 relative w-full max-w-lg rounded-3xl border border-gray-200/50 bg-white p-6 shadow-2xl duration-300 dark:border-gray-700/50 dark:bg-gray-800 sm:p-8">
             {/* Decorative gradient overlay */}
-            <div className="absolute inset-0 overflow-hidden pointer-events-none rounded-3xl">
-              <div className="absolute w-48 h-48 rounded-full -top-20 -right-20 bg-blue-400/5 dark:bg-blue-500/5 blur-2xl"></div>
-              <div className="absolute w-48 h-48 rounded-full -bottom-20 -left-20 bg-purple-400/5 dark:bg-purple-500/5 blur-2xl"></div>
+            <div className="pointer-events-none absolute inset-0 overflow-hidden rounded-3xl">
+              <div className="absolute -right-20 -top-20 h-48 w-48 rounded-full bg-blue-400/5 blur-2xl dark:bg-blue-500/5"></div>
+              <div className="absolute -bottom-20 -left-20 h-48 w-48 rounded-full bg-purple-400/5 blur-2xl dark:bg-purple-500/5"></div>
             </div>
 
             {/* Close Button */}
             <button
-              className="absolute z-10 flex items-center justify-center w-8 h-8 text-gray-400 transition-all duration-300 rounded-full top-4 right-4 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 hover:scale-110"
+              className="absolute right-4 top-4 z-10 flex h-8 w-8 items-center justify-center rounded-full text-gray-400 transition-all duration-300 hover:scale-110 hover:bg-gray-100 hover:text-gray-600 dark:text-gray-500 dark:hover:bg-gray-700 dark:hover:text-gray-300"
               onClick={() => setIsOpen(false)}
             >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+              <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M6 18L18 6M6 6l12 12"
+                />
               </svg>
             </button>
 
             {/* Modal Header */}
             <div className="relative mb-4">
               <div className="flex items-center gap-3">
-                <div className="p-2.5 bg-gradient-to-br from-[#1680ff] via-[#25c6e8] to-[#7d75ff] rounded-xl shadow-lg shadow-blue-500/25">
-                  <FiUserPlus className="w-5 h-5 text-white" />
+                <div className="rounded-xl bg-gradient-to-br from-[#1680ff] via-[#25c6e8] to-[#7d75ff] p-2.5 shadow-lg shadow-blue-500/25">
+                  <FiUserPlus className="h-5 w-5 text-white" />
                 </div>
                 <div>
-                  <h3 className="text-lg font-bold text-gray-800 sm:text-xl dark:text-white">
+                  <h3 className="text-lg font-bold text-gray-800 dark:text-white sm:text-xl">
                     Invite Friends
                   </h3>
-                  <p className="text-xs text-gray-600 sm:text-sm dark:text-gray-400">
+                  <p className="text-xs text-gray-600 dark:text-gray-400 sm:text-sm">
                     Share your referral link and earn rewards
                   </p>
                 </div>
@@ -133,8 +151,8 @@ export const WelcomeBanner = () => {
             </div>
 
             {/* Footer Note */}
-            <div className="relative pt-3 mt-4 border-t border-gray-200/50 dark:border-gray-700/50">
-              <p className="text-[10px] sm:text-xs text-center text-gray-500 dark:text-gray-400">
+            <div className="relative mt-4 border-t border-gray-200/50 pt-3 dark:border-gray-700/50">
+              <p className="text-center text-[10px] text-gray-500 dark:text-gray-400 sm:text-xs">
                 Earn rewards for every friend who joins through your link
               </p>
             </div>

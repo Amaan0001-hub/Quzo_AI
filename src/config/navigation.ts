@@ -4,6 +4,7 @@ export const primaryNav: NavItem[] = [
   {
     label: "Dashboard",
     href: "/dashboard",
+    icon: "home",
   },
 
   {

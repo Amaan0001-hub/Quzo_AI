@@ -2,29 +2,16 @@
 
 import { Menu, Moon, Sun, Wallet, Bell, ChevronDown, UserRound, ChevronUp, Check, Copy, Headphones, LogOut, X, Briefcase, TrendingUp, BarChart3, Loader2 } from "lucide-react";
 import { useAuthStore } from "@/store/auth.store";
-import { primaryNav } from "@/config/navigation";
-import { usePathname, useRouter } from "next/navigation";
+import { useSidebarStore } from "@/store/sidebar.store";
 import Link from "next/link";
-import { cn } from "@/lib/utils";
 import { useState, useRef, useEffect, useCallback } from "react";
 import { useDashboardSummary } from "@/features/dashboard/hooks/useDashboardSummary";
 import { useLogout } from "@/features/auth/hooks/useLogout";
 import { useTheme } from "next-themes";
 import { ThemeLogo } from "@/components/common/ThemeLogo";
-import type { NavItem } from "@/types/common";
 import GoogleTranslate from "@/components/common/GoogleTranslate";
 
 type HeaderNotification = Record<string, unknown>;
-
-function isNavPathActive(pathname: string, href: string) {
-  return pathname === href || (href !== "/" && pathname.startsWith(`${href}/`));
-}
-
-function isNavItemActive(pathname: string, item: NavItem) {
-  return item.isDropdown && item.dropdownItems
-    ? item.dropdownItems.some((dropdownItem) => isNavPathActive(pathname, dropdownItem.href))
-    : isNavPathActive(pathname, item.href);
-}
 
 function getNotificationRows(payload: unknown): HeaderNotification[] {
   const pending: unknown[] = [payload];
@@ -87,10 +74,8 @@ function getNotificationId(notification: HeaderNotification, index: number) {
 
 export function Navbar() {
   const user = useAuthStore((state) => state.user);
-  const pathname = usePathname();
-  const router = useRouter();
-  const [openDropdown, setOpenDropdown] = useState<string | null>(null);
-  const [loadingInvestmentFund, setLoadingInvestmentFund] = useState(false);
+  const isMobileOpen = useSidebarStore((state) => state.isMobileOpen);
+  const setMobileOpen = useSidebarStore((state) => state.setMobileOpen);
   const [accountMenuOpen, setAccountMenuOpen] = useState(false);
   const [walletOpen, setWalletOpen] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
@@ -99,8 +84,6 @@ export function Navbar() {
   const [seenNotificationsUser, setSeenNotificationsUser] = useState<string | null>(null);
   const [notificationsError, setNotificationsError] = useState("");
   const [notificationsLoading, setNotificationsLoading] = useState(true);
-  const [mobileNavOpen, setMobileNavOpen] = useState(false);
-  const [mobileDropdownOpen, setMobileDropdownOpen] = useState<string | null>(null);
   const [authLoginCopied, setAuthLoginCopied] = useState(false);
 
   const accountMenuRef = useRef<HTMLDivElement>(null);
@@ -114,11 +97,6 @@ export function Navbar() {
   useEffect(() => {
     setMounted(true);
   }, []);
-
-  useEffect(() => {
-    setLoadingInvestmentFund(false);
-    setMobileDropdownOpen(null);
-  }, [pathname]);
 
   const { data: dashboardData } = useDashboardSummary(Boolean(user));
   const displayAuthLogin = dashboardData?.data?.[0]?.AuthLogin || user?.name || 'Account';
@@ -320,8 +298,10 @@ export function Navbar() {
     <header className="sticky top-0 z-40 flex h-16 items-center justify-between border-b px-4 sm:px-6 bg-white dark:bg-[#0B1021] border-gray-200 dark:border-[#1E293B]">
       <button
         className="rounded-md p-2 hover:bg-gray-100 dark:hover:bg-white/5 lg:hidden"
-        onClick={() => setMobileNavOpen(true)}
+        onClick={() => setMobileOpen(true)}
         aria-label="Open menu"
+        aria-expanded={isMobileOpen}
+        aria-controls="primary-navigation"
         style={{ color: theme === "dark" ? "#25c6e8" : "#1680ff" }}
       >
         <Menu className="h-5 w-5" />
@@ -336,90 +316,6 @@ export function Navbar() {
           />
         </div>
 
-        <nav className="hidden lg:flex items-center gap-6 sm:gap-10 flex-1 justify-center">
-          {primaryNav.map((item) => {
-            const isActive = isNavItemActive(pathname, item);
-
-            if (item.isDropdown && item.dropdownItems) {
-              return (
-                <div
-                  key={item.label}
-                  className="relative"
-                  onMouseEnter={() => setOpenDropdown(item.label)}
-                  onMouseLeave={() => setOpenDropdown(null)}
-                >
-                  <button
-                    type="button"
-                    className={cn(
-                      "flex items-center gap-2 text-sm font-medium transition-colors",
-                      isActive ? "" : "hover:text-blue-600 dark:hover:text-cyan-300",
-                    )}
-                    style={{ color: isActive ? (theme === "dark" ? "#25c6e8" : "#1680ff") : (!mounted || theme === 'dark') ? '#E2E8F0' : '#334155' }}
-                    aria-expanded={openDropdown === item.label}
-                  >
-                    {item.img && (
-                      <img
-                        src={item.img}
-                        alt={item.label}
-                        className="h-5 w-5"
-                      />
-                    )}
-                    {item.label}
-                    <ChevronDown className="h-4 w-4" />
-                  </button>
-
-                  {openDropdown === item.label && (
-                    <div className="absolute left-0 top-full z-50 w-56 pt-2">
-                      <div className="rounded-md border shadow-lg bg-white dark:bg-[#0B1021] border-gray-200 dark:border-[#1E293B]">
-                        <div className="py-2">
-                          {item.dropdownItems.map((dropdownItem) => (
-                            <Link
-                              key={dropdownItem.href}
-                              href={dropdownItem.href}
-                              onClick={(event) => {
-                                setOpenDropdown(null);
-                                if (dropdownItem.href === "/investment-amount" && pathname !== dropdownItem.href) {
-                                  event.preventDefault();
-                                  setLoadingInvestmentFund(true);
-                                  router.push(dropdownItem.href);
-                                }
-                              }}
-                              className="block px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-white/5"
-                              style={{ color: pathname === dropdownItem.href ? (theme === "dark" ? "#25c6e8" : "#1680ff") : ((!mounted || theme === 'dark') ? '#E2E8F0' : '#334155') }}
-                            >
-                              {dropdownItem.label}
-                            </Link>
-                          ))}
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              );
-            }
-
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={cn(
-                  "flex items-center gap-2 text-sm font-medium transition-colors",
-                  isActive ? "" : "hover:text-blue-600 dark:hover:text-cyan-300",
-                )}
-                style={{ color: isActive ? (theme === "dark" ? "#25c6e8" : "#1680ff") : (!mounted || theme === 'dark') ? '#E2E8F0' : '#334155' }}
-              >
-                {item.img && (
-                  <img
-                    src={item.img}
-                    alt={item.label}
-                    className="h-5 w-5"
-                  />
-                )}
-                {item.label}
-              </Link>
-            );
-          })}
-        </nav>
       </div>
 
       {/* <div>
@@ -710,121 +606,6 @@ export function Navbar() {
         </div>
       </div>
 
-      {/* Mobile Navigation Menu */}
-      {mobileNavOpen && (
-        <div className="fixed inset-0 z-50 lg:hidden">
-          <div className="fixed inset-0 bg-black/50" onClick={() => setMobileNavOpen(false)} />
-          <div className="fixed left-0 top-0 h-full w-64 bg-white dark:bg-[#0B1021] shadow-xl overflow-y-auto">
-            <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-[#1E293B]">
-              <span className="font-bold" style={{ color: theme === "dark" ? "#25c6e8" : "#1680ff" }}>Menu</span>
-              <button
-                onClick={() => setMobileNavOpen(false)}
-                className="p-2 hover:bg-gray-100 dark:hover:bg-white/5 rounded-md"
-              >
-                <X className="h-5 w-5" />
-              </button>
-            </div>
-            <nav className="p-4 space-y-2">
-              {primaryNav.map((item) => {
-                const isActive = isNavItemActive(pathname, item);
-                const isDropdownOpen = mobileDropdownOpen === item.label;
-
-                if (item.isDropdown && item.dropdownItems) {
-                  return (
-                    <div key={item.label}>
-                      <button
-                        onClick={() => setMobileDropdownOpen(isDropdownOpen ? null : item.label)}
-                        className={cn(
-                          "w-full flex items-center justify-between gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors",
-                          isActive ? "bg-blue-500/10 text-blue-700 dark:bg-cyan-400/10 dark:text-cyan-300" : "hover:bg-gray-100 dark:hover:bg-white/5"
-                        )}
-                        style={{ color: isActive ? (theme === "dark" ? "#25c6e8" : "#1680ff") : (!mounted || theme === 'dark') ? '#E2E8F0' : '#334155' }}
-                      >
-                        <div className="flex items-center gap-3">
-                          {item.img && (
-                            <img
-                              src={item.img}
-                              alt={item.label}
-                              className="h-5 w-5"
-                            />
-                          )}
-                          {item.label}
-                        </div>
-                        <ChevronDown className={cn("h-4 w-4 transition-transform", isDropdownOpen ? "rotate-180" : "")} />
-                      </button>
-                      {isDropdownOpen && (
-                        <div className="ml-4 mt-2 space-y-1">
-                          {item.dropdownItems.map((dropdownItem) => {
-                            const isDropdownItemActive = isNavPathActive(pathname, dropdownItem.href);
-
-                            return (
-                              <Link
-                                key={dropdownItem.href}
-                                href={dropdownItem.href}
-                                onClick={() => {
-                                  setMobileNavOpen(false);
-                                  setMobileDropdownOpen(null);
-                                }}
-                                aria-current={isDropdownItemActive ? "page" : undefined}
-                                className={cn(
-                                  "block px-4 py-2 text-sm rounded-lg transition-colors",
-                                  isDropdownItemActive
-                                    ? "bg-blue-500/10 font-semibold dark:bg-cyan-400/10"
-                                    : "hover:bg-gray-100 dark:hover:bg-white/5",
-                                )}
-                                style={{
-                                  color: isDropdownItemActive
-                                    ? (theme === "dark" ? "#25c6e8" : "#1680ff")
-                                    : (!mounted || theme === "dark")
-                                      ? "#E2E8F0"
-                                      : "#334155",
-                                }}
-                              >
-                                {dropdownItem.label}
-                              </Link>
-                            );
-                          })}
-                        </div>
-                      )}
-                    </div>
-                  );
-                }
-
-                return (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    onClick={() => setMobileNavOpen(false)}
-                    className={cn(
-                      "flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors",
-                      isActive ? "bg-blue-500/10 text-blue-700 dark:bg-cyan-400/10 dark:text-cyan-300" : "hover:bg-gray-100 dark:hover:bg-white/5"
-                    )}
-                    style={{ color: isActive ? (theme === "dark" ? "#25c6e8" : "#1680ff") : (!mounted || theme === 'dark') ? '#E2E8F0' : '#334155' }}
-                  >
-                    {item.img && (
-                      <img
-                        src={item.img}
-                        alt={item.label}
-                        className="h-5 w-5"
-                      />
-                    )}
-                    {item.label}
-                  </Link>
-                );
-              })}
-            </nav>
-          </div>
-        </div>
-      )}
-      {loadingInvestmentFund && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-[#050505]/75 px-4 backdrop-blur-sm">
-          <div className="flex h-28 w-28 items-center justify-center rounded-full border border-blue-400/20 bg-[#0B1021] shadow-2xl shadow-blue-500/10">
-            <div className="flex h-14 w-14 items-center justify-center rounded-full border border-cyan-400/20 bg-cyan-400/10">
-              <Loader2 className="h-7 w-7 animate-spin text-[#25c6e8]" aria-hidden />
-            </div>
-          </div>
-        </div>
-      )}
     </header>
   );
 }
