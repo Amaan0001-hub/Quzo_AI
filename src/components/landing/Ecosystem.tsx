@@ -23,14 +23,14 @@ type EcosystemItem = {
   text: string;
 };
 
-const ITEMS: EcosystemItem[] = [
+const ITEMS = [
   { id: "chain", name: "QUZO CHAIN", icon: Blocks, tag: "Infrastructure", text: "EVM-compatible blockchain infrastructure supporting smart contracts and decentralised applications." },
   { id: "ai", name: "QUZO AI", icon: BrainCircuit, tag: "Intelligence", text: "Market analysis, insights and configurable trading strategies." },
   { id: "trade", name: "QUZO TRADE", icon: CandlestickChart, tag: "Markets", text: "Interface for supported cryptocurrency trading integrations." },
   { id: "wallet", name: "QUZO WALLET", icon: Wallet, tag: "Access", text: "Digital-asset management and ecosystem access." },
   { id: "defi", name: "QUZO DEFI", icon: ArrowLeftRight, tag: "Planned", text: "Planned swaps, liquidity and decentralised financial applications." },
   { id: "liquidity", name: "QUZO LIQUIDITY", icon: Waves, tag: "Planned", text: "Planned liquidity coordination for supported applications." },
-];
+] satisfies [EcosystemItem, ...EcosystemItem[]];
 
 const ease: [number, number, number, number] = [0.22, 1, 0.36, 1];
 const navBtn =
@@ -42,7 +42,7 @@ type PanelProps = {
 };
 
 const Panel = ({ active, select }: PanelProps) => {
-  const it = ITEMS[active];
+  const it = ITEMS[active] ?? ITEMS[0];
   const Icon = it.icon;
   const go = (d: number) => select((active + d + ITEMS.length) % ITEMS.length);
 
