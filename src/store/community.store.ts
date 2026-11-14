@@ -37,6 +37,30 @@ interface LeftRightDownlineMember {
   CountryFlag?: string;
 }
 
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
+function getLeftRightRows(payload: unknown): LeftRightDownlineMember[] {
+  let value = payload;
+  for (let depth = 0; depth < 5 && isRecord(value); depth += 1) {
+    if (value.success === false) {
+      throw new Error(
+        typeof value.message === "string"
+          ? value.message
+          : "Failed to fetch left/right downline data",
+      );
+    }
+    value = value.data;
+  }
+
+  if (!Array.isArray(value)) {
+    throw new Error("Left/right downline response has an invalid format.");
+  }
+
+  return value.filter((row): row is LeftRightDownlineMember => isRecord(row));
+}
+
 interface CommunityState {
   directMemberData: DirectMember[];
   personalTeamData: PersonalTeamMember[];
@@ -51,7 +75,11 @@ interface CommunityState {
   clearDirectMemberData: () => void;
   clearPersonalTeamData: () => void;
   clearLeftRightData: () => void;
-  fetchLeftRightData: (params: { uRank?: string; lvl?: string; statusId?: string }) => Promise<void>;
+  fetchLeftRightData: (params: {
+    uRank?: string;
+    lvl?: string;
+    statusId?: string;
+  }) => Promise<void>;
 }
 
 export const useCommunityStore = create<CommunityState>((set) => ({
@@ -79,19 +107,24 @@ export const useCommunityStore = create<CommunityState>((set) => ({
         body: JSON.stringify({
           uRank: params.uRank || "",
           lvl: params.lvl || "",
-          statusId: params.statusId || ""
+          statusId: params.statusId || "",
         }),
       });
 
-      const data = await response.json();
+      const payload: unknown = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.message || "Failed to fetch left/right downline data");
+        throw new Error(
+          isRecord(payload) && typeof payload.message === "string"
+            ? payload.message
+            : "Failed to fetch left/right downline data",
+        );
       }
 
-      set({ leftRightData: data.data || data, loading: false });
+      set({ leftRightData: getLeftRightRows(payload), loading: false });
     } catch (error) {
       set({
+        leftRightData: [],
         error: error instanceof Error ? error.message : "Failed to fetch left/right downline data",
         loading: false,
       });

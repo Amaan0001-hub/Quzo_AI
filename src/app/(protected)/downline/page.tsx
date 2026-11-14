@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import { useCommunityStore } from "@/store/community.store";
 
 const DownlineAffilates = () => {
-  const { leftRightData, loading, fetchLeftRightData } = useCommunityStore();
+  const { leftRightData, loading, error, fetchLeftRightData } = useCommunityStore();
 
   const [selectedLevel, setSelectedLevel] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
@@ -41,7 +41,7 @@ const DownlineAffilates = () => {
   };
 
   // ---------------- CLEAN TABLE DATA ----------------
-  const rawData = leftRightData;
+  const rawData = Array.isArray(leftRightData) ? leftRightData : [];
 
   // NOTE: level filtering ab server-side (Submit button) se hota hai.
   // Sirf search client-side rehta hai kyunki wo turant filter hona chahiye.
@@ -133,6 +133,14 @@ const DownlineAffilates = () => {
                 />
               </div>
             </div>
+            {error && (
+              <p
+                role="alert"
+                className="mb-4 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700 dark:bg-red-900/20 dark:text-red-300"
+              >
+                {error}
+              </p>
+            )}
             {/* TABLE */}
             <div className="overflow-x-auto rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm">
               <table className="min-w-full">

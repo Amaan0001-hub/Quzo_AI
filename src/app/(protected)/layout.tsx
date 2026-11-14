@@ -6,7 +6,7 @@ import { MobileSidebar } from "@/components/layout/MobileSidebar";
 
 export default function ProtectedLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="flex min-h-screen flex-col bg-background">
+    <div className="protected-app flex min-h-screen flex-col bg-background text-foreground">
       <Navbar />
       <div className="flex flex-1 items-stretch">
         <MobileSidebar />
