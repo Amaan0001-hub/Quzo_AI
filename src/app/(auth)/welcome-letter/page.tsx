@@ -63,13 +63,13 @@ export default function WelcomeLetter() {
               <div className="p-6 sm:p-8 md:p-10">
                 {/* ═══ Header ═══ */}
                 <div className="flex flex-col items-center text-center mb-8">
-                  <Link href="/" className="mb-5">
+                  {/* <Link href="/" className="mb-5">
                     <ThemeLogo
                       width={150}
                       height={64}
                       className="h-auto w-36 sm:w-44"
                     />
-                  </Link>
+                  </Link> */}
 
                   {/* "WELCOME" badge */}
                   <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-[#d4a017]/40 bg-[#d4a017]/5 mb-4">
@@ -100,13 +100,13 @@ export default function WelcomeLetter() {
 
                 <div className="mb-8 space-y-4 text-start">
                   <p className="text-base leading-relaxed text-slate-300">
-                    Welcome to Fyntix, {userName}!
+                    Welcome to Quzo, {userName}!
                     <br />
                     We&apos;re thrilled to have you on board.
                   </p>
                   <p className="text-slate-400">
                     The future isn&apos;t coming — it&apos;s already here, and it&apos;s Agentic.
-                    With Fyntix, you now have access to a powerful ecosystem
+                    With Quzo, you now have access to a powerful ecosystem
                     where AI agents work for you, generate consistent rewards, and
                     free up your time for what truly matters — your personal growth,
                     strategic planning, family moments, and much more.
@@ -118,7 +118,7 @@ export default function WelcomeLetter() {
                     Let them earn while you live smarter.
                   </p>
                   <p className="text-slate-400">
-                    Fyntix isn&apos;t just a platform — it&apos;s your gateway into the
+                    Quzo isn&apos;t just a platform — it&apos;s your gateway into the
                     Agent Era, where wealth creation meets automation and innovation.
                   </p>
 

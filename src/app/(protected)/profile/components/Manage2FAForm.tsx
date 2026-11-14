@@ -205,7 +205,7 @@ export function Manage2FAForm() {
 
     try {
       const totp = new OTPAuth.TOTP({
-        issuer: "FYNTIX",
+        issuer: "QUZO",
         label: "user",
         algorithm: "SHA1",
         digits: 6,

@@ -1352,7 +1352,7 @@ export default function FundDirectorPage() {
     }
   };
 
-  const submitSelfDeposit = async (asset: "USDT" | "Fyntix") => {
+  const submitSelfDeposit = async (asset: "USDT" | "Quzo") => {
     const balance = asset === "USDT" ? selfBalances.usdt : selfBalances.velt;
     // if (balance < 10) {
     //   toast.error(`A minimum ${asset} balance of 10 is required to submit a deposit.`);
@@ -1801,7 +1801,7 @@ export default function FundDirectorPage() {
                         </div>
                         <div className="flex flex-col items-center gap-2">
                           <div className="min-w-0 flex-none rounded-xl border border-slate-200 bg-white px-3 py-2 dark:border-slate-700 dark:bg-slate-900">
-                            <p className="text-[11px] text-slate-500 dark:text-slate-400">FYNTIX Balance</p>
+                            <p className="text-[11px] text-slate-500 dark:text-slate-400">QUZO Balance</p>
                             <p className="mt-0.5 text-sm font-semibold text-slate-900 dark:text-white">
                               {money(selfBalances.velt)}
                             </p>
@@ -1809,11 +1809,11 @@ export default function FundDirectorPage() {
                           <PrimaryButton
                             type="button"
                             disabled={isSubmittingSelfDeposit}
-                            onClick={() => void submitSelfDeposit("Fyntix")}
+                            onClick={() => void submitSelfDeposit("Quzo")}
                             className="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg border border-slate-300 bg-white px-5 py-2.5 text-sm font-semibold text-slate-700 shadow-sm transition hover:-translate-y-0.5 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700"
                           >
                             <ArrowDownLeft className="h-4 w-4" />
-                            {isSubmittingSelfDeposit ? "Processing..." : "FYNTIX Deposit"}
+                            {isSubmittingSelfDeposit ? "Processing..." : "QUZO Deposit"}
                           </PrimaryButton>
                         </div>
                       </div>
@@ -2125,9 +2125,9 @@ export default function FundDirectorPage() {
                       ? "Transfer confirmation"
                       : `${incomeWallet === "income" ? "Income" : "Mentor"} Wallet Balance`}
                   </p>
-                  <p className="text-sm font-semibold text-slate-700 dark:text-slate-300">
+                  <p className="text-sm font-semibold text-slate-700 dark:text-white">
                     Balance:{" "}
-                    <span className="bg-gradient-to-r from-[#1680ff] via-[#25c6e8] to-[#7d75ff] bg-clip-text text-transparent">
+                    <span className="text-slate-700 dark:text-white bg-gradient-to-r from-[#1680ff] via-[#25c6e8] to-[#7d75ff] bg-clip-text text-transparent">
                       {money(otpSent ? balances.deposit : balances[incomeWallet === "income" ? "performance" : "mentor"])}
                     </span>
                   </p>
@@ -2218,7 +2218,7 @@ export default function FundDirectorPage() {
                   </h2>
                   <div className="rounded-xl border border-blue-100/70 bg-gradient-to-r from-blue-50/70 to-violet-50/70 px-4 py-2 text-sm font-semibold text-slate-700 dark:border-blue-800/30 dark:from-blue-900/10 dark:to-violet-900/10 dark:text-slate-300">
                     Balance:{" "}
-                    <span className="bg-gradient-to-r from-[#1680ff] via-[#25c6e8] to-[#7d75ff] bg-clip-text text-transparent">
+                    <span className="text-slate-700 dark:text-slate-100 bg-gradient-to-r from-[#1680ff] via-[#25c6e8] to-[#7d75ff] bg-clip-text text-transparent">
                       {money(balances.deposit)}
                     </span>
                   </div>
@@ -2373,9 +2373,9 @@ export default function FundDirectorPage() {
                       <option value="mentor">Mentor Wallet</option>
                     </select>
                   </label>
-                  <div className="whitespace-nowrap text-sm font-semibold text-slate-700 dark:text-slate-300">
+                  <div className="whitespace-nowrap text-sm font-semibold text-slate-700 dark:text-slate-100">
                     Balance:{" "}
-                    <span className="bg-gradient-to-r from-[#1680ff] via-[#25c6e8] to-[#7d75ff] bg-clip-text text-transparent">
+                    <span className="text-slate-700 dark:text-slate-100 bg-gradient-to-r from-[#1680ff] via-[#25c6e8] to-[#7d75ff] bg-clip-text text-transparent">
                       {money(balances[withdrawWallet])}
                     </span>
                   </div>

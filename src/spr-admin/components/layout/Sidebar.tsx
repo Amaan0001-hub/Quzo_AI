@@ -113,7 +113,7 @@ export function Sidebar() {
         <div className="flex items-center justify-center">
           <Image
             src="/logos/fyntix-logo-dark.png"
-            alt="Fyntix"
+            alt="Quzo"
             width={160}
             height={64}
             className={cn(
@@ -124,7 +124,7 @@ export function Sidebar() {
           />
           <Image
             src="/logos/fyntix-logo-light.png"
-            alt="Fyntix"
+            alt="Quzo"
             width={160}
             height={64}
             className={cn(

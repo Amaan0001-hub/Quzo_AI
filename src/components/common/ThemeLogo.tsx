@@ -12,7 +12,7 @@ export function ThemeLogo({ width, height, className, priority = false }: ThemeL
     <>
       <Image
         src="/logos/fyntix-logo-light.png"
-        alt="Fyntix"
+        alt="Quzo"
         width={width}
         height={height}
         className={`block dark:hidden ${className ?? ""}`}
@@ -20,7 +20,7 @@ export function ThemeLogo({ width, height, className, priority = false }: ThemeL
       />
       <Image
         src="/logos/fyntix-logo-dark.png"
-        alt="Fyntix"
+        alt="Quzo"
         width={width}
         height={height}
         className={`hidden dark:block ${className ?? ""}`}

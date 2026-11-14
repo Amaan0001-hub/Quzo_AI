@@ -4,11 +4,11 @@ import { useEffect, useRef, useState } from "react";
 
 const faqs = [
   {
-    q: "Is Fyntix secure?",
+    q: "Is Quzo secure?",
     a: "Yes. We use encrypted access, strict admin controls, and continuous monitoring to protect every trader's account.",
   },
   {
-    q: "How do I get started on Fyntix?",
+    q: "How do I get started on Quzo?",
     a: "Create an account, complete verification, add funds, and you're ready to explore the markets and place your first trade.",
   },
   {
@@ -20,8 +20,8 @@ const faqs = [
     a: "Yes. Your dashboard gives you full, real-time visibility into your account, open positions, and complete trade history.",
   },
   {
-    q: "Does Fyntix give trading advice?",
-    a: "No. Fyntix is a self-directed trading platform. We provide the tools, data, and execution — every trade decision is yours to make.",
+    q: "Does Quzo give trading advice?",
+    a: "No. Quzo is a self-directed trading platform. We provide the tools, data, and execution — every trade decision is yours to make.",
   },
 ];
 
