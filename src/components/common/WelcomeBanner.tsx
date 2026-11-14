@@ -30,19 +30,17 @@ export const WelcomeBanner = () => {
 
   const initials = getInitials(fullName);
 
-  if (pathname === "/dashboard") return null;
-
   return (
     <div className="relative px-1 py-2 transition-colors duration-300 sm:px-2 sm:py-3 md:px-3 lg:px-4">
-      <div className="relative overflow-hidden rounded-2xl border border-blue-200/70 bg-white/90 shadow-lg backdrop-blur-sm transition-all duration-300 hover:-translate-y-0.5 hover:shadow-xl hover:shadow-blue-500/20 dark:border-blue-900/50 dark:bg-gray-800/90 sm:rounded-3xl">
+      <div className="relative overflow-hidden rounded-2xl border border-[#12a594]/20 bg-white/90 shadow-lg backdrop-blur-sm transition-all duration-300 hover:-translate-y-0.5 hover:shadow-xl hover:shadow-[#12a594]/20 dark:border-[#7ff0cf]/15 dark:bg-[#07242e]/90 sm:rounded-3xl">
         {/* Decorative gradient overlay */}
         <div className="pointer-events-none absolute inset-0 opacity-30">
-          <div className="absolute -right-20 -top-20 h-64 w-64 rounded-full bg-blue-400/10 blur-3xl dark:bg-blue-500/5"></div>
-          <div className="absolute -bottom-20 -left-20 h-64 w-64 rounded-full bg-purple-400/10 blur-3xl dark:bg-purple-500/5"></div>
+          <div className="absolute -right-20 -top-20 h-64 w-64 rounded-full bg-[#35d6c0]/10 blur-3xl dark:bg-[#35d6c0]/5"></div>
+          <div className="absolute -bottom-20 -left-20 h-64 w-64 rounded-full bg-[#1f5f7a]/10 blur-3xl dark:bg-[#1f5f7a]/20"></div>
         </div>
 
         {/* Gradient line at top */}
-        <div className="absolute left-0 top-0 h-0.5 w-full bg-gradient-to-r from-[#1680ff] via-[#25c6e8] to-[#7d75ff]"></div>
+        <div className="absolute left-0 top-0 h-0.5 w-full bg-gradient-to-r from-[#12a594] via-[#35d6c0] to-[#1f5f7a]"></div>
 
         <div className="relative p-3 sm:p-4 md:p-5 lg:p-6">
           <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-3">
@@ -50,7 +48,7 @@ export const WelcomeBanner = () => {
             <div className="min-w-0 flex-1">
               <div className="mb-2 flex items-center gap-3">
                 <div className="relative flex-shrink-0">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-r from-[#1680ff] via-[#25c6e8] to-[#7d75ff] text-sm font-bold text-white shadow-lg shadow-blue-500/25 sm:h-12 sm:w-12 sm:text-base">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-r from-[#12a594] via-[#35d6c0] to-[#1f5f7a] text-sm font-bold text-white shadow-lg shadow-[#12a594]/25 sm:h-12 sm:w-12 sm:text-base">
                     {initials || "U"}
                   </div>
                   <div className="absolute -bottom-0.5 -right-0.5 h-3.5 w-3.5 animate-pulse rounded-full border-2 border-white bg-emerald-500 dark:border-gray-800"></div>
@@ -63,7 +61,7 @@ export const WelcomeBanner = () => {
                     <span className="text-sm font-bold capitalize text-gray-800 dark:text-white sm:text-base">
                       {fullName || "User"}
                     </span>
-                    <span className="rounded-full border border-blue-200 bg-blue-50 px-2 py-0.5 font-mono text-xs text-blue-700 dark:border-blue-800/50 dark:bg-blue-900/30 dark:text-cyan-300">
+                    <span className="rounded-full border border-[#12a594]/20 bg-[#12a594]/5 px-2 py-0.5 font-mono text-xs text-[#087f73] dark:border-[#7ff0cf]/20 dark:bg-[#7ff0cf]/10 dark:text-[#7ff0cf]">
                       {authLogin || "N/A"}
                     </span>
                   </div>
@@ -76,7 +74,7 @@ export const WelcomeBanner = () => {
               {pathname === "/buy-agent-license" ? (
                 <button
                   onClick={() => router.push("/ai-tools")}
-                  className="group relative flex transform items-center gap-2 overflow-hidden rounded-xl bg-gradient-to-r from-[#1680ff] via-[#25c6e8] to-[#7d75ff] px-4 py-2.5 text-xs font-semibold text-white shadow-lg shadow-blue-500/25 transition-all duration-300 hover:scale-[1.02] hover:shadow-xl hover:shadow-blue-500/30 hover:brightness-110 active:scale-[0.98] sm:px-6 sm:py-3 sm:text-sm"
+                  className="group relative flex transform items-center gap-2 overflow-hidden rounded-xl bg-gradient-to-r from-[#12a594] via-[#35d6c0] to-[#1f5f7a] px-4 py-2.5 text-xs font-semibold text-white shadow-lg shadow-[#12a594]/25 transition-all duration-300 hover:scale-[1.02] hover:shadow-xl hover:shadow-[#12a594]/30 hover:brightness-110 active:scale-[0.98] sm:px-6 sm:py-3 sm:text-sm"
                 >
                   <span className="absolute inset-0 h-full w-full -translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent transition-transform duration-1000 group-hover:translate-x-full"></span>
                   <RiBrainLine
@@ -88,7 +86,7 @@ export const WelcomeBanner = () => {
               ) : (
                 <button
                   onClick={() => setIsOpen(true)}
-                  className="group relative inline-flex items-center justify-center gap-2 overflow-hidden rounded-xl bg-gradient-to-r from-[#1680ff] via-[#25c6e8] to-[#7d75ff] px-4 py-2.5 text-xs font-semibold text-white shadow-md shadow-blue-500/25 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-blue-500/40 sm:px-6 sm:py-3 sm:text-sm"
+                  className="group relative inline-flex items-center justify-center gap-2 overflow-hidden rounded-xl bg-gradient-to-r from-[#12a594] via-[#35d6c0] to-[#1f5f7a] px-4 py-2.5 text-xs font-semibold text-white shadow-md shadow-[#12a594]/25 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-[#12a594]/40 sm:px-6 sm:py-3 sm:text-sm"
                 >
                   <span className="absolute inset-0 h-full w-full -translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent transition-transform duration-1000 group-hover:translate-x-full"></span>
                   <FiUserPlus
@@ -109,8 +107,8 @@ export const WelcomeBanner = () => {
           <div className="animate-in slide-in-from-top-4 relative w-full max-w-lg rounded-3xl border border-gray-200/50 bg-white p-6 shadow-2xl duration-300 dark:border-gray-700/50 dark:bg-gray-800 sm:p-8">
             {/* Decorative gradient overlay */}
             <div className="pointer-events-none absolute inset-0 overflow-hidden rounded-3xl">
-              <div className="absolute -right-20 -top-20 h-48 w-48 rounded-full bg-blue-400/5 blur-2xl dark:bg-blue-500/5"></div>
-              <div className="absolute -bottom-20 -left-20 h-48 w-48 rounded-full bg-purple-400/5 blur-2xl dark:bg-purple-500/5"></div>
+              <div className="absolute -right-20 -top-20 h-48 w-48 rounded-full bg-[#35d6c0]/5 blur-2xl dark:bg-[#35d6c0]/5"></div>
+              <div className="absolute -bottom-20 -left-20 h-48 w-48 rounded-full bg-[#1f5f7a]/5 blur-2xl dark:bg-[#1f5f7a]/10"></div>
             </div>
 
             {/* Close Button */}
@@ -131,7 +129,7 @@ export const WelcomeBanner = () => {
             {/* Modal Header */}
             <div className="relative mb-4">
               <div className="flex items-center gap-3">
-                <div className="rounded-xl bg-gradient-to-br from-[#1680ff] via-[#25c6e8] to-[#7d75ff] p-2.5 shadow-lg shadow-blue-500/25">
+                <div className="rounded-xl bg-gradient-to-br from-[#12a594] via-[#35d6c0] to-[#1f5f7a] p-2.5 shadow-lg shadow-[#12a594]/25">
                   <FiUserPlus className="h-5 w-5 text-white" />
                 </div>
                 <div>

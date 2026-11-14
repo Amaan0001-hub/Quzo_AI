@@ -3,9 +3,62 @@
 import { useEffect, useState, type MouseEvent } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { ChevronDown, Loader2, X } from "lucide-react";
+import {
+  Award,
+  Bot,
+  BrainCircuit,
+  BriefcaseBusiness,
+  ChartNoAxesCombined,
+  ChevronDown,
+  Circle,
+  Coins,
+  Files,
+  GitBranch,
+  House,
+  LayoutDashboard,
+  Loader2,
+  LogOut,
+  Network,
+  PackageOpen,
+  PanelsTopLeft,
+  ScrollText,
+  UserRoundPlus,
+  UsersRound,
+  WalletCards,
+  Wrench,
+  type LucideIcon,
+} from "lucide-react";
 import { primaryNav } from "@/config/navigation";
+import { useLogout } from "@/features/auth/hooks/useLogout";
 import { useSidebarStore } from "@/store/sidebar.store";
+
+const menuIcons: Record<string, LucideIcon> = {
+  Home: House,
+  Dashboard: LayoutDashboard,
+  Packages: PackageOpen,
+  "Investment Fund": Coins,
+  "Investment Fund ": Coins,
+  "Order History": ScrollText,
+  "Fund Director": BriefcaseBusiness,
+  Tools: Wrench,
+  "AI Engine": BrainCircuit,
+  "AI Assistant": Bot,
+  Analytics: ChartNoAxesCombined,
+  Affiliate: UsersRound,
+  "Business Dashboard": PanelsTopLeft,
+  "Direct Partners": UserRoundPlus,
+  "Level Tree": GitBranch,
+  "Downline Partners": Network,
+  Reports: Files,
+  "Income Report": ChartNoAxesCombined,
+  "Wallet Manager": WalletCards,
+  Rank: Award,
+};
+
+function MenuIcon({ label, className }: { label: string; className?: string }) {
+  const Icon = menuIcons[label] ?? Circle;
+  return <Icon className={className ?? "h-5 w-5"} aria-hidden="true" />;
+}
 
 function isNavPathActive(pathname: string, href: string) {
   return pathname === href || (href !== "/" && pathname.startsWith(`${href}/`));
@@ -22,6 +75,7 @@ export function MobileSidebar() {
   const router = useRouter();
   const isMobileOpen = useSidebarStore((state) => state.isMobileOpen);
   const setMobileOpen = useSidebarStore((state) => state.setMobileOpen);
+  const logout = useLogout();
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   const [loadingInvestmentFund, setLoadingInvestmentFund] = useState(false);
 
@@ -57,25 +111,14 @@ export function MobileSidebar() {
       )}
       <aside
         id="primary-navigation"
-        className={`fixed left-0 top-16 z-40 h-[calc(100vh-4rem)] w-64 shrink-0 overflow-y-auto border-r border-gray-200 bg-white transition-[transform,visibility] dark:border-[#1E293B] dark:bg-[#0B1021] lg:sticky lg:top-16 lg:z-auto lg:block ${
+        className={`fixed left-0 top-16 z-40 flex h-[calc(100vh-4rem)] w-64 shrink-0 flex-col overflow-y-auto border-r border-gray-200 bg-white transition-[transform,visibility] dark:border-[#1E293B] dark:bg-[#0B1021] lg:sticky lg:top-16 lg:z-auto lg:block ${
           isMobileOpen
             ? "visible translate-x-0"
             : "invisible -translate-x-full lg:visible lg:translate-x-0"
         }`}
         aria-label="Primary navigation"
       >
-        <div className="flex items-center justify-between border-b border-gray-200 p-4 dark:border-[#1E293B] lg:hidden">
-          <span className="font-semibold text-slate-800 dark:text-slate-100">Menu</span>
-          <button
-            type="button"
-            onClick={() => setMobileOpen(false)}
-            className="rounded-md p-2 text-slate-600 hover:bg-gray-100 dark:text-slate-300 dark:hover:bg-white/5"
-            aria-label="Close menu"
-          >
-            <X className="h-5 w-5" />
-          </button>
-        </div>
-        <nav className="space-y-1 p-4">
+        <nav className="flex-1 space-y-1 p-4">
           {primaryNav.map((item) => {
             const isActive = isNavItemActive(pathname, item);
             const isDropdownOpen = openDropdown === item.label;
@@ -86,15 +129,19 @@ export function MobileSidebar() {
                   <button
                     type="button"
                     onClick={() => setOpenDropdown(isDropdownOpen ? null : item.label)}
-                    className={`flex w-full items-center justify-between gap-3 rounded-lg px-4 py-3 text-left text-sm font-medium transition-colors ${
+                    className={`flex w-full items-center justify-between gap-3 rounded-2xl px-4 py-3 text-left text-sm font-medium transition-all ${
                       isActive
-                        ? "bg-blue-500/10 text-blue-700 dark:bg-cyan-400/10 dark:text-cyan-300"
-                        : "text-slate-700 hover:bg-gray-100 dark:text-slate-200 dark:hover:bg-white/5"
+                        ? "bg-gradient-to-r from-[#12a594] to-[#32d3bd] text-white shadow-[0_12px_24px_rgba(18,165,148,0.25)]"
+                        : "text-slate-700 hover:bg-[#12a594]/5 dark:text-slate-200 dark:hover:bg-[#7ff0cf]/[0.06]"
                     }`}
                     aria-expanded={isDropdownOpen}
                   >
                     <span className="flex items-center gap-3">
-                      {item.img && <img src={item.img} alt="" className="h-5 w-5" />}
+                      {item.img ? (
+                        <img src={item.img} alt="" className="h-5 w-5" />
+                      ) : (
+                        <MenuIcon label={item.label} className="h-5 w-5 shrink-0" />
+                      )}
                       {item.label}
                     </span>
                     <ChevronDown
@@ -114,12 +161,13 @@ export function MobileSidebar() {
                             href={dropdownItem.href}
                             onClick={(event) => handleNavigation(event, dropdownItem.href)}
                             aria-current={isDropdownItemActive ? "page" : undefined}
-                            className={`block rounded-lg px-4 py-2 text-sm transition-colors ${
+                            className={`flex items-center gap-3 rounded-xl px-4 py-2 text-sm transition-all ${
                               isDropdownItemActive
-                                ? "bg-blue-500/10 font-semibold text-blue-700 dark:bg-cyan-400/10 dark:text-cyan-300"
-                                : "text-slate-600 hover:bg-gray-100 dark:text-slate-300 dark:hover:bg-white/5"
+                                ? "bg-gradient-to-r from-[#12a594] to-[#32d3bd] font-semibold text-white shadow-[0_8px_18px_rgba(18,165,148,0.2)]"
+                                : "text-slate-600 hover:bg-[#12a594]/5 dark:text-slate-300 dark:hover:bg-[#7ff0cf]/[0.06]"
                             }`}
                           >
+                            <MenuIcon label={dropdownItem.label} className="h-4 w-4 shrink-0" />
                             {dropdownItem.label}
                           </Link>
                         );
@@ -136,24 +184,41 @@ export function MobileSidebar() {
                 href={item.href}
                 onClick={(event) => handleNavigation(event, item.href)}
                 aria-current={isActive ? "page" : undefined}
-                className={`flex items-center gap-3 rounded-lg px-4 py-3 text-sm font-medium transition-colors ${
+                className={`flex items-center gap-3 rounded-2xl px-4 py-3 text-base font-medium transition-all ${
                   isActive
-                    ? "bg-blue-500/10 text-blue-700 dark:bg-cyan-400/10 dark:text-cyan-300"
-                    : "text-slate-700 hover:bg-gray-100 dark:text-slate-200 dark:hover:bg-white/5"
+                    ? "bg-gradient-to-r from-[#12a594] to-[#32d3bd] text-white shadow-[0_12px_24px_rgba(18,165,148,0.25)]"
+                    : "text-slate-700 hover:bg-[#12a594]/5 dark:text-slate-200 dark:hover:bg-[#7ff0cf]/[0.06]"
                 }`}
               >
-                {item.img && <img src={item.img} alt="" className="h-5 w-5" />}
+                {item.img ? (
+                  <img src={item.img} alt="" className="h-5 w-5" />
+                ) : (
+                  <MenuIcon label={item.label} className="h-5 w-5 shrink-0" />
+                )}
                 {item.label}
               </Link>
             );
           })}
         </nav>
+        <div className="mt-auto border-t border-gray-200 p-4 dark:border-[#1E293B]">
+          <button
+            type="button"
+            onClick={() => {
+              setMobileOpen(false);
+              logout.mutate();
+            }}
+            className="flex w-full items-center gap-3 rounded-2xl px-4 py-3 text-base font-medium text-rose-600 transition-colors hover:bg-rose-500/10 dark:text-rose-400"
+          >
+            <LogOut className="h-5 w-5 shrink-0" aria-hidden="true" />
+            Logout
+          </button>
+        </div>
       </aside>
       {loadingInvestmentFund && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-[#050505]/75 px-4 backdrop-blur-sm">
-          <div className="flex h-28 w-28 items-center justify-center rounded-full border border-blue-400/20 bg-[#0B1021] shadow-2xl shadow-blue-500/10">
-            <div className="flex h-14 w-14 items-center justify-center rounded-full border border-cyan-400/20 bg-cyan-400/10">
-              <Loader2 className="h-7 w-7 animate-spin text-[#25c6e8]" aria-hidden />
+          <div className="flex h-28 w-28 items-center justify-center rounded-full border border-[#7ff0cf]/20 bg-[#0B1021] shadow-2xl shadow-[#12a594]/10">
+            <div className="flex h-14 w-14 items-center justify-center rounded-full border border-[#7ff0cf]/20 bg-[#7ff0cf]/10">
+              <Loader2 className="h-7 w-7 animate-spin text-[#7ff0cf]" aria-hidden />
             </div>
           </div>
         </div>

@@ -4,6 +4,7 @@ import { FiCopy, FiHelpCircle } from "react-icons/fi";
 import { Link as LinkIcon } from "lucide-react";
 import { FaWhatsapp, FaFacebookF, FaTwitter, FaTelegramPlane, FaFilePdf } from "react-icons/fa";
 import { toast } from "sonner";
+import { useEffect, useState } from "react";
 import { useAuthStore } from "@/store/auth.store";
 import { useDashboardSummary } from "@/features/dashboard/hooks/useDashboardSummary";
 
@@ -11,10 +12,20 @@ const ReferralLink = () => {
   const { user } = useAuthStore();
   const { data: dashboardData } = useDashboardSummary();
   const authLogin = dashboardData?.data?.[0]?.AuthLogin || user?.email || "user123";
-  const referralLink = `https://fyntix.club/register?RefID=${authLogin}`;
+  const [origin, setOrigin] = useState("");
+
+  useEffect(() => {
+    setOrigin(window.location.origin);
+  }, []);
+
+  const referralLink = origin
+    ? `${origin}/register?${new URLSearchParams({ RefID: authLogin }).toString()}`
+    : "";
 
   const handleCopyClick = () => {
-    const fullMessage = `🚀 𝐉𝐨𝐢𝐧 Fyntix – 𝐄𝐦𝐩𝐨𝐰𝐞𝐫𝐢𝐧𝐠 𝐭𝐡𝐞 𝐅𝐮𝐭𝐮𝐫𝐞 𝐨𝐟 𝐓𝐫𝐚𝐝𝐢𝐧𝐠.
+    if (!referralLink) return;
+
+    const fullMessage = `🚀 𝐉𝐨𝐢𝐧 Quzo – 𝐄𝐦𝐩𝐨𝐰𝐞𝐫𝐢𝐧𝐠 𝐭𝐡𝐞 𝐅𝐮𝐭𝐮𝐫𝐞 𝐨𝐟 𝐓𝐫𝐚𝐝𝐢𝐧𝐠.
      Start your trading journey today and explore exciting market opportunities. Sign up using my referral link and unlock exclusive rewards:
 👉 ${referralLink}`;
     navigator.clipboard
@@ -28,6 +39,7 @@ const ReferralLink = () => {
   };
 
   const handleCopy = () => {
+    if (!referralLink) return;
     navigator.clipboard.writeText(referralLink);
     toast.success("copied to clipboard!");
   };
@@ -53,6 +65,7 @@ const ReferralLink = () => {
               readOnly
               value={referralLink}
               onClick={() => {
+                if (!referralLink) return;
                 window.open(referralLink, "_blank");
               }}
               className="w-full px-3 py-2 text-sm text-gray-800 bg-white border border-gray-300 rounded-lg cursor-pointer sm:flex-1 focus:outline-none"
@@ -95,7 +108,7 @@ const ReferralLink = () => {
           <a
             href={`https://wa.me/?text=${encodeURIComponent(
               `*AI is the future – and you can profit from it today!*
-Join Fyntix using my referral link: ${referralLink} Earn rewards by AI Marketing. Don't miss out!`
+Join Quzo using my referral link: ${referralLink} Earn rewards by AI Marketing. Don't miss out!`
             )}&media=${encodeURIComponent(
               "https://imagedelivery.net/nq9qT5FHZv9Sg48UUnD1-A/6db933b4-d8e8-4cb4-f94d-5ff7533aba00/public"
             )}`}
@@ -112,7 +125,7 @@ Join Fyntix using my referral link: ${referralLink} Earn rewards by AI Marketing
             href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(
               referralLink
             )}&quote=${encodeURIComponent(
-              "✨ *Imagine earning by AI Marketing!* Fyntix makes it possible. Join today using my referral link: Start your AI-powered income journey now! #AIRevolution #Fyntix #TechFuture"
+              "✨ *Imagine earning by AI Marketing!* Quzo makes it possible. Join today using my referral link: Start your AI-powered income journey now! #AIRevolution #Quzo #TechFuture"
             )}`}
             target="_blank"
             rel="noopener noreferrer"
@@ -125,10 +138,10 @@ Join Fyntix using my referral link: ${referralLink} Earn rewards by AI Marketing
           {/* Twitter/X */}
           <a
             href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(
-              "💡 *Own, Rent & Profit from AI Agents!* Join the world's first AI marketplace – Fyntix. Sign up now using my link and enjoy rewards:"
+              "💡 *Own, Rent & Profit from AI Agents!* Join the world's first AI marketplace – Quzo. Sign up now using my link and enjoy rewards:"
             )}&url=${encodeURIComponent(
               referralLink
-            )} 💡 *Own, Rent & Profit from AI Agents!* Join the world's first AI marketplace – Fyntix. Sign up now using my link and enjoy rewards:`}
+            )} 💡 *Own, Rent & Profit from AI Agents!* Join the world's first AI marketplace – Quzo. Sign up now using my link and enjoy rewards:`}
             target="_blank"
             rel="noopener noreferrer"
             className="text-white bg-[#000000] hover:bg-[#1DA1F2]/90 focus:ring-4 focus:outline-none focus:ring-[#1DA1F2]/50 font-medium rounded-lg text-sm px-2.5 py-1.5 text-center inline-flex items-center dark:focus:ring-[#1DA1F2]/55 me-2 mb-2"
@@ -150,7 +163,7 @@ Join Fyntix using my referral link: ${referralLink} Earn rewards by AI Marketing
             href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(
               referralLink
             )} 💡 *Own, Rent & Profit from AI Agents!*
-Join the world's first AI marketplace – Fyntix.
+Join the world's first AI marketplace – Quzo.
 Sign up now using my link and enjoy rewards:`}
             target="_blank"
             rel="noopener noreferrer"
@@ -171,7 +184,7 @@ Sign up now using my link and enjoy rewards:`}
             href={`https://t.me/share/url?url=${encodeURIComponent(
               referralLink
             )}&text=${encodeURIComponent(
-              "💡 *Own, Rent & Profit from AI Agents!* Join the world's first AI marketplace – Fyntix.Sign up now using my link and enjoy rewards"
+              "💡 *Own, Rent & Profit from AI Agents!* Join the world's first AI marketplace – Quzo.Sign up now using my link and enjoy rewards"
             )}`}
             target="_blank"
             rel="noopener noreferrer"
@@ -184,9 +197,9 @@ Sign up now using my link and enjoy rewards:`}
           {/* Email */}
           <a
             href={`mailto:?subject=${encodeURIComponent(
-              "🚀 *Work smarter with AI!* Join me on Fyntix and start earning."
+              "🚀 *Work smarter with AI!* Join me on Quzo and start earning."
             )}&body=${encodeURIComponent(
-              `Hi! I wanted to share this great opportunity with you. Join Fyntix using my referral link and start earning rewards: ${referralLink}`
+              `Hi! I wanted to share this great opportunity with you. Join Quzo using my referral link and start earning rewards: ${referralLink}`
             )}`}
             className="text-white bg-[#34495e] hover:bg-[#34495e]/90 focus:ring-4 focus:outline-none focus:ring-[#34495e]/50 font-medium rounded-lg text-sm px-2.5 py-1.5 text-center inline-flex items-center me-2 mb-2"
           >

@@ -2,9 +2,13 @@ import type { NavItem } from "@/types/common";
 
 export const primaryNav: NavItem[] = [
   {
+    label: "Home",
+    href: "/home",
+    icon: "home",
+  },
+  {
     label: "Dashboard",
     href: "/dashboard",
-    icon: "home",
   },
 
   {

@@ -13,7 +13,7 @@ interface ExecutionRow {
   latency: number;
 }
 
-const ACCENT_COLOR = "#1680ff";
+const ACCENT_COLOR = "#12a594";
 const CHAINS = [
   { name: "ALL", count: 60 },
   { name: "AVAX", count: 9 },

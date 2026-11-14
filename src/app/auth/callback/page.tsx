@@ -73,8 +73,8 @@ export default function AuthCallbackPage() {
           });
         }
 
-        window.history.replaceState({}, "", "/dashboard");
-        router.replace("/dashboard");
+        window.history.replaceState({}, "", "/home");
+        router.replace("/home");
       })
       .catch((err) => {
         console.error("Callback error:", err);

@@ -1,6 +1,7 @@
 import { apiClient } from "@/lib/api-client";
 
 export interface DashboardData {
+  QuzoWallet: number;
   statusCode: number;
   message: string;
   ActiveDirectIds: number;

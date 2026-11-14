@@ -1,0 +1,178 @@
+export const homeDashboardData = {
+  market: {
+    pairs: [
+      { symbol: "BTC/USDT", price: "67,928.42", change: "+0.71%" },
+      { symbol: "ETH/USDT", price: "3,521.86", change: "+1.24%" },
+      { symbol: "EUR/USD", price: "1.0842", change: "+0.18%" },
+      { symbol: "XAU/USD", price: "2,342.18", change: "+0.42%" },
+      { symbol: "QUZO/BTC", price: "0.00000444", change: "+3.12%" },
+    ],
+    chart:
+      "M0 186 L16 183 L33 180 L49 175 L65 172 L82 174 L98 160 L114 149 L131 143 L147 140 L163 145 L180 143 L196 136 L212 148 L229 148 L245 140 L261 126 L278 123 L294 109 L310 101 L327 93 L343 90 L359 78 L376 68 L392 74 L408 73 L425 61 L441 51 L457 41 L474 42 L490 32 L506 38 L522 52 L539 54 L555 47 L571 41 L588 41 L604 33 L620 30 L637 41 L653 44 L669 45 L686 41 L702 39 L718 29 L735 32 L751 25 L767 31 L784 24 L800 20",
+  },
+  package: {
+    name: "MEV Sandwich",
+    multiplier: "3× income cap",
+    investment: 1000,
+    totalIncomeCap: 3000,
+    remainingCap: 1754.4,
+    capUsedPercent: 41.5,
+  },
+  quzoPrice: {
+    value: "0.00000444",
+    unit: "BTC",
+    change: "+3.12%",
+    period: "24h",
+  },
+  income: {
+    total: 5684.03,
+    categories: [
+      {
+        name: "Direct Referral",
+        amount: 2184.5,
+        percent: 38,
+        change: "+8.4%",
+        today: 76.46,
+        month: 1267.01,
+        allTime: 2185,
+        color: "#12a594",
+        chart:
+          "M0 22 L8 25 L15 23 L23 23 L31 19 L38 23 L46 21 L54 19 L62 17 L69 21 L77 22 L85 19 L92 19 L100 20",
+      },
+      {
+        name: "Daily Profit",
+        amount: 1245.6,
+        percent: 22,
+        change: "+2.1%",
+        today: 43.6,
+        month: 722.45,
+        allTime: 1246,
+        color: "#3aa3c4",
+        chart:
+          "M0 20 L8 21 L15 21 L23 21 L31 18 L38 17 L46 14 L54 9 L62 8 L69 7 L77 8 L85 11 L92 12 L100 10",
+      },
+      {
+        name: "Level",
+        amount: 968.2,
+        percent: 17,
+        change: "+5.7%",
+        today: 33.89,
+        month: 561.56,
+        allTime: 968,
+        color: "#1f5f7a",
+        chart:
+          "M0 29 L8 28 L15 30 L23 29 L31 27 L38 21 L46 16 L54 20 L62 18 L69 13 L77 14 L85 13 L92 15 L100 10",
+      },
+      {
+        name: "Booster",
+        amount: 312.4,
+        percent: 5,
+        change: "+0.5%",
+        today: 10.93,
+        month: 181.19,
+        allTime: 312,
+        color: "#d9a441",
+        chart:
+          "M0 27 L8 24 L15 18 L23 17 L31 15 L38 14 L46 8 L54 10 L62 8 L69 9 L77 10 L85 5 L92 9 L100 10",
+      },
+      {
+        name: "DAO",
+        amount: 540,
+        percent: 10,
+        change: "+12%",
+        today: 18.9,
+        month: 313.2,
+        allTime: 540,
+        color: "#4a7f8f",
+        chart:
+          "M0 25 L8 20 L15 17 L23 15 L31 14 L38 8 L46 11 L54 11 L62 9 L69 5 L77 7 L85 7 L92 4 L100 4",
+      },
+      {
+        name: "Rewards",
+        amount: 250,
+        percent: 4,
+        change: "New",
+        today: 8.75,
+        month: 145,
+        allTime: 250,
+        color: "#8fc9cf",
+        chart:
+          "M0 24 L8 27 L15 25 L23 23 L31 22 L38 22 L46 23 L54 21 L62 19 L69 21 L77 23 L85 19 L92 15 L100 11",
+      },
+      {
+        name: "Salary",
+        amount: 183.33,
+        percent: 3,
+        change: "+1%",
+        today: 6.42,
+        month: 106.33,
+        allTime: 183,
+        color: "#1fa88a",
+        chart:
+          "M0 22 L8 23 L15 24 L23 21 L31 21 L38 16 L46 16 L54 12 L62 9 L69 7 L77 9 L85 11 L92 8 L100 11",
+      },
+    ],
+  },
+  team: {
+    activePercent: 70,
+    directActivePercent: 75,
+    total: 486,
+    active: 341,
+    inactive: 145,
+    directs: 12,
+    activeDirects: 9,
+    levelsOpen: 7,
+    levelsTotal: 20,
+    business: 184250,
+    businessChange: "+6.2%",
+    powerBusiness: 112600,
+    powerPercent: 61,
+    weakerBusiness: 71650,
+    weakerPercent: 39,
+    powerTeamId: "2,874,019",
+    newMembers: 24,
+  },
+  wallets: [
+    { name: "Working Wallet", value: 3480.75, note: "Available balance" },
+    { name: "Profit Wallet", value: 1245.6, note: "Available balance" },
+    { name: "USDT Wallet", value: 920, note: "Available balance" },
+    { name: "QUZO Wallet", value: 18420, note: "≈ $6,787.77", token: "QZ" },
+  ],
+  withdrawals: [
+    { name: "Working withdrawal", value: 3480.75 },
+    { name: "Profit withdrawal", value: 1245.6 },
+  ],
+  notifications: [
+    { text: "Daily profit credited: $41.52", time: "2 min ago" },
+    { text: "New direct partner joined: QZ-48213", time: "1 hr ago" },
+    { text: "Salary reward cycle 3 of 36 posted", time: "Today" },
+    { text: "DAO payout scheduled for Friday", time: "Tomorrow" },
+    { text: "Booster window opens in 6 hours", time: "Today" },
+  ],
+  news: [
+    {
+      headline: "Bitcoin holds above key support as ETF inflows continue",
+      source: "CoinWire",
+    },
+    {
+      headline: "EUR/USD steadies ahead of central bank commentary",
+      source: "FX Daily",
+    },
+    {
+      headline: "Cross-DEX arbitrage volume climbs on layer-2 networks",
+      source: "DeFi Pulse",
+    },
+    {
+      headline: "Gold edges higher as dollar softens",
+      source: "MarketBrief",
+    },
+    {
+      headline: "EVM networks report record daily active addresses",
+      source: "ChainView",
+    },
+    {
+      headline: "AI-driven execution gains share in on-chain trading",
+      source: "Ledger Post",
+    },
+  ],
+} as const;

@@ -364,10 +364,19 @@ function SearchModal({ onClose, onSearch }: { onClose: () => void; onSearch: (qu
 // ─── Signup Modal ───────────────────────────────────────────────────────────
 function SignupModal({ parentId, side, onClose }: { parentId: string; side: string; onClose: () => void }) {
   const positionCode = side === "left" ? "L" : "R";
-  const link = `https://kaliki-user.vercel.app/register?RefID=${parentId}&Position=${positionCode}`;
+  const [origin, setOrigin] = useState("");
   const [copied, setCopied] = useState(false);
 
+  useEffect(() => {
+    setOrigin(window.location.origin);
+  }, []);
+
+  const link = origin
+    ? `${origin}/register?${new URLSearchParams({ RefID: parentId, Position: positionCode }).toString()}`
+    : "";
+
   const copy = () => {
+    if (!link) return;
     navigator.clipboard.writeText(link).catch(() => { });
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);

@@ -99,7 +99,7 @@ export function ChangePasswordForm() {
     <FormProvider {...methods}>
       <form
         onSubmit={methods.handleSubmit(onSubmit)}
-        className="space-y-6 rounded-2xl border border-blue-200 bg-gradient-to-br from-blue-50/70 via-white to-cyan-50/50 p-4 dark:border-blue-900/50 dark:from-slate-900 dark:via-gray-900 dark:to-blue-950/30 sm:p-6"
+        className="space-y-6 rounded-2xl border border-blue-200  p-4 dark:border-blue-900/50 dark:from-slate-900 dark:via-gray-900 dark:to-blue-950/30 sm:p-6"
       >
         {/* Current Password */}
         <div>

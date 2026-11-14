@@ -1,6 +1,24 @@
 "use client";
 
-import { Menu, Moon, Sun, Wallet, Bell, ChevronDown, UserRound, ChevronUp, Check, Copy, Headphones, LogOut, X, Briefcase, TrendingUp, BarChart3, Loader2 } from "lucide-react";
+import {
+  Menu,
+  Moon,
+  Sun,
+  Wallet,
+  Bell,
+  ChevronDown,
+  UserRound,
+  ChevronUp,
+  Check,
+  Copy,
+  Headphones,
+  LogOut,
+  X,
+  Briefcase,
+  TrendingUp,
+  BarChart3,
+  Loader2,
+} from "lucide-react";
 import { useAuthStore } from "@/store/auth.store";
 import { useSidebarStore } from "@/store/sidebar.store";
 import Link from "next/link";
@@ -8,8 +26,9 @@ import { useState, useRef, useEffect, useCallback } from "react";
 import { useDashboardSummary } from "@/features/dashboard/hooks/useDashboardSummary";
 import { useLogout } from "@/features/auth/hooks/useLogout";
 import { useTheme } from "next-themes";
-import { ThemeLogo } from "@/components/common/ThemeLogo";
 import GoogleTranslate from "@/components/common/GoogleTranslate";
+import { primaryNav } from "@/config/navigation";
+import { usePathname } from "next/navigation";
 
 type HeaderNotification = Record<string, unknown>;
 
@@ -23,9 +42,7 @@ function getNotificationRows(payload: unknown): HeaderNotification[] {
     for (const value of currentLevel) {
       if (Array.isArray(value)) {
         if (
-          value.every(
-            (item) => typeof item === "object" && item !== null && !Array.isArray(item),
-          )
+          value.every((item) => typeof item === "object" && item !== null && !Array.isArray(item))
         ) {
           return value.filter(
             (item): item is HeaderNotification =>
@@ -53,7 +70,12 @@ function getNotificationRows(payload: unknown): HeaderNotification[] {
     depth += 1;
   }
 
-  if (typeof payload === "object" && payload !== null && "success" in payload && payload.success === false) {
+  if (
+    typeof payload === "object" &&
+    payload !== null &&
+    "success" in payload &&
+    payload.success === false
+  ) {
     throw new Error(
       "message" in payload && typeof payload.message === "string"
         ? payload.message
@@ -73,6 +95,7 @@ function getNotificationId(notification: HeaderNotification, index: number) {
 }
 
 export function Navbar() {
+  const pathname = usePathname();
   const user = useAuthStore((state) => state.user);
   const isMobileOpen = useSidebarStore((state) => state.isMobileOpen);
   const setMobileOpen = useSidebarStore((state) => state.setMobileOpen);
@@ -99,8 +122,21 @@ export function Navbar() {
   }, []);
 
   const { data: dashboardData } = useDashboardSummary(Boolean(user));
-  const displayAuthLogin = dashboardData?.data?.[0]?.AuthLogin || user?.name || 'Account';
+  const currentPageLabel = primaryNav
+    .flatMap((item) =>
+      item.dropdownItems
+        ? [
+          ...item.dropdownItems,
+          ...(item.href !== "/" ? [{ label: item.label, href: item.href }] : []),
+        ]
+        : [item],
+    )
+    .filter((item) => pathname === item.href || pathname.startsWith(`${item.href}/`))
+    .sort((a, b) => b.href.length - a.href.length)[0]?.label;
+  const displayAuthLogin = dashboardData?.data?.[0]?.AuthLogin || user?.name || "Account";
   const walletData = dashboardData?.data?.[0];
+
+  console.log(walletData, "walletData");
   const notificationUserKey = user?.id || displayAuthLogin;
 
   const loadNotifications = useCallback(async () => {
@@ -158,11 +194,11 @@ export function Navbar() {
     };
 
     if (accountMenuOpen || walletOpen || notificationsOpen) {
-      document.addEventListener('mousedown', handleClickOutside);
+      document.addEventListener("mousedown", handleClickOutside);
     }
 
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [accountMenuOpen, walletOpen, notificationsOpen]);
 
@@ -185,7 +221,9 @@ export function Navbar() {
       );
       const parsed: unknown = savedSeenNotifications ? JSON.parse(savedSeenNotifications) : [];
       setSeenNotifications(
-        new Set(Array.isArray(parsed) ? parsed.filter((id): id is string => typeof id === "string") : []),
+        new Set(
+          Array.isArray(parsed) ? parsed.filter((id): id is string => typeof id === "string") : [],
+        ),
       );
     } catch (error) {
       console.error("Could not restore read notification state:", error);
@@ -254,68 +292,80 @@ export function Navbar() {
 
   // Wallet Data (Screenshot ke hisaab se)
   const wallets = [
-
     {
-      id: 'income',
-      name: 'Income Wallet',
-      balance: walletData?.IncomeWallet ? `$${Number(walletData.IncomeWallet).toFixed(4)}` : '$0.0000',
+      id: "income",
+      name: "Working Wallet",
+      balance: walletData?.IncomeWallet
+        ? `$${Number(walletData.IncomeWallet).toFixed(4)}`
+        : "$0.0000",
       icon: Briefcase,
-      color: '#0ea5e9',
-      bg: '#e0f2fe'
+      color: "#0ea5e9",
+      bg: "#e0f2fe",
     },
     {
-      id: 'performance',
-      name: 'Mentor Wallet',
-      balance: walletData?.MentorWallet ? `$${Number(walletData.MentorWallet).toFixed(4)}` : '$0.0000',
-      icon: TrendingUp,
-      color: '#8b5cf6',
-      bg: '#ede9fe'
-    },
-    {
-      id: 'yield',
-      name: 'Fund Wallet',
-      balance: walletData?.FundWallet ? `$${Number(walletData.FundWallet).toFixed(4)}` : '$0.0000',
+      id: "yield",
+      name: "Yield Wallet",
+      balance: walletData?.YieldWallet ? `$${Number(walletData.YieldWallet).toFixed(4)}` : "$0.0000",
       icon: BarChart3,
-      color: '#10b981',
-      bg: '#d1fae5'
+      color: "#10b981",
+      bg: "#d1fae5",
     },
     {
-      id: 'deposit',
-      name: 'USDT Wallet',
-      balance: walletData?.DepositWallet ? `$${Number(walletData.DepositWallet).toFixed(4)}` : '$0.0000',
+      id: "deposit",
+      name: "USDT Wallet",
+      balance: walletData?.DepositWallet
+        ? `$${Number(walletData.DepositWallet).toFixed(4)}`
+        : "$0.0000",
       icon: Briefcase,
-      color: '#0ea5e9',
-      bg: '#e0f2fe'
+      color: "#0ea5e9",
+      bg: "#e0f2fe",
     },
-
-    
-    
-    
-   
+    {
+      id: "performance",
+      name: "Quzo Wallet",
+      balance: walletData?.QuzoWallet
+        ? `$${Number(walletData.QuzoWallet).toFixed(4)}`
+        : "$0.0000",
+      icon: TrendingUp,
+      color: "#8b5cf6",
+      bg: "#ede9fe",
+    },
   ];
 
   return (
-    <header className="sticky top-0 z-40 flex h-16 items-center justify-between border-b px-4 sm:px-6 bg-white dark:bg-[#0B1021] border-gray-200 dark:border-[#1E293B]">
+    <header className="sticky top-0 z-40 flex h-16 items-center justify-between border-b border-gray-200 bg-white px-4 dark:border-[#1E293B] dark:bg-[#0B1021] sm:px-6">
       <button
         className="rounded-md p-2 hover:bg-gray-100 dark:hover:bg-white/5 lg:hidden"
         onClick={() => setMobileOpen(true)}
         aria-label="Open menu"
         aria-expanded={isMobileOpen}
         aria-controls="primary-navigation"
-        style={{ color: theme === "dark" ? "#25c6e8" : "#1680ff" }}
+        style={{ color: theme === "dark" ? "#7ff5e6" : "#12a594" }}
       >
         <Menu className="h-5 w-5" />
       </button>
 
-      <div className="flex items-center gap-4 sm:gap-8 flex-1">
+      <div className="flex min-w-0 flex-1 items-center gap-8 sm:gap-28">
         <div className="flex items-center gap-2">
-          <ThemeLogo
-            width={150}
-            height={40}
-            className="h-10 w-auto object-contain"
-          />
+          <Link href="/dashboard" className="flex items-center gap-2.5" aria-label="QUZO dashboard">
+            <span className="grid h-10 w-10 place-items-center rounded-[14px] bg-gradient-to-br from-[#12b6a4] to-[#31cbb5] text-[27px] font-bold leading-none text-white shadow-[0_8px_18px_rgba(18,165,148,0.24)]">
+              Q
+            </span>
+            <span className="font-sans text-2xl font-bold tracking-[0.04em] text-[#062831] dark:text-white">
+              QUZO
+            </span>
+          </Link>
         </div>
-
+        {currentPageLabel && (
+          <div className="min-w-0 border-l border-gray-200 pl-3 dark:border-[#1E293B] sm:pl-4">
+            <p className="truncate text-sm font-semibold text-slate-800 dark:text-slate-100 sm:text-base">
+              {currentPageLabel}
+            </p>
+            <p className="truncate text-[10px] text-slate-500 dark:text-slate-400 sm:text-xs">
+              Welcome back, {displayAuthLogin}
+            </p>
+          </div>
+        )}
       </div>
 
       {/* <div>
@@ -323,14 +373,18 @@ export function Navbar() {
       </div> */}
 
       <div className="flex items-center gap-2 sm:gap-4">
-        <GoogleTranslate/>
+        <GoogleTranslate />
         <button
           className="rounded-md p-2 hover:bg-gray-100 dark:hover:bg-white/5"
           aria-label="Toggle theme"
-          style={{ color: theme === "dark" ? "#25c6e8" : "#1680ff" }}
-          onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+          style={{ color: theme === "dark" ? "#7ff5e6" : "#12a594" }}
+          onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
         >
-          {mounted && theme === 'dark' ? <Sun className="h-4 sm:h-5 w-4 sm:w-5" /> : <Moon className="h-4 sm:h-5 w-4 sm:w-5" />}
+          {mounted && theme === "dark" ? (
+            <Sun className="h-4 w-4 sm:h-5 sm:w-5" />
+          ) : (
+            <Moon className="h-4 w-4 sm:h-5 sm:w-5" />
+          )}
         </button>
 
         {/* ================= WALLET DROPDOWN START ================= */}
@@ -339,44 +393,50 @@ export function Navbar() {
             onClick={() => setWalletOpen((open) => !open)}
             className="rounded-md p-2 hover:bg-gray-100 dark:hover:bg-white/5"
             aria-label="Wallet"
-            style={{ color: theme === "dark" ? "#25c6e8" : "#1680ff" }}
+            style={{ color: theme === "dark" ? "#7ff5e6" : "#12a594" }}
           >
             <Wallet className="h-5 w-5" />
           </button>
 
           {walletOpen && (
-            <div className="absolute right-0 top-full z-50 mt-3 w-[320px] rounded-2xl border shadow-2xl bg-white dark:bg-[#0B1021] border-gray-200 dark:border-[#1E293B] dark:shadow-black/50 overflow-hidden">
-
+            <div className="absolute right-0 top-full z-50 mt-3 w-[320px] overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-2xl dark:border-[#1E293B] dark:bg-[#0B1021] dark:shadow-black/50">
               {/* Header */}
-              <div className="flex items-center justify-between p-4 border-b border-gray-100 dark:border-[#1E293B]">
+              <div className="flex items-center justify-between border-b border-gray-100 p-4 dark:border-[#1E293B]">
                 <div className="flex items-center gap-3">
                   <div className="flex h-10 w-10 items-center justify-center rounded-full bg-green-100 text-green-600">
                     <Wallet size={20} />
                   </div>
                   <div>
-                    <h3 className="text-sm font-bold text-gray-900 dark:text-white">Wallet Balance</h3>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">Your current balances</p>
+                    <h3 className="text-sm font-bold text-gray-900 dark:text-white">
+                      Wallet Balance
+                    </h3>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                      Your current balances
+                    </p>
                   </div>
                 </div>
                 <button
                   onClick={() => setWalletOpen(false)}
-                  className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors"
+                  className="text-gray-400 transition-colors hover:text-gray-600 dark:hover:text-gray-200"
                 >
                   <X size={18} />
                 </button>
               </div>
 
               {/* Wallet List */}
-              <div className="p-4 space-y-3">
+              <div className="space-y-3 p-4">
                 {wallets.map((wallet) => (
                   <div
                     key={wallet.id}
-                    className="flex items-center justify-between p-3 rounded-xl transition-colors hover:opacity-90"
+                    className="flex items-center justify-between rounded-xl p-3 transition-colors hover:opacity-90"
                     style={{ backgroundColor: wallet.bg }}
                   >
                     <div className="flex items-center gap-3">
                       {/* Colored Dot */}
-                      <div className="h-2 w-2 rounded-full" style={{ backgroundColor: wallet.color }} />
+                      <div
+                        className="h-2 w-2 rounded-full"
+                        style={{ backgroundColor: wallet.color }}
+                      />
 
                       {/* Icon & Name */}
                       <wallet.icon size={18} style={{ color: wallet.color }} />
@@ -404,7 +464,7 @@ export function Navbar() {
             className="relative rounded-md p-2 hover:bg-gray-100 dark:hover:bg-white/5"
             aria-label={`Notifications${unreadCount ? `, ${unreadCount} unread` : ""}`}
             aria-expanded={notificationsOpen}
-            style={{ color: theme === "dark" ? "#25c6e8" : "#1680ff" }}
+            style={{ color: theme === "dark" ? "#7ff5e6" : "#12a594" }}
           >
             <Bell className="h-4 w-4 sm:h-5 sm:w-5" />
             {unreadCount > 0 && (
@@ -446,7 +506,9 @@ export function Navbar() {
                 </button>
               </div>
 
-              <div className={`overflow-y-auto ${notifications.length > 3 ? "max-h-72" : "max-h-56"}`}>
+              <div
+                className={`overflow-y-auto ${notifications.length > 3 ? "max-h-72" : "max-h-56"}`}
+              >
                 {notificationsError ? (
                   <div className="px-4 py-6 text-center">
                     <p className="text-xs text-rose-600 dark:text-rose-300">{notificationsError}</p>
@@ -460,14 +522,16 @@ export function Navbar() {
                   </div>
                 ) : notificationsLoading ? (
                   <div className="flex justify-center px-4 py-8">
-                    <Loader2 className="h-6 w-6 animate-spin text-[#1680ff]" aria-label="Loading notifications" />
+                    <Loader2
+                      className="h-6 w-6 animate-spin text-[#12a594]"
+                      aria-label="Loading notifications"
+                    />
                   </div>
                 ) : unreadCount > 0 ? (
                   notifications.map((notification, index) => {
                     const id = getNotificationId(notification, index);
                     const isSeen = notification.Seen ?? notification.seen;
-                    const isUnread =
-                      !isSeen && !seenNotifications.has(id);
+                    const isUnread = !isSeen && !seenNotifications.has(id);
                     const message =
                       (typeof notification.AdminRemarks === "string" &&
                         notification.AdminRemarks) ||
@@ -505,7 +569,6 @@ export function Navbar() {
                               {amountText}
                             </span>
                           )}
-
                         </span>
                         {isUnread && (
                           <span className="mt-2 h-2 w-2 shrink-0 rounded-full bg-blue-500" />
@@ -542,70 +605,107 @@ export function Navbar() {
           <button
             type="button"
             onClick={() => setAccountMenuOpen(true)}
-            className="flex h-10 items-center gap-2 rounded-full border px-2 py-1.5 text-xs transition hover:border-blue-500 dark:hover:border-cyan-500 hover:bg-gray-100 dark:hover:bg-white/5 sm:px-2.5 bg-white dark:bg-[#0B1021] border-gray-200 dark:border-[#1E293B]"
-            style={{ color: theme === "dark" ? "#25c6e8" : "#1680ff" }}
+            className="flex h-10 items-center gap-2 rounded-full border border-gray-200 bg-white px-2 py-1.5 text-xs transition hover:border-blue-500 hover:bg-gray-100 dark:border-[#1E293B] dark:bg-[#0B1021] dark:hover:border-cyan-500 dark:hover:bg-white/5 sm:px-2.5"
+            style={{ color: theme === "dark" ? "#7ff5e6" : "#12a594" }}
             aria-expanded={accountMenuOpen}
             aria-label="Open account menu"
           >
-            <span className="flex h-8 w-8 items-center justify-center rounded-full text-white" style={{ background: 'linear-gradient(135deg, #1680ff, #25c6e8 50%, #7d75ff)' }}>
+            <span
+              className="flex h-8 w-8 items-center justify-center rounded-full text-white"
+              style={{ background: "linear-gradient(135deg, #12a594, #35d6c0 50%, #1f5f7a)" }}
+            >
               <UserRound size={17} strokeWidth={2} />
             </span>
-            <span className="hidden sm:block max-w-[96px] truncate font-semibold ">{displayAuthLogin || 'Account'}</span>
-            {accountMenuOpen ? <ChevronUp size={15} strokeWidth={2} /> : <ChevronDown size={15} strokeWidth={2} />}
+            <span className="hidden max-w-[96px] truncate font-semibold sm:block">
+              {displayAuthLogin || "Account"}
+            </span>
+            {accountMenuOpen ? (
+              <ChevronUp size={15} strokeWidth={2} />
+            ) : (
+              <ChevronDown size={15} strokeWidth={2} />
+            )}
           </button>
 
           {accountMenuOpen && (
             <div className="absolute right-0 top-full z-20 w-[min(280px,calc(100vw-1.5rem))] pt-3">
-              <div className="overflow-hidden rounded-2xl border shadow-2xl bg-white dark:bg-[#0B1021] border-gray-200 dark:border-[#1E293B] dark:shadow-black/50">
+              <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-2xl dark:border-[#1E293B] dark:bg-[#0B1021] dark:shadow-black/50">
                 <div className="p-4 sm:p-5">
-                  <div className="mb-3 text-[11px] font-semibold tracking-[0.18em]" style={{ color: theme === 'dark' ? '#64748B' : '#6B7280' }}>YOUR USER ID</div>
-                  <button type="button" onClick={copyAuthLogin} className="flex w-full items-center justify-between gap-3 rounded-xl p-2 text-left transition-transform hover:scale-[1.01] focus:outline-none focus:ring-2 focus:ring-[#1680ff]" style={{ background: 'linear-gradient(135deg, #1680ff, #25c6e8 50%, #7d75ff)', color: '#fff' }} aria-label="Copy your user ID">
+                  <div
+                    className="mb-3 text-[11px] font-semibold tracking-[0.18em]"
+                    style={{ color: theme === "dark" ? "#64748B" : "#6B7280" }}
+                  >
+                    YOUR USER ID
+                  </div>
+                  <button
+                    type="button"
+                    onClick={copyAuthLogin}
+                    className="flex w-full items-center justify-between gap-3 rounded-xl p-2 text-left transition-transform hover:scale-[1.01] focus:outline-none focus:ring-2 focus:ring-[#12a594]"
+                    style={{
+                      background: "linear-gradient(135deg, #12a594, #35d6c0 50%, #1f5f7a)",
+                      color: "#fff",
+                    }}
+                    aria-label="Copy your user ID"
+                  >
                     <span className="flex min-w-0 items-center gap-3">
-                      <span className="shrink-0 rounded-full px-2.5 py-1 text-[11px] font-bold tracking-wide" style={{ background: 'rgba(255,255,255,0.22)' }}>ID</span>
-                      <span className="truncate text-base font-semibold tracking-wide">{displayAuthLogin || 'Not available'}</span>
+                      <span
+                        className="shrink-0 rounded-full px-2.5 py-1 text-[11px] font-bold tracking-wide"
+                        style={{ background: "rgba(255,255,255,0.22)" }}
+                      >
+                        ID
+                      </span>
+                      <span className="truncate text-base font-semibold tracking-wide">
+                        {displayAuthLogin || "Not available"}
+                      </span>
                     </span>
-                    <span className="flex h-4 w-4 shrink-0 items-center justify-center rounded-lg" style={{ background: 'rgba(255,255,255,0.22)' }}>
+                    <span
+                      className="flex h-4 w-4 shrink-0 items-center justify-center rounded-lg"
+                      style={{ background: "rgba(255,255,255,0.22)" }}
+                    >
                       {authLoginCopied ? <Check size={17} /> : <Copy size={17} />}
                     </span>
                   </button>
-                  <div className="mt-2 text-center text-xs" style={{ color: theme === 'dark' ? '#64748B' : '#6B7280' }}>Click to copy your ID</div>
+                  <div
+                    className="mt-2 text-center text-xs"
+                    style={{ color: theme === "dark" ? "#64748B" : "#6B7280" }}
+                  >
+                    Click to copy your ID
+                  </div>
                 </div>
-                <div className="border-t py-1 border-gray-200 dark:border-[#1E293B]">
-                <Link
-                  href="/profile"
-                  onClick={() => setAccountMenuOpen(false)}
-                  className="flex w-full items-center gap-3 px-5 py-3.5 text-left text-sm font-medium transition-colors hover:bg-gray-100 dark:hover:bg-white/5"
-                  style={{ color: theme === 'dark' ? '#E2E8F0' : '#334155' }}
-                >
-                  <UserRound size={18} strokeWidth={1.8} />
-                  Profile
-                </Link>
+                <div className="border-t border-gray-200 py-1 dark:border-[#1E293B]">
+                  <Link
+                    href="/profile"
+                    onClick={() => setAccountMenuOpen(false)}
+                    className="flex w-full items-center gap-3 px-5 py-3.5 text-left text-sm font-medium transition-colors hover:bg-gray-100 dark:hover:bg-white/5"
+                    style={{ color: theme === "dark" ? "#E2E8F0" : "#334155" }}
+                  >
+                    <UserRound size={18} strokeWidth={1.8} />
+                    Profile
+                  </Link>
 
-                <Link
-                  href="/support"
-                  onClick={() => setAccountMenuOpen(false)}
-                  className="flex w-full items-center gap-3 px-5 py-3.5 text-left text-sm font-medium transition-colors hover:bg-gray-100 dark:hover:bg-white/5"
-                  style={{ color: theme === 'dark' ? '#E2E8F0' : '#334155' }}
-                >
-                  <Headphones size={18} strokeWidth={1.8} />
-                  Support
-                </Link>
-                <button
-                  type="button"
-                  onClick={handleLogout}
-                  className="flex w-full items-center gap-3 px-5 py-3.5 text-left text-sm font-medium transition-colors hover:bg-red-500/10"
-                  style={{ color: '#F87171' }}
-                >
-                  <LogOut size={18} strokeWidth={1.8} />
-                  Logout
-                </button>
+                  <Link
+                    href="/support"
+                    onClick={() => setAccountMenuOpen(false)}
+                    className="flex w-full items-center gap-3 px-5 py-3.5 text-left text-sm font-medium transition-colors hover:bg-gray-100 dark:hover:bg-white/5"
+                    style={{ color: theme === "dark" ? "#E2E8F0" : "#334155" }}
+                  >
+                    <Headphones size={18} strokeWidth={1.8} />
+                    Support
+                  </Link>
+                  <button
+                    type="button"
+                    onClick={handleLogout}
+                    className="flex w-full items-center gap-3 px-5 py-3.5 text-left text-sm font-medium transition-colors hover:bg-red-500/10"
+                    style={{ color: "#F87171" }}
+                  >
+                    <LogOut size={18} strokeWidth={1.8} />
+                    Logout
+                  </button>
                 </div>
               </div>
             </div>
           )}
         </div>
       </div>
-
     </header>
   );
 }

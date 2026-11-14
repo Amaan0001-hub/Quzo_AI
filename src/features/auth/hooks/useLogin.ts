@@ -19,7 +19,7 @@ export function useLogin() {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.auth.me });
       toast.success("Login successful!");
 
-      router.push("/dashboard");
+      router.push("/home");
     },
     onError: (error: unknown) => {
       const responseMessage = axios.isAxiosError<{ message?: unknown }>(error)
