@@ -29,7 +29,7 @@ export function LoginForm() {
           <div className="flex items-center justify-center">
             <Image
               src="/logos/fyntix-logo-dark.png"
-              alt="Fyntix"
+              alt="Quzo"
               width={250}
               height={80}
               className="admin-login-logo-dark h-auto w-56 max-w-full object-contain"
@@ -37,7 +37,7 @@ export function LoginForm() {
             />
             <Image
               src="/logos/fyntix-logo-light.png"
-              alt="Fyntix"
+              alt="Quzo"
               width={250}
               height={80}
               className="admin-login-logo-light hidden h-auto w-56 max-w-full object-contain"
@@ -113,14 +113,14 @@ export function LoginForm() {
           )}
 
           <p className="text-center text-xs text-slate-500">
-            Secure access to your Fyntix dashboard
+            Secure access to your Quzo dashboard
           </p>
         </div>
 
         <div className="border-t border-white/10 bg-[#0e1015] px-6 py-4">
           <div className="flex items-center justify-between text-xs text-slate-400">
             <div className="font-semibold tracking-wide text-slate-300">
-              FYNTIX ADMIN
+              QUZO ADMIN
             </div>
             <div className="flex items-center gap-1">
               <Shield className="h-3 w-3" />

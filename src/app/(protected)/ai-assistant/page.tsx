@@ -968,7 +968,7 @@ export default function AIAssistantPage() {
                         Analysis Complete
                       </div>
                       <div className="text-xs text-muted-foreground mt-2">
-                        Generated just now · via Fyntix AI Engine
+                        Generated just now · via Quzo AI Engine
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
@@ -1306,7 +1306,7 @@ export default function AIAssistantPage() {
                       <div className="flex items-center gap-3 mb-3">
                         <div className="ata-reasoning-avatar">AI</div>
                         <div>
-                          <div className="text-sm font-semibold">Fyntix AI Reasoning</div>
+                          <div className="text-sm font-semibold">Quzo AI Reasoning</div>
                           <div className="text-xs text-muted-foreground">
                             Institutional Analysis Engine
                           </div>

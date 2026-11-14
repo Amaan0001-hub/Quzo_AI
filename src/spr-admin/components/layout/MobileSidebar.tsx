@@ -139,14 +139,14 @@ export function MobileSidebar() {
           <div className="flex items-center">
             <Image
               src="/logos/fyntix-logo-dark.png"
-              alt="Fyntix"
+              alt="Quzo"
               width={160}
               height={64}
               className="admin-sidebar-logo-dark h-auto w-36 object-contain"
             />
             <Image
               src="/logos/fyntix-logo-light.png"
-              alt="Fyntix"
+              alt="Quzo"
               width={160}
               height={64}
               className="admin-sidebar-logo-light hidden h-auto w-36 object-contain"

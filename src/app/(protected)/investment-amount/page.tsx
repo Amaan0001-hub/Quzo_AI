@@ -306,12 +306,12 @@ const ActivatePlanModal: React.FC<ActivatePlanModalProps> = ({
                     {isLoadingWallet ? <Loader2 className="h-6 w-6 animate-spin text-[#F5C451]" aria-label="Loading" /> : `$${walletBalance}`}
                   </p>
                 </div>
-                <div>
+                {/* <div>
                   <p className="text-gray-600 dark:text-gray-400 text-[10px] font-bold tracking-widest uppercase mb-1">Fund Wallet</p>
                   <p className="text-green-600 dark:text-green-400 text-2xl font-bold">
                     {isLoadingWallet ? <Loader2 className="h-6 w-6 animate-spin text-[#F5C451]" aria-label="Loading" /> : `$${fundWalletBalance}`}
                   </p>
-                </div>
+                </div> */}
               </div>
             ) : (
               <>
