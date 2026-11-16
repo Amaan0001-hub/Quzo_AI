@@ -76,17 +76,12 @@ export default function RankPage() {
   const [daoLoading, setDaoLoading] = useState(false);
   const [daoError, setDaoError] = useState("");
   const [daoData, setDaoData] = useState<DAOData>({});
-  const [activeTab, setActiveTab] = useState<"rank" | "unity" | "dao">("rank");
+  const [activeTab, setActiveTab] = useState<"rank" | "dao">("rank");
 
   useEffect(() => {
     loadRankData();
   }, []);
 
-  useEffect(() => {
-    if (activeTab === "unity") {
-      loadUnityData();
-    }
-  }, [activeTab]);
 
   useEffect(() => {
     if (activeTab === "dao") {
@@ -369,17 +364,6 @@ export default function RankPage() {
           Rank Progress
         </button>
         <button
-          onClick={() => setActiveTab("unity")}
-          className={`flex items-center gap-2 rounded-lg px-4 py-2.5 text-sm font-semibold transition-all ${
-            activeTab === "unity"
-              ? "bg-gradient-to-r from-[#1680ff] via-[#25c6e8] to-[#7d75ff] text-white shadow-lg"
-              : "bg-slate-100 text-slate-600 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
-          }`}
-        >
-          <Coins className="h-4 w-4" />
-          Unity Revenue Yield
-        </button>
-        <button
           onClick={() => setActiveTab("dao")}
           className={`flex items-center gap-2 rounded-lg px-4 py-2.5 text-sm font-semibold transition-all ${
             activeTab === "dao"
@@ -547,169 +531,7 @@ export default function RankPage() {
         </>
       )}
 
-      {/* Unity Revenue Yield Tab */}
-      {activeTab === "unity" && (
-        <>
-          {unityError && (
-            <div
-              className="border-b border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700 dark:border-rose-900/50 dark:bg-rose-950/30 dark:text-rose-300"
-              role="alert"
-            >
-              <div className="flex flex-wrap justify-between gap-3">
-                <span>{unityError}</span>
-                <button
-                  type="button"
-                  onClick={() => loadUnityData()}
-                  className="font-semibold underline underline-offset-2"
-                >
-                  Retry
-                </button>
-              </div>
-            </div>
-          )}
-
-          {!unityError && (
-            <>
-              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                <div className="relative overflow-hidden rounded-2xl border border-slate-200/80 bg-white/90 shadow-sm dark:border-slate-700/70 dark:bg-slate-900/75">
-                  <div className="flex items-center justify-between border-b border-slate-200 px-4 py-3 dark:border-slate-700">
-                    <span className="text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300">
-                      Power Team Business
-                    </span>
-                    <TrendingUp className="h-4 w-4 text-emerald-500" aria-hidden />
-                  </div>
-                  <div className="px-4 py-4">
-                    <p className="text-2xl font-extrabold text-slate-900 dark:text-white">
-                      {formatMoney(unity[0]?.PowerTeamBusines || 0)}
-                    </p>
-                  </div>
-                </div>
-
-                <div className="relative overflow-hidden rounded-2xl border border-slate-200/80 bg-white/90 shadow-sm dark:border-slate-700/70 dark:bg-slate-900/75">
-                  <div className="flex items-center justify-between border-b border-slate-200 px-4 py-3 dark:border-slate-700">
-                    <span className="text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300">
-                      Weaker Team Business
-                    </span>
-                    <TrendingDown className="h-4 w-4 text-amber-500" aria-hidden />
-                  </div>
-                  <div className="px-4 py-4">
-                    <p className="text-2xl font-extrabold text-slate-900 dark:text-white">
-                      {formatMoney(unity[0]?.WeakerTeamBusines || 0)}
-                    </p>
-                  </div>
-                </div>
-
-                <div className="relative overflow-hidden rounded-2xl border border-slate-200/80 bg-white/90 shadow-sm dark:border-slate-700/70 dark:bg-slate-900/75">
-                  <div className="flex items-center justify-between border-b border-slate-200 px-4 py-3 dark:border-slate-700">
-                    <span className="text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300">
-                      Strong Team ID
-                    </span>
-                    <Info className="h-4 w-4 text-blue-500" aria-hidden />
-                  </div>
-                  <div className="px-4 py-4">
-                    <p className="text-lg font-extrabold text-slate-900 dark:text-white">
-                      {unity[0]?.StrongTeamID || "N/A"}
-                    </p>
-                  </div>
-                </div>
-
-                <div className="relative overflow-hidden rounded-2xl border border-slate-200/80 bg-white/90 shadow-sm dark:border-slate-700/70 dark:bg-slate-900/75">
-                  <div className="flex items-center justify-between border-b border-slate-200 px-4 py-3 dark:border-slate-700">
-                    <span className="text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300">
-                      Yield
-                    </span>
-                    <Zap className="h-4 w-4 text-[#1680ff] dark:text-[#25c6e8]" aria-hidden />
-                  </div>
-                  <div className="px-4 py-4">
-                    <p className="text-2xl font-extrabold text-slate-900 dark:text-white">
-                      {unity[0]?.RankAchvd || "N/A"}%
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              <section className="relative overflow-hidden rounded-2xl border border-slate-200/80 bg-white/90 shadow-sm dark:border-slate-700/70 dark:bg-slate-900/75">
-                <div className="absolute inset-x-0 top-0 h-0.5 bg-gradient-to-r from-[#1680ff] via-[#25c6e8] to-[#7d75ff]" />
-                <div className="flex items-center justify-between border-b border-slate-200 px-4 py-4 dark:border-slate-700 sm:px-6">
-                  <div>
-                    <h2 className="font-bold text-slate-900 dark:text-white">Unity Revenue Table</h2>
-                    <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
-                      {unity.length} level{unity.length === 1 ? "" : "s"}
-                    </p>
-                  </div>
-                </div>
-
-                <div className="overflow-x-auto">
-                  <table className="min-w-full text-left text-sm">
-                    <thead className="bg-gradient-to-r from-blue-50/80 via-cyan-50/60 to-violet-50/80 text-xs uppercase tracking-wider text-slate-600 dark:from-blue-900/20 dark:via-cyan-900/10 dark:to-violet-900/20 dark:text-slate-300">
-                      <tr>
-                        <th className="whitespace-nowrap px-4 py-3">#</th>
-                        <th className="whitespace-nowrap px-4 py-3">REQUIRED BUSINESS</th>
-                        <th className="whitespace-nowrap px-4 py-3">YIELD %</th>
-                        <th className="whitespace-nowrap px-4 py-3">POWER TEAM</th>
-                        <th className="whitespace-nowrap px-4 py-3">WEAKER TEAM</th>
-                        <th className="whitespace-nowrap px-4 py-3">STATUS</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
-                      {unityLoading ? (
-                        <tr>
-                          <td colSpan={8} className="px-4 py-10 text-center">
-                            <Loader2 className="mx-auto h-6 w-6 animate-spin text-[#1680ff]" aria-label="Loading" />
-                          </td>
-                        </tr>
-                      ) : unity.length === 0 ? (
-                        <tr>
-                          <td colSpan={8} className="px-4 py-10 text-center text-slate-500">
-                            No unity revenue data found.
-                          </td>
-                        </tr>
-                      ) : (
-                        unity.map((row, index) => {
-                          const status = row.Statusx.toLowerCase();
-                          const isQualified = status === "qualify" || status === "qualified";
-                          return (
-                            <tr
-                              key={`${row.RequiredBusiness}-${index}`}
-                              className="text-slate-700 transition-colors hover:bg-blue-50/50 dark:text-slate-200 dark:hover:bg-cyan-900/10"
-                            >
-                              <td className="whitespace-nowrap px-4 py-3">{index + 1}</td>
-                              <td className="whitespace-nowrap px-4 py-3 font-semibold">
-                                {row.RequiredBusiness}
-                              </td>
-                              <td className="whitespace-nowrap px-4 py-3">
-                                {row.TotalDiffPer}
-                              </td>
-                              <td className="whitespace-nowrap px-4 py-3">
-                                {formatMoney(row.PowerTeamBusines)}
-                              </td>
-                              <td className="whitespace-nowrap px-4 py-3">
-                                {formatMoney(row.WeakerTeamBusines)}
-                              </td>
-                             
-                              <td className="whitespace-nowrap px-4 py-3">
-                                <span
-                                  className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-bold ${
-                                    isQualified
-                                      ? "border-emerald-200 bg-emerald-100 text-emerald-700 dark:border-emerald-700/50 dark:bg-emerald-900/30 dark:text-emerald-300"
-                                      : "border-amber-200 bg-amber-100 text-amber-700 dark:border-amber-700/50 dark:bg-amber-900/30 dark:text-amber-300"
-                                  }`}
-                                >
-                                  {row.Statusx}
-                                </span>
-                              </td>
-                            </tr>
-                          );
-                        })
-                      )}
-                    </tbody>
-                  </table>
-                </div>
-              </section>
-            </>
-          )}
-        </>
-      )}
+     
 
       {/* DAO Program Tab */}
       {activeTab === "dao" && (
