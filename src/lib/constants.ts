@@ -35,6 +35,9 @@ export const QUERY_KEYS = {
     all: ["orderHistory"] as const,
     booster: ["orderHistory", "booster"] as const,
   },
+  notifications: {
+    all: ["notifications", "all"] as const,
+  },
 } as const;
 
 export const DEFAULT_PAGE_SIZE = 20;

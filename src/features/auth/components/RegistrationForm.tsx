@@ -1005,7 +1005,7 @@ export function Register() {
         <div className="w-full lg:w-2/3 p-8 md:p-12 flex flex-col justify-center relative bg-[#031B23]/40 overflow-y-auto">
 
           {/* Header Section */}
-          <div className="flex flex-col items-start mb-8">
+          <Link href="/" className="flex flex-col items-start mb-8 hover:opacity-80 transition-opacity">
             <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-[#19D8D0]/30 bg-[#19D8D0]/10 px-4 py-1.5 text-[10px] font-mono uppercase tracking-widest text-[#19D8D0]">
               <Sparkles size={14} />
               Join the New Era
@@ -1016,7 +1016,7 @@ export function Register() {
             <p className="mt-3 font-mono text-[10px] tracking-[0.25em] text-slate-400 uppercase">
               Powering the future of wealth
             </p>
-          </div>
+          </Link>
 
           <FormProvider {...form}>
             <form
@@ -1422,8 +1422,6 @@ export function Register() {
                     <button
                       type="button"
                       onClick={() => {
-                        // Add your resend OTP API call here
-                        console.log("Resending OTP to", registeredEmail);
                       }}
                       disabled={isVerifying || registration.isPending}
                       className="font-medium text-[#19D8D0] hover:text-[#7FF3EC] transition-colors ml-1 disabled:opacity-50 disabled:hover:text-[#19D8D0]"

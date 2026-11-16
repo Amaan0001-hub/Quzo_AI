@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Loader2, Boxes, Coins } from "lucide-react";
+import { Loader2, Boxes, Coins, Users, ShieldCheck, Network, TrendingUp, Zap } from "lucide-react";
 import type { IconType } from "react-icons";
 
 import {
@@ -125,6 +125,73 @@ function money(value: number, dec = 2): string {
   return `$${value.toFixed(dec)}`;
 }
 
+const pctOf = (a: number, b: number) => (b > 0 ? Math.min(100, (a / b) * 100) : 0);
+
+// ---------- Team table helpers ----------
+function GroupLabel({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="border-b border-[#dcebe8] dark:border-[#1E293B] bg-[#f3f9f8] dark:bg-[#0B1021] px-4 py-2 text-xs font-semibold text-[#12a594]">
+      {children}
+    </div>
+  );
+}
+
+function MetricRow({
+  icon,
+  label,
+  value,
+  pct,
+  status,
+  accent = "#12a594",
+  from = "#12a594",
+  to = "#34cdb8",
+  highlight = false,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  value: React.ReactNode;
+  pct: number;
+  status: string;
+  accent?: string;
+  from?: string;
+  to?: string;
+  highlight?: boolean;
+}) {
+  return (
+    <div
+      className={`grid grid-cols-[1fr_auto] items-center gap-x-4 gap-y-2 border-b border-[#e3eeec] dark:border-[#1E293B] px-4 py-3 md:grid-cols-[2fr_1.2fr_3fr_1.2fr] ${
+        highlight ? "bg-[#eef6f9] dark:bg-[#0B1021]" : "bg-white dark:bg-[#0B1021]"
+      }`}
+      style={{ borderLeft: `4px solid ${accent}` }}
+    >
+      <div className="flex items-center gap-3">
+        <span
+          className="grid h-9 w-9 place-items-center rounded-lg"
+          style={{ background: `${accent}1f`, color: accent }}
+        >
+          {icon}
+        </span>
+        <span className="text-[15px] text-[#0f2a33] dark:text-gray-300">{label}</span>
+      </div>
+      <div className="text-right text-base font-bold text-[#0f2a33] dark:text-white md:text-left">{value}</div>
+      <div className="order-last col-span-2 h-2 overflow-hidden rounded-full bg-[#dff0ec] dark:bg-[#1E293B] md:order-none md:col-span-1">
+        <div
+          className="h-full rounded-full"
+          style={{ width: `${pct}%`, background: `linear-gradient(90deg, ${from}, ${to})` }}
+        />
+      </div>
+      <div className="text-right">
+        <span
+          className="inline-block rounded-full px-3 py-1 text-xs font-semibold"
+          style={{ background: `${accent}1f`, color: accent }}
+        >
+          {status}
+        </span>
+      </div>
+    </div>
+  );
+}
+
 // ---------- Count-up hook ----------
 function useCountUp(endValue: number, duration = 1000) {
   const [value, setValue] = useState(0);
@@ -149,8 +216,6 @@ function useCountUp(endValue: number, duration = 1000) {
         startValueRef.current = target;
       }
     };
-
-    
 
     rafRef.current = requestAnimationFrame(step);
     return () => {
@@ -222,6 +287,11 @@ export default function AIBUSINESSHUB() {
     setTimeout(() => setToast(""), 1800);
   };
 
+  const handleViewMore = (label: string) => {
+    localStorage.setItem('incomeTab', label);
+    router.push('/income-reports');
+  };
+
   // Data from affiliate
   const activeDirectMembers = getText(affiliate?.ActiveDirectMembers, "0");
   const directBusiness = getNumber(affiliate?.DirectBusiness);
@@ -259,7 +329,7 @@ export default function AIBUSINESSHUB() {
 
   // Package API values
   const totalTradingPackage = getNumber(affiliate?.TotalEarning);
-   const remaningPackage = getNumber(affiliate?.RemainingLimit);
+  const remaningPackage = getNumber(affiliate?.RemainingLimit);
   const activeTradingPackage = getNumber(affiliate?.TradingPackage);
   const activeSmartBondPack = getNumber(affiliate?.SmartBondPack);
   const activeSecureBondPack = getNumber(affiliate?.SecureBondPack);
@@ -276,6 +346,13 @@ export default function AIBUSINESSHUB() {
   const teamTotal = Number(leftBusvolume) + Number(rightBusvolume);
   const powerLeg = Math.max(Number(leftBusvolume), Number(rightBusvolume));
   const weakLeg = Math.min(Number(leftBusvolume), Number(rightBusvolume));
+
+  // Team table values (sab existing data se)
+  const activeDirectNum = getNumber(affiliate?.ActiveDirectMembers);
+  const totalTeamNum = getNumber(affiliate?.TotalTeam);
+  const activeTeamNum = getNumber(affiliate?.ActiveTeam);
+  const powerPct = pctOf(powerLeg, teamTotal);
+  const weakPct = teamTotal > 0 ? 100 - powerPct : 0;
 
   // Package info
   const packageInfo = {
@@ -311,50 +388,13 @@ export default function AIBUSINESSHUB() {
   }
 
   const kpis = [
-    { label: "Direct Referral Income", value: directIncome, prefix: "$", dec: 2, tone: "green", icon: "arrowUp", trend: "+12%", series: [12, 15, 18, 22, 25, 28, 30] },
-    { label: "Daily Profit Income", value: dailyProfitIncome, prefix: "$", dec: 2, tone: "blue", icon: "chart", trend: "+8%", series: [10, 12, 14, 16, 18, 20, 22] },
-    { label: "Booster Income", value: boosterProfitAPI, prefix: "$", dec: 2, tone: "violet", icon: "award", trend: "+15%", series: [8, 10, 12, 15, 18, 20, 25] },
-    { label: "DAO Income", value: daoIncome, prefix: "$", dec: 2, tone: "amber", icon: "rocket", trend: "+20%", series: [15, 18, 22, 25, 28, 32, 35] },
-    { label: "Level Income", value: levelIncomeAPI, prefix: "$", dec: 2, tone: "violet", icon: "group", trend: "+10%", series: [10, 12, 14, 16, 18, 20, 22] },
-    { label: "Rewards Income", value: rewardIncome, prefix: "$", dec: 2, tone: "blue", icon: "share", trend: "+18%", series: [12, 14, 16, 18, 20, 22, 24] },
-    { label: "Salary Income", value: salaryIncome, prefix: "$", dec: 2, tone: "green", icon: "refresh", trend: "+25%", series: [15, 18, 21, 24, 27, 30, 33] },
-  ];
-
-  const wallets = [
-    { label: "Total Earning", value: totalEarning },
-    { label: "Earning Limit", value: subscription },
-    { label: "Remaining Limit", value: remainingLimit },
-    { label: "Team Business", value: teamBusiness },
-  ];
-
-  const packages = [
-    { key: "lp", name: "Liquidity Provider", desc: "LP Trade", active: activeTradingPackage, total: totalTradingPackage, limit: liquidityEarningLimit, pending: liquidityPendingLimit, tone: "blue" },
-    { key: "sb", name: "Smart Bonds", desc: "Fixed returns", active: activeSmartBondPack, total: totalSmartBondPack, limit: smartEarningLimit, pending: smartPendingLimit, tone: "violet" },
-    { key: "sec", name: "Secure Bonds", desc: "Secure growth", active: activeSecureBondPack, total: totalSecureBondPack, limit: secureEarningLimit, pending: securePendingLimit, tone: "amber" },
-  ];
-
-  const boosters = [
-    { key: "r", name: "Runner", icon: "🏃", reward: 20, req: "Sponsor 3 direct participants within 7 days", window: "", target: 3, progress: 2, state: "IN PROGRESS" },
-    { key: "b", name: "Biker", icon: "🚴", reward: 30, req: "Achieve 3 Runners within 15 days", window: "", target: 3, progress: 0, state: "LOCKED" },
-    { key: "f", name: "Fighter", icon: "🥊", reward: 50, req: "Achieve 3 Bikers within 30 days", window: "", target: 3, progress: 0, state: "LOCKED" },
-  ];
-
-  const dryTiers = [
-    { dir: 1, pct: 10 },
-    { dir: 3, pct: 15 },
-    { dir: 5, pct: 20 },
-    { dir: 10, pct: 30 },
-    { dir: 20, pct: 50 },
-    { dir: 50, pct: 100 },
-  ];
-
-  const unityTiers = [
-    { vol: "$10K", pct: 15 },
-    { vol: "$50K", pct: 25 },
-    { vol: "$100K", pct: 40 },
-    { vol: "$500K", pct: 60 },
-    { vol: "$1M", pct: 80 },
-    { vol: "$5M", pct: 100 },
+    { label: "Direct Referral Income", value: directIncome, prefix: "$", dec: 2, tone: "green", icon: "arrowUp", series: [12, 15, 18, 22, 25, 28, 30] },
+    { label: "Daily Profit Income", value: dailyProfitIncome, prefix: "$", dec: 2, tone: "blue", icon: "chart", series: [10, 12, 14, 16, 18, 20, 22] },
+    { label: "Booster Income", value: boosterProfitAPI, prefix: "$", dec: 2, tone: "violet", icon: "award", series: [8, 10, 12, 15, 18, 20, 25] },
+    { label: "DAO Income", value: daoIncome, prefix: "$", dec: 2, tone: "amber", icon: "rocket", series: [15, 18, 22, 25, 28, 32, 35] },
+    { label: "Level Income", value: levelIncomeAPI, prefix: "$", dec: 2, tone: "violet", icon: "group", series: [10, 12, 14, 16, 18, 20, 22] },
+    { label: "Rewards Income", value: rewardIncome, prefix: "$", dec: 2, tone: "blue", icon: "share", series: [12, 14, 16, 18, 20, 22, 24] },
+    { label: "Salary Income", value: salaryIncome, prefix: "$", dec: 2, tone: "green", icon: "refresh", series: [15, 18, 21, 24, 27, 30, 33] },
   ];
 
   const incomeHistory = [
@@ -376,7 +416,7 @@ export default function AIBUSINESSHUB() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
+      <div className="flex items-center justify-center min-h-screen dark:bg-[#0B1021]">
         <Loader2 className="h-8 w-8 animate-spin text-purple-400" />
       </div>
     );
@@ -385,9 +425,6 @@ export default function AIBUSINESSHUB() {
   return (
     <>
       <div className="hub-bg p-4 sm:p-6 lg:p-8">
-
-      
-
 
         {/* Business Overview */}
         <section className="mb-8">
@@ -423,7 +460,7 @@ export default function AIBUSINESSHUB() {
                 <div className={`hub-card hub-k2 hub-tone-${k.tone}`}>
                   <div className="hub-k2-top">
                     <div className="ico"><Icon name={k.icon} size={20} /></div>
-                    <span className="trend">{k.trend}</span>
+                    <span className="trend"><a href="#" onClick={(e) => { e.preventDefault(); handleViewMore(k.label); }} style={{ color: 'inherit', textDecoration: 'none', fontWeight: 500 }}>View More</a></span>
                   </div>
                   <small className="mono">{k.label}</small>
                   <b className="mono"><CountUp value={k.value} prefix={k.prefix} dec={k.dec} /></b>
@@ -436,15 +473,14 @@ export default function AIBUSINESSHUB() {
           </div>
         </section>
 
-
         {/* Trading Packages */}
-          <section aria-labelledby="trading-package-heading">
-          <h2 id="trading-package-heading" className="mb-3 text-lg font-semibold text-gray-900">
+        <section aria-labelledby="trading-package-heading">
+          <h2 id="trading-package-heading" className="mb-3 text-lg font-semibold text-gray-900 dark:text-white">
             Trading package
           </h2>
           <div className="grid gap-4 xl:grid-cols-2">
-            <article className="flex flex-col items-center gap-4 rounded-2xl border border-gray-200 bg-white p-4 sm:p-5 shadow-sm">
-              <div className="flex items-center gap-2 text-sm font-medium text-gray-700">
+            <article className="flex flex-col items-center gap-4 rounded-2xl border border-gray-200 dark:border-[#1E293B] bg-white dark:bg-[#0B1021] p-4 sm:p-5 shadow-sm">
+              <div className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300">
                 <span className="grid h-8 w-8 place-items-center rounded-lg bg-[#12a594]/10 text-[#12a594]">
                   <Boxes className="h-4 w-4" aria-hidden />
                 </span>
@@ -458,7 +494,7 @@ export default function AIBUSINESSHUB() {
                       <stop offset="1" stopColor="#1f5f7a" />
                     </linearGradient>
                   </defs>
-                  <circle cx="75" cy="75" r="60" fill="none" stroke="#e5e7eb" strokeWidth="10" />
+                  <circle cx="75" cy="75" r="60" fill="none" stroke="#e5e7eb" strokeWidth="10" className="dark:stroke-[#1E293B]" />
                   <circle
                     className="dashboard-ring"
                     cx="75"
@@ -473,8 +509,8 @@ export default function AIBUSINESSHUB() {
                   />
                 </svg>
                 <div className="text-center">
-                  <p className="text-2xl font-semibold text-gray-900">{packageInfo.capUsedPercent}%</p>
-                  <p className="mt-1 text-[11px] text-gray-500">cap used</p>
+                  <p className="text-2xl font-semibold text-gray-900 dark:text-white">{packageInfo.capUsedPercent}%</p>
+                  <p className="mt-1 text-[11px] text-gray-500 dark:text-gray-400">cap used</p>
                 </div>
               </div>
               <div className="grid grid-cols-3 gap-2 w-full">
@@ -483,13 +519,13 @@ export default function AIBUSINESSHUB() {
                   { label: "Total income cap", value: money(packageInfo.totalIncomeCap) },
                   { label: "Remaining cap", value: money(packageInfo.remainingCap) },
                 ].map((item) => (
-                  <div key={item.label} className="rounded-xl bg-gray-50 p-3">
-                    <p className="text-[10px] leading-4 text-gray-500">{item.label}</p>
-                    <p className="mt-1 text-sm font-semibold text-gray-900">{item.value}</p>
+                  <div key={item.label} className="rounded-xl bg-gray-50 dark:bg-[#1E293B] p-3">
+                    <p className="text-[10px] leading-4 text-gray-500 dark:text-gray-400">{item.label}</p>
+                    <p className="mt-1 text-sm font-semibold text-gray-900 dark:text-white">{item.value}</p>
                   </div>
                 ))}
               </div>
-              <div className="h-2 overflow-hidden rounded-full bg-gray-200 w-full">
+              <div className="h-2 overflow-hidden rounded-full bg-gray-200 dark:bg-[#1E293B] w-full">
                 <div
                   className="h-full rounded-full bg-gradient-to-r from-[#12a594] to-[#3aa3c4]"
                   style={{ width: `${packageInfo.capUsedPercent}%` }}
@@ -497,19 +533,19 @@ export default function AIBUSINESSHUB() {
               </div>
             </article>
 
-            <article className="flex flex-col justify-between rounded-2xl border border-gray-200 bg-white p-4 sm:p-5 shadow-sm">
+            <article className="flex flex-col justify-between rounded-2xl border border-gray-200 dark:border-[#1E293B] bg-white dark:bg-[#0B1021] p-4 sm:p-5 shadow-sm">
               <div>
-                <div className="flex items-center gap-2 text-sm font-medium text-gray-700">
+                <div className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300">
                   <span className="grid h-8 w-8 place-items-center rounded-lg bg-[#d9a441]/10 text-[#d9a441]">
                     <Coins className="h-4 w-4" aria-hidden />
                   </span>
                   QUZO / BTC live price
                 </div>
-                <p className="mt-4 text-2xl font-semibold text-gray-900">
+                <p className="mt-4 text-2xl font-semibold text-gray-900 dark:text-white">
                   {quzoPrice.value}{" "}
-                  <span className="text-base font-medium text-gray-500">{quzoPrice.unit}</span>
+                  <span className="text-base font-medium text-gray-500 dark:text-gray-400">{quzoPrice.unit}</span>
                 </p>
-                <p className="mt-1 text-xs text-green-600">
+                <p className="mt-1 text-xs text-green-600 dark:text-green-400">
                   ▲ {quzoPrice.change} · {quzoPrice.period}
                 </p>
               </div>
@@ -524,52 +560,139 @@ export default function AIBUSINESSHUB() {
           </div>
         </section>
 
-       
-
-        
-
-    
-
-        {/* Team + Personal */}
+        {/* Team Network */}
         <section className="mb-8 mt-3">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-            <Reveal>
-              <div className="hub-card">
-                <div className="hub-card-head">
-                  <h3>Team Network</h3>
-                  <span className="hub-chip blue">Direct line</span>
-                </div>
-                <div className="grid grid-cols-3 gap-3" style={{ gap: 10, gridTemplateColumns: 'repeat(3,1fr)' }}>
-                  <div className="hub-wallet" style={{ textAlign: 'center' }}><small>Direct ID</small><b className="mono" style={{ color: 'var(--hub-text)' }}>{getText(affiliate?.AuthloginId, "N/A")}</b></div>
-                  <div className="hub-wallet" style={{ textAlign: 'center' }}><small>Active Direct</small><b className="mono">{activeDirectMembers}</b></div>
-                  <div className="hub-wallet" style={{ textAlign: 'center' }}><small>Direct Business</small><b className="mono"><CountUp value={directBusiness} prefix="$" dec={0} /></b></div>
-                  <div className="hub-wallet" style={{ textAlign: 'center' }}><small>Total Team</small><b className="mono">{totalTeam}</b></div>
-                  <div className="hub-wallet" style={{ textAlign: 'center' }}><small>Active Team</small><b className="mono">{activeTeam}</b></div>
-                  <div className="hub-wallet" style={{ textAlign: 'center' }}><small>Team Business</small><b className="mono"><CountUp value={teamBusiness} prefix="$" dec={0} /></b></div>
-                </div>
-                <div className="hub-kv" style={{ marginTop: 14 }}><span>Current Booster Rank</span><span>{leadershipRank}</span></div>
-                <div className="hub-kv"><span>Booster Status</span><span>Active</span></div>
+          <Reveal>
+            <div className="overflow-hidden rounded-2xl border border-[#dcebe8] dark:border-[#1E293B] bg-[#f3f9f8] dark:bg-[#0B1021] shadow-sm">
+              {/* Header */}
+              <div className="hidden grid-cols-[2fr_1.2fr_3fr_1.2fr] border-b border-[#dcebe8] dark:border-[#1E293B] px-4 py-3 text-sm font-medium text-[#5b7580] dark:text-gray-400 md:grid">
+                <span>Metric</span>
+                <span>Value</span>
+                <span>Progress</span>
+                <span className="text-right">Status</span>
               </div>
-            </Reveal>
-            <Reveal delay={100}>
-              <div className="hub-card">
-                <div className="hub-card-head">
-                  <h3>Personal Info</h3>
-                  <span className="hub-chip muted">Active</span>
+
+              <GroupLabel>Directs</GroupLabel>
+              <MetricRow
+                icon={<Users size={18} />}
+                label="Direct ID"
+                value={getText(affiliate?.AuthloginId, "N/A")}
+                pct={100}
+                status="Direct line"
+              />
+              <MetricRow
+                icon={<ShieldCheck size={18} />}
+                label="Active Direct ID"
+                value={activeDirectMembers}
+                pct={activeDirectNum > 0 ? 100 : 0}
+                status={`${activeDirectMembers} active`}
+              />
+
+              <GroupLabel>Team</GroupLabel>
+              <MetricRow
+                icon={<Network size={18} />}
+                label="Total Team"
+                value={totalTeam}
+                pct={100}
+                status={`${totalTeam} members`}
+                accent="#1f5f7a"
+                from="#2a8f9a"
+                to="#34cdb8"
+              />
+              <MetricRow
+                icon={<Users size={18} />}
+                label="Active Team"
+                value={activeTeam}
+                highlight
+                pct={pctOf(activeTeamNum, totalTeamNum)}
+                status={`${pctOf(activeTeamNum, totalTeamNum).toFixed(0)}% active`}
+                accent="#2fa3c4"
+                from="#3bb5cf"
+                to="#34cdb8"
+              />
+
+              <GroupLabel>Business</GroupLabel>
+              <MetricRow
+                icon={<TrendingUp size={18} />}
+                label="Direct Business"
+                value={<CountUp value={directBusiness} prefix="$" dec={0} />}
+                pct={pctOf(directBusiness, teamBusiness)}
+                status={`${pctOf(directBusiness, teamBusiness).toFixed(0)}% of team`}
+                accent="#d9a441"
+                from="#a8b860"
+                to="#34cdb8"
+              />
+              <MetricRow
+                icon={<TrendingUp size={18} />}
+                label="Team Business"
+                value={<CountUp value={teamBusiness} prefix="$" dec={0} />}
+                pct={100}
+                status="Total"
+                accent="#d9a441"
+                from="#a8b860"
+                to="#34cdb8"
+              />
+              <MetricRow
+                icon={<Zap size={18} />}
+                label="Power Team Business"
+                value={money(powerLeg, 0)}
+                pct={powerPct}
+                status={`${powerPct.toFixed(0)}% of team`}
+                accent="#4b7a85"
+                from="#3f9a9a"
+                to="#34cdb8"
+              />
+              <MetricRow
+                icon={<TrendingUp size={18} />}
+                label="Weaker Team Business"
+                value={money(weakLeg, 0)}
+                pct={weakPct}
+                status={`${weakPct.toFixed(0)}% of team`}
+                accent="#5f7782"
+                from="#4f9a96"
+                to="#34cdb8"
+              />
+
+              {/* Footer */}
+              <div className="grid grid-cols-1 gap-5 px-4 py-4 md:grid-cols-2">
+                <div>
+                  <p className="text-sm text-[#5b7580] dark:text-gray-400">Power vs weaker team</p>
+                  <div className="mt-2 flex gap-1">
+                    <div className="h-3 rounded-full bg-[#4b7a85]" style={{ width: `${powerPct}%` }} />
+                    <div className="h-3 rounded-full bg-[#5f7782]" style={{ width: `${weakPct}%`, minWidth: 6 }} />
+                  </div>
+                  <div className="mt-1 flex justify-between text-xs text-[#5b7580] dark:text-gray-400">
+                    <span>Power {powerPct.toFixed(0)}%</span>
+                    <span>Weaker {weakPct.toFixed(0)}%</span>
+                  </div>
                 </div>
-                <div className="hub-kv"><span>User ID</span><span className="mono">{getText(affiliate?.AuthloginId, "N/A")}</span></div>
-                <div className="hub-kv"><span>Email</span><span className="mono">{getText(affiliate?.EmailId, "N/A")}</span></div>
-                <div className="hub-kv"><span>Mobile</span><span className="mono">{getText(affiliate?.Mobile, "N/A")}</span></div>
-                <div className="hub-kv"><span>Sponsor</span><span className="mono">{getText(affiliate?.SponsorId, "N/A")}</span></div>
-                <div className="hub-kv"><span>Current Rank</span><span>{leadershipRank}</span></div>
-                <div className="hub-kv"><span>Rank Progress</span><span>{rankPercentage}%</span></div>
-                <div className="hub-kv"><span>Strong Team ID</span><span className="mono">{strongLegID}</span></div>
+                <div>
+                  <p className="text-sm text-[#5b7580] dark:text-gray-400">Power Team ID No.</p>
+                  <p className="mt-1 text-2xl font-bold text-[#0f2a33] dark:text-white">{strongLegID}</p>
+                </div>
               </div>
-            </Reveal>
-          </div>
+            </div>
+          </Reveal>
+
+          {/* Personal Info */}
+          <Reveal delay={100}>
+            <div className="hub-card mt-4">
+              <div className="hub-card-head">
+                <h3>Personal Info</h3>
+                <span className="hub-chip muted">Active</span>
+              </div>
+              <div className="hub-kv"><span>User ID</span><span className="mono">{getText(affiliate?.AuthloginId, "N/A")}</span></div>
+              <div className="hub-kv"><span>Email</span><span className="mono">{getText(affiliate?.EmailId, "N/A")}</span></div>
+              <div className="hub-kv"><span>Mobile</span><span className="mono">{getText(affiliate?.Mobile, "N/A")}</span></div>
+              <div className="hub-kv"><span>Sponsor</span><span className="mono">{getText(affiliate?.SponsorId, "N/A")}</span></div>
+              <div className="hub-kv"><span>Current Rank</span><span>{leadershipRank}</span></div>
+              <div className="hub-kv"><span>Rank Progress</span><span>{rankPercentage}%</span></div>
+              <div className="hub-kv"><span>Strong Team ID</span><span className="mono">{strongLegID}</span></div>
+            </div>
+          </Reveal>
         </section>
 
-        <p className="foot">Risk notice — investing involves market risk. Past performance does not guarantee future results.</p>
+        <p className="foot dark:text-gray-400">Risk notice — investing involves market risk. Past performance does not guarantee future results.</p>
       </div>
       <div className={`hub-toast ${toast ? "show" : ""}`}>{toast}</div>
     </>

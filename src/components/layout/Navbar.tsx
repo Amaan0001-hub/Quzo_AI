@@ -135,8 +135,6 @@ export function Navbar() {
     .sort((a, b) => b.href.length - a.href.length)[0]?.label;
   const displayAuthLogin = dashboardData?.data?.[0]?.AuthLogin || user?.name || "Account";
   const walletData = dashboardData?.data?.[0];
-
-  console.log(walletData, "walletData");
   const notificationUserKey = user?.id || displayAuthLogin;
 
   const loadNotifications = useCallback(async () => {
@@ -321,8 +319,8 @@ export function Navbar() {
       id: "performance",
       name: "Quzo Wallet",
       balance: walletData?.QuzoWallet
-        ? `$${Number(walletData.QuzoWallet).toFixed(4)}`
-        : "$0.0000",
+        ? `${Number(walletData.QuzoWallet).toFixed(4)}`
+        : "0.0000",
       icon: TrendingUp,
       color: "#8b5cf6",
       bg: "#ede9fe",

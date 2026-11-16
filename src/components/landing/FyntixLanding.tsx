@@ -50,7 +50,6 @@ export default function FyntixLanding() {
   const [contractCopyStatus, setContractCopyStatus] = useState<"idle" | "copied" | "error">(
     "idle",
   );
-  const contractAddress = "0xA9650709005e8ad1798e42c539D3F1576E3b9850";
 
   useEffect(() => {
     setMounted(true);
