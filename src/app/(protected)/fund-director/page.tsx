@@ -782,7 +782,7 @@ export default function FundDirectorPage() {
   const [depositDetails, setDepositDetails] = useState("");
   const [depositRemark, setDepositRemark] = useState("");
   const [isSubmittingFiatDeposit, setIsSubmittingFiatDeposit] = useState(false);
-  const [incomeWallet, setIncomeWallet] = useState<"income" | "mentor">("income");
+  const [incomeWallet, setIncomeWallet] = useState<"income" | "yield">("income");
   const [incomeAmount, setIncomeAmount] = useState("");
   const [recipient, setRecipient] = useState("");
   const [recipientName, setRecipientName] = useState("");
@@ -793,7 +793,7 @@ export default function FundDirectorPage() {
   const [p2pAmount, setP2pAmount] = useState("");
   const [p2pOtp, setP2pOtp] = useState("");
   const [p2pOtpSent, setP2pOtpSent] = useState(false);
-  const [withdrawWallet, setWithdrawWallet] = useState<"performance" | "mentor">(
+  const [withdrawWallet, setWithdrawWallet] = useState<"performance" | "yield">(
     "performance",
   );
   const [withdrawAmount, setWithdrawAmount] = useState("");
@@ -1094,7 +1094,7 @@ export default function FundDirectorPage() {
       setBalances({
         deposit: Number(data.DepositWallet ?? data.depositWallet) || 0,
         performance: Number(data.IncomeWallet ?? data.incomeWallet) || 0,
-        yield: Number(data.FundWallet ?? data.fundWallet) || 0,
+        yield: Number(data.ROIWallet ?? data.roiWallet) || 0,
         legacy: Number(data.LegacyWallet ?? data.legacyWallet) || 0,
         mentor: Number(data.MentorWallet ?? data.mentorWallet) || 0,
       });
@@ -1448,7 +1448,7 @@ export default function FundDirectorPage() {
   const submitIncomeTransfer = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const amount = Number(incomeAmount);
-    const balanceKey = incomeWallet === "income" ? "performance" : "mentor";
+    const balanceKey = incomeWallet === "income" ? "performance" : "yield";
     if (!Number.isFinite(amount) || amount <= 0 || amount > balances[balanceKey]) {
       toast.error("Enter an amount within the selected wallet balance");
       return;
@@ -1591,7 +1591,7 @@ export default function FundDirectorPage() {
         amount,
         walletAdress: withdrawAddress.trim(),
         payMode: 1,
-        walletType: withdrawWallet === "performance" ? 1 : withdrawWallet === "mentor" ? 2 : 0,
+        walletType: withdrawWallet === "performance" ? 1 : withdrawWallet === "yield" ? 2 : 0,
         withdrawalotp: withdrawalEmailOtp,
       });
       setWithdrawAmount("");
@@ -2068,7 +2068,7 @@ export default function FundDirectorPage() {
                       You can find the transaction reference number in your wallet&apos;s
                       transaction history.
                     </p>
-                    <div className="space-y-2 rounded-xl border border-blue-200 bg-gradient-to-r from-blue-50 to-violet-50 p-4 text-sm dark:border-blue-800/30 dark:from-blue-900/10 dark:to-violet-900/10">
+                    <div className="info-card-blue-violet space-y-2 text-sm">
                       <p className="font-bold text-blue-700 dark:text-cyan-300">📋 Next Steps:</p>
                       <ul className="space-y-1.5 text-slate-600 dark:text-slate-400">
                         <li>• We will verify your transaction</li>
@@ -2108,27 +2108,27 @@ export default function FundDirectorPage() {
                       <select
                         value={incomeWallet}
                         onChange={(event) =>
-                          setIncomeWallet(event.target.value as "income" | "mentor")
+                          setIncomeWallet(event.target.value as "income" | "yield")
                         }
                         className="w-full rounded-xl border-2 border-slate-200 bg-white px-4 py-2.5 font-medium outline-none transition focus:border-[#1680ff] focus:ring-4 focus:ring-blue-500/10 dark:border-slate-700 dark:bg-slate-800 dark:text-white sm:w-auto"
                       >
                         <option value="income">Income Wallet</option>
-                        <option value="mentor">Mentor Wallet</option>
+                        <option value="yield">Yield Wallet</option>
                       </select>
                     </label>
                   )}
                 </div>
 
-                <div className="mb-6 flex flex-col items-start justify-between gap-3 rounded-xl border border-blue-100/70 bg-gradient-to-r from-blue-50/70 to-violet-50/70 p-4 dark:border-blue-800/30 dark:from-blue-900/10 dark:to-violet-900/10 sm:flex-row sm:items-center">
+                <div className="info-card-blue-violet">
                   <p className="text-sm font-semibold text-slate-700 dark:text-slate-300">
                     {otpSent
                       ? "Transfer confirmation"
-                      : `${incomeWallet === "income" ? "Income" : "Mentor"} Wallet Balance`}
+                      : `${incomeWallet === "income" ? "Income" : "yield"} Wallet Balance`}
                   </p>
                   <p className="text-sm font-semibold text-slate-700 dark:text-white">
                     Balance:{" "}
                     <span className="text-slate-700 dark:text-white bg-gradient-to-r from-[#1680ff] via-[#25c6e8] to-[#7d75ff] bg-clip-text text-transparent">
-                      {money(otpSent ? balances.deposit : balances[incomeWallet === "income" ? "performance" : "mentor"])}
+                      {money(otpSent ? balances.deposit : balances[incomeWallet === "income" ? "performance" : "yield"])}
                     </span>
                   </p>
                 </div>
@@ -2149,7 +2149,7 @@ export default function FundDirectorPage() {
                         disabled={
                           !incomeAmount ||
                           Number(incomeAmount) < 1 ||
-                          Number(incomeAmount) > balances[incomeWallet === "income" ? "performance" : "mentor"]
+                          Number(incomeAmount) > balances[incomeWallet === "income" ? "performance" : "yield"]
                         }
                       >
                         <ShieldCheck className="h-4 w-4" />
@@ -2216,7 +2216,7 @@ export default function FundDirectorPage() {
                     <span className="h-6 w-1 rounded-full bg-gradient-to-b from-[#1680ff] to-[#7d75ff]" />
                     Transfer To Deposit Wallet
                   </h2>
-                  <div className="rounded-xl border border-blue-100/70 bg-gradient-to-r from-blue-50/70 to-violet-50/70 px-4 py-2 text-sm font-semibold text-slate-700 dark:border-blue-800/30 dark:from-blue-900/10 dark:to-violet-900/10 dark:text-slate-300">
+                  <div className="badge-blue-violet">
                     Balance:{" "}
                     <span className="text-slate-700 dark:text-slate-100 bg-gradient-to-r from-[#1680ff] via-[#25c6e8] to-[#7d75ff] bg-clip-text text-transparent">
                       {money(balances.deposit)}
@@ -2359,23 +2359,23 @@ export default function FundDirectorPage() {
                   </div>
                 </div>
 
-                <div className="mb-6 flex flex-col items-start justify-between gap-4 rounded-xl border border-blue-100/70 bg-gradient-to-r from-blue-50/70 to-violet-50/70 p-4 dark:border-blue-800/30 dark:from-blue-900/10 dark:to-violet-900/10 sm:flex-row sm:items-center">
+                <div className="mb-6 flex flex-col items-start gap-4 rounded-xl border border-green-100/70 bg-gradient-to-r from-green-50/70 to-white/70 p-4 dark:border-green-800/30 dark:from-green-900/10 dark:to-slate-800/10 sm:flex-row sm:items-center sm:justify-between">
                   <label className="flex w-full items-center gap-3 text-sm font-medium text-slate-700 dark:text-slate-300 sm:w-auto">
                     <Wallet className="h-5 w-5 shrink-0 text-[#1680ff] dark:text-[#25c6e8]" />
                     <select
                       value={withdrawWallet}
                       onChange={(event) =>
-                        setWithdrawWallet(event.target.value as "performance" | "mentor")
+                        setWithdrawWallet(event.target.value as "performance" | "yield")
                       }
                       className="w-full rounded-xl border-2 border-slate-200 bg-white px-4 py-2.5 font-medium outline-none transition focus:border-[#1680ff] focus:ring-4 focus:ring-blue-500/10 dark:border-slate-700 dark:bg-slate-800 dark:text-white sm:w-auto"
                     >
                       <option value="performance">Income Wallet</option>
-                      <option value="mentor">Mentor Wallet</option>
+                      <option value="yield">Yield Wallet</option>
                     </select>
                   </label>
-                  <div className="whitespace-nowrap text-sm font-semibold text-slate-700 dark:text-slate-100">
+                  <div className="w-full text-sm font-semibold text-slate-700 dark:text-slate-100 sm:w-auto">
                     Balance:{" "}
-                    <span className="text-slate-700 dark:text-slate-100 bg-gradient-to-r from-[#1680ff] via-[#25c6e8] to-[#7d75ff] bg-clip-text text-transparent">
+                    <span className="bg-gradient-to-r from-[#1680ff] via-[#25c6e8] to-[#7d75ff] bg-clip-text text-transparent">
                       {money(balances[withdrawWallet])}
                     </span>
                   </div>

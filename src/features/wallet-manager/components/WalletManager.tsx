@@ -540,20 +540,22 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { Clock3, Loader2, RefreshCw, Search, TrendingDown, TrendingUp, Wallet } from "lucide-react";
 import { useDashboardSummary } from "@/features/dashboard/hooks/useDashboardSummary";
 
-type ReportTab = "deposit" | "income" | "mentor" | "fund";
+type ReportTab = "deposit" | "income" | "quzo" | "yield";
 type ReportRow = Record<string, unknown>;
 
 const tabs: { id: ReportTab; label: string }[] = [
   { id: "deposit", label: "USDT Wallet" },
-  { id: "mentor", label: "Mentor Wallet" },
-  { id: "fund", label: "Fund Wallet" },
-  { id: "income", label: "Income Wallet" },
+  { id: "income", label: "Working Wallet" },
+  { id: "yield", label: "Yield Wallet" },
+  { id: "quzo", label: "Quzo Wallet" },
+  
+  
 ];
 
 const reportColumns: Record<ReportTab, string[]> = {
   deposit: ["Transaction Type", "Date", "Credit", "Debit", "Remark"],
-  mentor: ["Transaction Type", "Date", "Credit", "Debit", "Remark"],
-  fund: ["Transaction Type", "Date", "Credit", "Debit", "Remark"],
+  quzo: ["Transaction Type", "Date", "Credit", "Debit", "Remark"],
+  yield: ["Transaction Type", "Date", "Credit", "Debit", "Remark"],
   income: ["Transaction Type", "Date", "Credit", "Debit", "Remark"],
 };
 
@@ -765,12 +767,12 @@ export function WalletManager() {
       label: "USDT Wallet Balance",
       value: Number(summary?.DepositWallet ?? 0),
     },
-    mentor: {
-      label: "Mentor Wallet Balance",
-      value: Number(summary?.MentorWallet ?? 0),
+    quzo: {
+      label: "Quzo Wallet Balance",
+      value: Number(summary?.QuzoWallet ?? 0),
     },
-    fund: {
-      label: "Fund Wallet Balance",
+    yield: {
+      label: "Yield Wallet Balance",
       value: Number(summary?.FundWallet ?? 0),
     },
     income: {

@@ -16,7 +16,7 @@ import {
 } from "react-icons/fa";
 
 export default function Reports() {
-  const [activeTab, setActiveTab] = useState("Dynamic Referral Yield");
+  const [activeTab, setActiveTab] = useState("Direct Referral Income");
   const pathname = usePathname();
   const pageName = getPageName(pathname);
 
@@ -30,28 +30,26 @@ export default function Reports() {
 
   const getTransactionType = (tabName: string) => {
     const map: Record<string, string> = {
-      "Dynamic Referral Yield": "Dynamic Referral Yield",
-      "Daily Revenue Sharing": "Daily Revenue Sharing",
-      "Booster Profit": "Booster Profit",
-      "Unity Revenue Yield": "Unity Revenue Yield",
-      "Performance Revenue": "Performance Revenue",
-      "Smart Bonds": "Smart Bonds",
-      "Smart Growth": "Smart Growth",
-      "Secure Bonds": "Secure Bonds",
+      "Direct Referral Income": "Direct Referral Income",
+      "Daily Profit Income": "Daily Profit Income",
+      "Level Income": "Level Income",
+      "Booster Income": "Booster Income",
+      "DAO Income": "DAO Income",
+      "Rewards Income": "Rewards Income",
+      "Salary Income": "Salary Income",
 
     };
     return map[tabName] || "ALL";
   };
 
   const tabs = [
-    { id: "Dynamic Referral Yield", label: "Dynamic Referral Yield", icon: FaUserPlus },
-    { id: "Daily Revenue Sharing", label: "Daily Revenue Sharing", icon: FaMoneyBillWave },
-    { id: "Booster Profit", label: "Booster Profit", icon: FaGift },
-    { id: "Unity Revenue Yield", label: "Unity Revenue Yield", icon: FaSeedling },
-    { id: "Performance Revenue", label: "Performance Revenue", icon: FaLayerGroup },
-    { id: "Smart Bonds", label: "Smart Bonds", icon: FaUsers },
-    { id: "Smart Growth", label: "Smart Growth", icon: FaCrown },
-    { id: "Secure Bonds", label: "Secure Bonds", icon: FaMedal },
+    { id: "Direct Referral Income", label: "Direct Referral Income", icon: FaUserPlus },
+    { id: "Daily Profit Income", label: "Daily Profit Income", icon: FaMoneyBillWave },
+    { id: "Booster Income", label: "Booster Income", icon: FaGift },
+    { id: "DAO Income", label: "DAO Income", icon: FaSeedling },
+    { id: "Rewards Income", label: "Rewards Income", icon: FaLayerGroup },
+    { id: "Salary Income", label: "Salary Income", icon: FaUsers },
+    { id: "Level Income", label: "Level Income", icon: FaCrown },
   ];
 
   return (
