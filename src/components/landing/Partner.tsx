@@ -3,8 +3,6 @@ import type { ChangeEvent, FormEvent } from "react";
 import { ArrowUpRight, Mail, CheckCircle2, AlertCircle, Loader2 } from "lucide-react";
 import { Reveal } from "@/components/landing/Reveal";
 
-const API = process.env.REACT_APP_BACKEND_URL;
-
 type EnquiryType =
   | "Partnership"
   | "Developer"
@@ -28,7 +26,6 @@ type Form = {
   organisation: string;
   enquiry_type: EnquiryType;
   message: string;
-  website: string;
 };
 
 type FormErrors = Partial<Record<keyof Form, string>>;
@@ -41,7 +38,6 @@ const EMPTY: Form = {
   organisation: "",
   enquiry_type: "Partnership",
   message: "",
-  website: "",
 };
 
 const validate = (f: Form): FormErrors => {
@@ -91,7 +87,6 @@ export const Partner = () => {
   const [state, setState] = useState<Status>("idle");
   const [serverError, setServerError] = useState<string>("");
   const nameRef = useRef<HTMLInputElement>(null);
-  const startedAt = useRef<number>(Date.now());
 
   const set =
     (k: keyof Form) =>
@@ -113,22 +108,27 @@ export const Partner = () => {
     setState("submitting");
 
     try {
-      const res = await fetch(`${API}/api/contact`, {
+      const res = await fetch("/api/contact-us", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...form, elapsed_ms: Date.now() - startedAt.current }),
+        body: JSON.stringify({
+          name: form.name,
+          Email: form.email,
+          EnquiryType: form.enquiry_type,
+          message: form.message,
+        }),
       });
 
       if (!res.ok) {
-        const data = (await res.json().catch(() => ({}))) as { detail?: unknown };
-        const detail =
-          typeof data.detail === "string"
-            ? data.detail
+        const data = (await res.json().catch(() => ({}))) as { message?: unknown };
+        const message =
+          typeof data.message === "string"
+            ? data.message
             : "Please check your details and try again.";
         throw new Error(
           res.status === 429
             ? "Too many enquiries from your connection. Please try again later."
-            : detail,
+            : message,
         );
       }
 
@@ -146,7 +146,6 @@ export const Partner = () => {
   };
 
   const reset = () => {
-    startedAt.current = Date.now();
     setState("idle");
   };
 
@@ -258,19 +257,6 @@ export const Partner = () => {
                   data-testid="partner-org-input"
                 />
               </label>
-
-              <div className="absolute -left-[9999px] h-px w-px overflow-hidden" aria-hidden="true">
-                <label>
-                  Website
-                  <input
-                    tabIndex={-1}
-                    autoComplete="off"
-                    value={form.website}
-                    onChange={set("website")}
-                    name="website"
-                  />
-                </label>
-              </div>
 
               <fieldset className="mt-5">
                 <legend className="text-xs text-slate-300">Enquiry type</legend>

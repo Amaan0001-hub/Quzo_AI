@@ -111,7 +111,7 @@ export function ForgotPassword() {
 
         {/* RIGHT: form */}
         <div className="w-full lg:w-1/2 p-8 md:p-12 flex flex-col justify-center relative bg-[#031B23]/40">
-          <div className="flex flex-col items-center lg:items-start text-center lg:text-left mb-8">
+          <Link href="/" className="flex flex-col items-center lg:items-start text-center lg:text-left mb-8 hover:opacity-80 transition-opacity">
             <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-[#19D8D0]/30 bg-[#19D8D0]/10 px-4 py-1.5 text-[11px] font-mono uppercase tracking-widest text-[#19D8D0]">
               <Sparkles size={14} />
               Account Recovery
@@ -122,7 +122,7 @@ export function ForgotPassword() {
             <p className="mt-2 font-mono text-[11px] tracking-[0.2em] text-slate-400 uppercase">
               Reset your account access
             </p>
-          </div>
+          </Link>
 
           {/* API Logic Integrated Here */}
           {isSubmitted ? (

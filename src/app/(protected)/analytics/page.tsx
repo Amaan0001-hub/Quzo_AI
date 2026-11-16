@@ -2,27 +2,24 @@
 
 import { useState, useEffect } from "react";
 
-interface ExecutionRow {
-  time: string;
-  chain: string;
-  route: string;
-  pair: string;
-  tx: string;
-  amount: number;
-  spread: number;
-  latency: number;
+interface AnalyticsData {
+  TradeID: number;
+  Capital: number;
+  TradeDate: string;
+  AssetID: number;
+  AIAgent: string;
+  TradeAction: string;
+  EntryPrice: number;
+  ExitPrice: number;
+  ProfitPercentage: number;
+  Profit: number;
+  PortfolioValue: number;
+  Status: string;
+  CreatedOn: string | null;
+  TotalProfit: number;
 }
 
 const ACCENT_COLOR = "#12a594";
-const CHAINS = [
-  { name: "ALL", count: 60 },
-  { name: "AVAX", count: 9 },
-  { name: "ETH", count: 8 },
-  { name: "SOL", count: 8 },
-  { name: "BSC", count: 15 },
-  { name: "ARB", count: 8 },
-  { name: "BASE", count: 12 },
-];
 
 export default function AnalyticsPage() {
   const [opsValue, setOpsValue] = useState(1716);
@@ -34,91 +31,31 @@ export default function AnalyticsPage() {
   const [p50, setP50] = useState(68);
   const [p95, setP95] = useState(132);
 
-  const [activeChain, setActiveChain] = useState("ALL");
-  const [streamRows, setStreamRows] = useState<ExecutionRow[]>([
-    {
-      time: "12:49:11",
-      chain: "BSC",
-      route: "Wombat → THENA",
-      pair: "BNB/USDT",
-      tx: "0xe7bcb…4703",
-      amount: 7296,
-      spread: 24,
-      latency: 202,
-    },
-    {
-      time: "12:49:08",
-      chain: "BASE",
-      route: "Aerodrome → BaseSwap",
-      pair: "ETH/USDC",
-      tx: "0x63484…fe1a",
-      amount: 9342,
-      spread: 35,
-      latency: 285,
-    },
-    {
-      time: "12:49:05",
-      chain: "BSC",
-      route: "PancakeSwap → Biswap",
-      pair: "BNB/USDT",
-      tx: "0xc4448…1a46",
-      amount: 7442,
-      spread: 65,
-      latency: 54,
-    },
-    {
-      time: "12:49:03",
-      chain: "BSC",
-      route: "PancakeSwap → Biswap",
-      pair: "BNB/USDT",
-      tx: "0xc9e8f…8d42",
-      amount: 7962,
-      spread: 39,
-      latency: 420,
-    },
-    {
-      time: "12:49:00",
-      chain: "AVAX",
-      route: "Pangolin → Trader Joe",
-      pair: "AVAX/USDT",
-      tx: "0x53f72…5e4b",
-      amount: 6202,
-      spread: 9,
-      latency: 316,
-    },
-    {
-      time: "12:48:58",
-      chain: "BASE",
-      route: "Uniswap v3 → Aerodrome",
-      pair: "ETH/USDC",
-      tx: "0x18b84…b81b",
-      amount: 8930,
-      spread: 44,
-      latency: 272,
-    },
-    {
-      time: "12:48:55",
-      chain: "BSC",
-      route: "Wombat → THENA",
-      pair: "BNB/USDT",
-      tx: "0x38dc6…15a0",
-      amount: 8299,
-      spread: 38,
-      latency: 360,
-    },
-    {
-      time: "12:48:52",
-      chain: "BSC",
-      route: "Wombat → THENA",
-      pair: "BNB/USDT",
-      tx: "0xb6926…a578",
-      amount: 8878,
-      spread: 44,
-      latency: 357,
-    },
-  ]);
+  const [analyticsData, setAnalyticsData] = useState<AnalyticsData[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  // Simulate live data updates
+  // Fetch analytics data from API
+  useEffect(() => {
+    const fetchAnalytics = async () => {
+      try {
+        const response = await fetch("/api/analytics", {
+          method: "POST",
+        });
+        const result = await response.json();
+        if (result.data) {
+          setAnalyticsData(result.data);
+        }
+      } catch (error) {
+        console.error("Failed to fetch analytics:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchAnalytics();
+  }, []);
+
+  // Simulate live data updates for stats
   useEffect(() => {
     const interval = setInterval(() => {
       setOpsValue((prev) => Math.max(1500, Math.min(1800, prev + (Math.random() - 0.5) * 50)));
@@ -129,40 +66,12 @@ export default function AnalyticsPage() {
       setReserveValue((prev) => Math.max(1.4, Math.min(1.6, prev + (Math.random() - 0.5) * 0.01)));
       setP50((prev) => Math.max(50, Math.min(100, prev + (Math.random() - 0.5) * 10)));
       setP95((prev) => Math.max(100, Math.min(180, prev + (Math.random() - 0.5) * 15)));
-
-      // Add new execution row
-      const chainIndex = Math.floor(Math.random() * (CHAINS.length - 1)) + 1;
-      const newChain = CHAINS[chainIndex]?.name ?? "BSC";
-      const routes = [
-        "Wombat → THENA",
-        "Aerodrome → BaseSwap",
-        "PancakeSwap → Biswap",
-        "Pangolin → Trader Joe",
-        "Uniswap v3 → Aerodrome",
-        "Orca → Raydium",
-      ];
-      const pairs = ["BNB/USDT", "ETH/USDC", "AVAX/USDT", "SOL/USDC", "ARB/ETH"];
-      const now = new Date();
-      const time = `${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}:${String(now.getSeconds()).padStart(2, "0")}`;
-
-      const newRow: ExecutionRow = {
-        time,
-        chain: newChain,
-        route: routes[Math.floor(Math.random() * routes.length)]!,
-        pair: pairs[Math.floor(Math.random() * pairs.length)]!,
-        tx: `0x${Math.random().toString(16).substr(2, 4)}…${Math.random().toString(16).substr(2, 4)}`,
-        amount: Math.floor(Math.random() * 5000) + 5000,
-        spread: Math.floor(Math.random() * 50) + 10,
-        latency: Math.floor(Math.random() * 400) + 50,
-      };
-
-      setStreamRows((prev) => [newRow, ...prev].slice(0, 8));
     }, 2000);
 
     return () => clearInterval(interval);
   }, []);
 
-  const filteredRows = activeChain === "ALL" ? streamRows : streamRows.filter((row) => row.chain === activeChain);
+
 
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat("en-US", {
@@ -371,59 +280,63 @@ export default function AnalyticsPage() {
           </div>
         </div>
 
-        {/* Chain Pills */}
-        <div className="flex flex-wrap gap-2 mb-4">
-          {CHAINS.map((chain) => (
-            <button
-              key={chain.name}
-              onClick={() => setActiveChain(chain.name)}
-              className={`rounded-full px-3 py-1.5 text-xs font-mono font-medium flex items-center gap-1.5 transition-colors ${
-                activeChain === chain.name
-                  ? "bg-blue-600 text-white dark:bg-cyan-400 dark:text-slate-950"
-                  : "bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-blue-50 hover:text-blue-700 dark:hover:bg-cyan-900/20 dark:hover:text-cyan-300"
-              }`}
-            >
-              <span className="h-1.5 w-1.5 rounded-full" style={{ background: activeChain === chain.name ? "currentColor" : "#9ca3af" }}></span>
-              {chain.name} <span className="text-gray-400">{chain.count}</span>
-            </button>
-          ))}
-        </div>
+
 
         {/* Execution Table */}
         <div className="overflow-x-auto">
-          <table className="w-full text-sm min-w-[760px]">
-            <thead>
-              <tr className="border-b border-gray-200 dark:border-[#1E293B]">
-                <th className="text-left px-3 py-2 text-[11px] font-medium text-gray-400">TIME</th>
-                <th className="text-left px-3 py-2 text-[11px] font-medium text-gray-400">CHAIN</th>
-                <th className="text-left px-3 py-2 text-[11px] font-medium text-gray-400">ROUTE</th>
-                <th className="text-left px-3 py-2 text-[11px] font-medium text-gray-400">PAIR · TX</th>
-                <th className="text-right px-3 py-2 text-[11px] font-medium text-gray-400">AMOUNT</th>
-                <th className="text-right px-3 py-2 text-[11px] font-medium text-gray-400">SPREAD</th>
-                <th className="text-right px-3 py-2 text-[11px] font-medium text-gray-400">LATENCY</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredRows.map((row, index) => (
-                <tr key={index} className="border-b border-gray-200 dark:border-[#1E293B]">
-                  <td className="px-3 py-2.5 font-mono text-xs text-gray-500 dark:text-gray-400">{row.time}</td>
-                  <td className="px-3 py-2.5">
-                    <span className="font-mono text-[11px] font-semibold px-1.5 py-0.5 rounded border border-gray-200 dark:border-[#1E293B]">
-                      {row.chain}
-                    </span>
-                  </td>
-                  <td className="px-3 py-2.5 text-gray-700 dark:text-gray-300">{row.route}</td>
-                  <td className="px-3 py-2.5">
-                    <div className="font-mono text-xs font-semibold text-gray-900 dark:text-white">{row.pair}</div>
-                    <div className="font-mono text-[10px] text-gray-400">{row.tx}</div>
-                  </td>
-                  <td className="px-3 py-2.5 text-right font-mono font-semibold text-gray-900 dark:text-white">{formatCurrency(row.amount)}</td>
-                  <td className="px-3 py-2.5 text-right font-mono text-gray-500 dark:text-gray-400">{row.spread} bps</td>
-                  <td className="px-3 py-2.5 text-right font-mono text-gray-500 dark:text-gray-400">{row.latency} ms</td>
+          {loading ? (
+            <div className="text-center py-8 text-gray-500">Loading analytics data...</div>
+          ) : (
+            <table className="w-full text-sm min-w-[760px]">
+              <thead>
+                <tr className="border-b border-gray-200 dark:border-[#1E293B]">
+                  <th className="text-left px-3 py-2 text-[11px] font-medium text-gray-400">DATE</th>
+                  <th className="text-left px-3 py-2 text-[11px] font-medium text-gray-400">AI AGENT</th>
+                  <th className="text-left px-3 py-2 text-[11px] font-medium text-gray-400">ACTION</th>
+                  <th className="text-left px-3 py-2 text-[11px] font-medium text-gray-400">ASSET · ID</th>
+                  <th className="text-right px-3 py-2 text-[11px] font-medium text-gray-400">ENTRY PRICE</th>
+                  <th className="text-right px-3 py-2 text-[11px] font-medium text-gray-400">EXIT PRICE</th>
+                  <th className="text-right px-3 py-2 text-[11px] font-medium text-gray-400">CAPITAL</th>
+                  <th className="text-right px-3 py-2 text-[11px] font-medium text-gray-400">PROFIT %</th>
+                  <th className="text-right px-3 py-2 text-[11px] font-medium text-gray-400">TOTAL PROFIT</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {analyticsData.map((row) => (
+                  <tr key={row.TradeID} className="border-b border-gray-200 dark:border-[#1E293B]">
+                    <td className="px-3 py-2.5 font-mono text-xs text-gray-500 dark:text-gray-400">
+                      {new Date(row.TradeDate).toLocaleDateString()}
+                    </td>
+                    <td className="px-3 py-2.5">
+                      <span className="font-mono text-[11px] font-semibold px-1.5 py-0.5 rounded border border-gray-200 dark:border-[#1E293B]">
+                        {row.AIAgent}
+                      </span>
+                    </td>
+                    <td className="px-3 py-2.5 text-gray-700 dark:text-gray-300">{row.TradeAction}</td>
+                    <td className="px-3 py-2.5">
+                      <div className="font-mono text-xs font-semibold text-gray-900 dark:text-white">Asset #{row.AssetID}</div>
+                      <div className="font-mono text-[10px] text-gray-400">Trade #{row.TradeID}</div>
+                    </td>
+                    <td className="px-3 py-2.5 text-right font-mono text-gray-500 dark:text-gray-400">
+                      ${row.EntryPrice.toFixed(2)}
+                    </td>
+                    <td className="px-3 py-2.5 text-right font-mono text-gray-500 dark:text-gray-400">
+                      ${row.ExitPrice.toFixed(2)}
+                    </td>
+                    <td className="px-3 py-2.5 text-right font-mono font-semibold text-gray-900 dark:text-white">
+                      {formatCurrency(row.Capital)}
+                    </td>
+                    <td className="px-3 py-2.5 text-right font-mono text-gray-500 dark:text-gray-400">
+                      {row.ProfitPercentage}%
+                    </td>
+                    <td className="px-3 py-2.5 text-right font-mono text-gray-500 dark:text-gray-400">
+                      {formatCurrency(row.TotalProfit)}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
         </div>
       </div>
     </div>

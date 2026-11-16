@@ -14,6 +14,42 @@ import {
 } from "lucide-react";
 import { homePageData } from "@/features/dashboard/constants/home-page";
 import { useDashboardSummary } from "@/features/dashboard/hooks/useDashboardSummary";
+import { useNotifications } from "@/features/dashboard/hooks/useNotifications";
+import Qurobot from "@/components/common/Qurobot";
+
+function formatNotificationDate(dateString: string): string {
+  const date = new Date(dateString);
+  const now = new Date();
+  const diffMs = now.getTime() - date.getTime();
+  const diffMins = Math.floor(diffMs / 60000);
+  const diffHours = Math.floor(diffMs / 3600000);
+  const diffDays = Math.floor(diffMs / 86400000);
+
+  if (diffMins < 1) return "Just now";
+  if (diffMins < 60) return `${diffMins} min ago`;
+  if (diffHours < 24) return `${diffHours}h ago`;
+  if (diffDays === 1) return "Yesterday";
+  if (diffDays < 7) return `${diffDays} days ago`;
+
+  return date.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+}
+
+function getNotificationColor(remarks: string): string {
+  const lower = remarks.toLowerCase();
+  if (lower.includes("credit") || lower.includes("deposit") || lower.includes("roi")) {
+    return "#12a594";
+  }
+  if (lower.includes("debit") || lower.includes("withdrawal")) {
+    return "#e94f4f";
+  }
+  if (lower.includes("ai") || lower.includes("strategy")) {
+    return "#3b8df0";
+  }
+  if (lower.includes("reply") || lower.includes("query") || lower.includes("ticket")) {
+    return "#d9a441";
+  }
+  return "#8b6cf0";
+}
 
 const coinPeriods = ["1D", "7D", "30D", "90D", "1Y"] as const;
 const performancePeriods = ["7D", "30D", "90D", "1Y"] as const;
@@ -68,29 +104,6 @@ const promotions = [
     color: "#1f5f7a",
   },
 ] as const;
-
-const activity = [
-  {
-    title: "AI bot profit credited",
-    amount: "+$41.52",
-    time: "Today · 09:42 AM",
-    color: "#12a594",
-  },
-  {
-    title: "Investment activated",
-    amount: "$1,000.00",
-    time: "Nov 12 · 02:11 PM",
-    color: "#3b8df0",
-  },
-  { title: "QUZO reward credited", amount: "+500.0000 QZ", time: "Yesterday", color: "#12b5a3" },
-  { title: "USDT deposit", amount: "+$920.00", time: "Yesterday", color: "#8b6cf0" },
-  {
-    title: "Level income received",
-    amount: "+$12.80",
-    time: "Nov 10 · 11:15 AM",
-    color: "#10a67b",
-  },
-];
 
 function formatMoney(value: number, digits = 2) {
   return value.toLocaleString("en-US", {
@@ -378,6 +391,12 @@ export function MemberHomeDashboard() {
   } = useDashboardSummary();
   const walletData = dashboardSummary?.data?.[0];
 
+  const {
+    data: notificationsData,
+    isLoading: isNotificationsLoading,
+  } = useNotifications();
+  const notifications = notificationsData?.data || [];
+
   const wallets = [
     {
       name: "USDT Wallet",
@@ -416,7 +435,7 @@ export function MemberHomeDashboard() {
   const totalWalletBalance = (walletData?.DepositWallet || 0) +
     (walletData?.WorkingWallet ?? walletData?.IncomeWallet ?? 0) +
     (walletData?.YieldWallet || 0) +
-    (walletData?.QuzoWallet ? Number(walletData.QuzoWallet) * 0.3684 : 0);
+    (walletData?.QuzoWallet ? Number(walletData.QuzoWallet) : 0);
 
   useEffect(() => {
     const timer = window.setInterval(
@@ -714,9 +733,10 @@ export function MemberHomeDashboard() {
             </div>
             <div className="min-w-0 flex-1">
               {[
-                ["Invested amount", "$1,000.00"],
-                ["Total profit", "+$1,245.60"],
-                ["ROI (cumulative)", "+124.56%"],
+                ["Invested amount", walletData?.TradingPackage ? `$${Number(walletData.TradingPackage).toFixed(2)}` : "$0"],
+                ["Booster Status", walletData?.BoosterPackage ?? "N/A"],
+                ["Package Status", walletData?.Boostertype ?? "N/A"],
+                ["Rank", walletData?.UserRank ?? "N/A"],
               ].map(([label, value], index) => (
                 <div
                   key={label}
@@ -778,32 +798,7 @@ export function MemberHomeDashboard() {
       </div>
 
       <div className="grid gap-4 xl:grid-cols-3">
-        <Panel>
-          <SectionHeading>
-            <Coins className="h-4 w-4 text-[#12a594]" aria-hidden />
-            Earnings overview
-          </SectionHeading>
-          <div className="mt-4 grid grid-cols-3 gap-2">
-            {homePageData.earnings.map((item) => (
-              <div
-                key={item.label}
-                className="min-w-0 border-l border-[#d9e8ec] pl-2 first:border-0 first:pl-0 dark:border-[#153747]"
-              >
-                <span
-                  className="block h-2 w-2 rounded-full"
-                  style={{ backgroundColor: item.color }}
-                />
-                <p className="mt-2 text-[10px] leading-4 text-[#5b7885] dark:text-[#84a2ad]">
-                  {item.label}
-                </p>
-                <p className="mt-1 truncate text-sm font-semibold text-[#06262f] dark:text-white">
-                  ${formatMoney(item.amount)}
-                </p>
-                <p className="mt-1 text-[10px] text-[#12a594]">▲ {item.change}</p>
-              </div>
-            ))}
-          </div>
-        </Panel>
+        <Qurobot />
 
         <Panel>
           <div className="flex items-center justify-between gap-2">
@@ -813,26 +808,38 @@ export function MemberHomeDashboard() {
             </SectionHeading>
             <Pill>● Live</Pill>
           </div>
-          <div className="mt-2 divide-y divide-dashed divide-[#d9e8ec] dark:divide-[#153747]">
-            {activity.slice(0, 3).map((item) => (
-              <div key={item.title} className="flex items-center gap-2.5 py-2.5 first:pt-1">
-                <span
-                  className="h-2 w-2 shrink-0 rounded-full"
-                  style={{ backgroundColor: item.color }}
-                />
-                <span className="min-w-0 flex-1">
-                  <span className="block truncate text-[11px] font-medium text-[#06262f] dark:text-white">
-                    {item.title}
-                  </span>
-                  <span className="block text-[10px] text-[#5b7885] dark:text-[#84a2ad]">
-                    {item.time}
-                  </span>
-                </span>
-                <strong className="shrink-0 text-[11px] text-[#06262f] dark:text-white">
-                  {item.amount}
-                </strong>
+          <div className={`mt-2 divide-y divide-dashed divide-[#d9e8ec] dark:divide-[#153747] ${notifications.length > 10 ? 'max-h-[320px] overflow-y-auto' : ''}`}>
+            {isNotificationsLoading ? (
+              <div className="py-4 text-center text-[11px] text-[#5b7885] dark:text-[#84a2ad]">
+                Loading...
               </div>
-            ))}
+            ) : notifications.length === 0 ? (
+              <div className="py-4 text-center text-[11px] text-[#5b7885] dark:text-[#84a2ad]">
+                No recent activity
+              </div>
+            ) : (
+              notifications.slice(0, 8).map((item, index) => (
+                <div key={index} className="flex items-center gap-2.5 py-2.5 first:pt-1">
+                  <span
+                    className="h-2 w-2 shrink-0 rounded-full"
+                    style={{ backgroundColor: getNotificationColor(item.AdminRemarks) }}
+                  />
+                  <span className="min-w-0 flex-1">
+                    <span className="block truncate text-[11px] font-medium text-[#06262f] dark:text-white">
+                      {item.AdminRemarks}
+                    </span>
+                    <span className="block text-[10px] text-[#5b7885] dark:text-[#84a2ad]">
+                      {formatNotificationDate(item.NotificationDate)}
+                    </span>
+                  </span>
+                  {item.Amount && (
+                    <strong className="shrink-0 text-[11px] text-[#06262f] dark:text-white">
+                      {item.Amount}
+                    </strong>
+                  )}
+                </div>
+              ))
+            )}
           </div>
         </Panel>
 
