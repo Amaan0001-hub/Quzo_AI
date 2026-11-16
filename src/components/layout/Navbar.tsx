@@ -289,7 +289,7 @@ export function Navbar() {
   const wallets = [
     {
       id: "income",
-      name: "Working Wallet",
+      name: "Working Reward Wallet",
       balance: walletData?.IncomeWallet
         ? `$${Number(walletData.IncomeWallet).toFixed(4)}`
         : "$0.0000",
@@ -299,7 +299,7 @@ export function Navbar() {
     },
     {
       id: "yield",
-      name: "Yield Wallet",
+      name: "Trading Reward Wallet",
       balance: walletData?.YieldWallet ? `$${Number(walletData.YieldWallet).toFixed(4)}` : "$0.0000",
       icon: BarChart3,
       color: "#10b981",
@@ -307,7 +307,7 @@ export function Navbar() {
     },
     {
       id: "deposit",
-      name: "USDT Wallet",
+      name: "USDT Funding Wallet",
       balance: walletData?.DepositWallet
         ? `$${Number(walletData.DepositWallet).toFixed(4)}`
         : "$0.0000",
@@ -317,7 +317,7 @@ export function Navbar() {
     },
     {
       id: "performance",
-      name: "Quzo Wallet",
+      name: "QUZO Coin Wallet",
       balance: walletData?.QuzoWallet
         ? `${Number(walletData.QuzoWallet).toFixed(4)}`
         : "0.0000",
@@ -398,7 +398,7 @@ export function Navbar() {
           </button>
 
           {walletOpen && (
-            <div className="absolute right-0 top-full z-50 mt-3 w-[320px] overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-2xl dark:border-[#1E293B] dark:bg-[#0B1021] dark:shadow-black/50">
+            <div className="absolute right-0 top-full z-50 mt-3 w-[350px] overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-2xl dark:border-[#1E293B] dark:bg-[#0B1021] dark:shadow-black/50">
               <div className="flex items-center justify-between border-b border-gray-100 p-4 dark:border-[#1E293B]">
                 <div className="flex items-center gap-3">
                   <div className="flex h-10 w-10 items-center justify-center rounded-full bg-green-100 text-green-600">

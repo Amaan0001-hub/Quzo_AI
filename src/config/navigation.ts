@@ -12,13 +12,13 @@ export const primaryNav: NavItem[] = [
   // },
 
   {
-    label: "Packages",
+    label: "AI Subscriptions",
     href: "/",
     isDropdown: true,
     dropdownItems: [
-      { label: "Investment Fund ", href: "/investment-amount" },
+      { label: "Explore Plans", href: "/investment-amount" },
       // { label: "Booster", href: "/booster" },
-      { label: "Order History", href: "/order-history" },
+      { label: "Purchase History", href: "/order-history" },
     ],
   },
 
@@ -40,16 +40,16 @@ export const primaryNav: NavItem[] = [
     href: "/analytics",
   },
   {
-    label: "Affiliate",
+    label: "Business Network",
     href: "/affiliate",
 
     isDropdown: true,
     dropdownItems: [
-      { label: "Business Dashboard", href: "/ai-business-hub" },
-      { label: "Direct Partners", href: "/direct-partners" },
-      { label: "Level Tree", href: "/network-tree" },
+      { label: "Business Overview", href: "/ai-business-hub" },
+      { label: "My Partners", href: "/direct-partners" },
+      { label: "Network Structure", href: "/network-tree" },
       // { label: "Level Partners Tree", href: "/intelligent-partner-view" },
-      { label: "Downline Partners", href: "/downline" },
+      { label: "Extended Network", href: "/downline" },
       // { label: "Downline Tree", href: "/binary-tree" },
     ],
   },
