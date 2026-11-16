@@ -81,3 +81,18 @@ export function useSendOtp() {
     },
   });
 }
+
+// NAYA HOOK: Registration ke liye OTP bhejne ke liye
+export function useSendOtpForRegistration() {
+  return useMutation({
+    mutationFn: ({ userid, password }: { userid: string; password: string }) =>
+      authService.sendOtpForRegistration(userid, password),
+    onSuccess: (response) => {
+      toast.success(response.message || "OTP sent to your registered email!");
+    },
+    onError: (error: unknown) => {
+      const errorMessage = getApiErrorMessage(error);
+      toast.error(errorMessage || "Failed to send OTP for registration. Please try again.");
+    },
+  });
+}

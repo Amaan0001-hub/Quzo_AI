@@ -55,4 +55,10 @@ export const authService = {
       "/auth/send-otp",
       { userid, password },
     ),
+  // NAYA: Registration ke liye OTP Send karna
+  sendOtpForRegistration: (userid: string, password: string) =>
+    apiClient.post<{ statusCode: number; message: string; data: null }, { userid: string; password: string }>(
+      "/auth/send-otp-reg", // Ye aapki nayi API route file ka path hai
+      { userid, password },
+    ),
 };
