@@ -388,12 +388,12 @@ export default function AIBUSINESSHUB() {
   }
 
   const kpis = [
-    { label: "Direct Referral Income", value: directIncome, prefix: "$", dec: 2, tone: "green", icon: "arrowUp", series: [12, 15, 18, 22, 25, 28, 30] },
-    { label: "Daily Profit Income", value: dailyProfitIncome, prefix: "$", dec: 2, tone: "blue", icon: "chart", series: [10, 12, 14, 16, 18, 20, 22] },
+    { label: "Direct Partner Rewards", value: directIncome, prefix: "$", dec: 2, tone: "green", icon: "arrowUp", series: [12, 15, 18, 22, 25, 28, 30] },
+    { label: "AI Strategy Rewards", value: dailyProfitIncome, prefix: "$", dec: 2, tone: "blue", icon: "chart", series: [10, 12, 14, 16, 18, 20, 22] },
     { label: "Booster Income", value: boosterProfitAPI, prefix: "$", dec: 2, tone: "violet", icon: "award", series: [8, 10, 12, 15, 18, 20, 25] },
     { label: "DAO Income", value: daoIncome, prefix: "$", dec: 2, tone: "amber", icon: "rocket", series: [15, 18, 22, 25, 28, 32, 35] },
-    { label: "Level Income", value: levelIncomeAPI, prefix: "$", dec: 2, tone: "violet", icon: "group", series: [10, 12, 14, 16, 18, 20, 22] },
-    { label: "Rewards Income", value: rewardIncome, prefix: "$", dec: 2, tone: "blue", icon: "share", series: [12, 14, 16, 18, 20, 22, 24] },
+    { label: "Network Rewards", value: levelIncomeAPI, prefix: "$", dec: 2, tone: "violet", icon: "group", series: [10, 12, 14, 16, 18, 20, 22] },
+    { label: "Achievement Rewards", value: rewardIncome, prefix: "$", dec: 2, tone: "blue", icon: "share", series: [12, 14, 16, 18, 20, 22, 24] },
     { label: "Salary Income", value: salaryIncome, prefix: "$", dec: 2, tone: "green", icon: "refresh", series: [15, 18, 21, 24, 27, 30, 33] },
   ];
 

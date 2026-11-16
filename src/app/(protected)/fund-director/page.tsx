@@ -68,11 +68,11 @@ const fiatDepositDetails: Record<
 };
 
 const tabs: { id: TabId; label: string; icon: typeof Wallet }[] = [
-  { id: "deposit", label: "Self Deposit", icon: ArrowDownLeft },
+  { id: "deposit", label: "Deposit USDT", icon: ArrowDownLeft },
   // { id: "fiat", label: "Fiat Deposit", icon: Landmark },
-  { id: "income", label: "Income Transfer", icon: ArrowLeftRight },
+  { id: "income", label: "Transfer Rewards", icon: ArrowLeftRight },
   { id: "p2p", label: "P2P Transfer", icon: Send },
-  { id: "withdrawal", label: "Withdrawal", icon: ArrowUpRight },
+  { id: "withdrawal", label: "Withdraw Funds", icon: ArrowUpRight },
 ];
 
 const initialRecords: Record<TabId, FundDirectorRecord[]> = {
@@ -1796,7 +1796,7 @@ export default function FundDirectorPage() {
                             onClick={() => void submitSelfDeposit("USDT")}
                           >
                             <ArrowDownLeft className="h-4 w-4" />
-                            {isSubmittingSelfDeposit ? "Processing..." : "USDT Deposit"}
+                            {isSubmittingSelfDeposit ? "Processing..." : "Deposit USDT"}
                           </PrimaryButton>
                         </div>
                       
