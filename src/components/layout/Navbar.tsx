@@ -143,7 +143,6 @@ export function Navbar() {
     setNotificationsError("");
     try {
       const response = await fetch("/api/notifications");
-
       const payload: unknown = await response.json();
 
       if (!response.ok) {
@@ -179,7 +178,6 @@ export function Navbar() {
     }
   };
 
-  // Click Outside Logic (Account Menu + Wallet Menu)
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (accountMenuRef.current && !accountMenuRef.current.contains(event.target as Node)) {
@@ -290,7 +288,6 @@ export function Navbar() {
     setSeenNotifications((current) => new Set(current).add(id));
   };
 
-  // Wallet Data (Screenshot ke hisaab se)
   const wallets = [
     {
       id: "income",
@@ -333,9 +330,10 @@ export function Navbar() {
   ];
 
   return (
-    <header className="sticky top-0 z-40 flex h-16 items-center justify-between border-b border-gray-200 bg-white px-4 dark:border-[#1E293B] dark:bg-[#0B1021] sm:px-6">
+    <header className="sticky top-0 z-50 flex h-16 items-center justify-between border-b border-gray-200 bg-white px-4 dark:border-[#1E293B] dark:bg-[#0B1021] sm:px-6">
+      {/* Mobile Menu Button (z-10 to stay above) */}
       <button
-        className="rounded-md p-2 hover:bg-gray-100 dark:hover:bg-white/5 lg:hidden"
+        className="z-10 rounded-md p-2 hover:bg-gray-100 dark:hover:bg-white/5 lg:hidden"
         onClick={() => setMobileOpen(true)}
         aria-label="Open menu"
         aria-expanded={isMobileOpen}
@@ -345,33 +343,26 @@ export function Navbar() {
         <Menu className="h-5 w-5" />
       </button>
 
-      <div className="flex min-w-0 flex-1 items-center gap-8 sm:gap-28">
+      <div className="flex min-w-0 flex-1 items-center gap-4 sm:gap-28">
         <div className="flex items-center gap-2">
-          {/* <Link href="/dashboard" className="flex items-center gap-2.5" aria-label="QUZO dashboard">
-            <span className="grid h-10 w-10 place-items-center rounded-[14px] bg-gradient-to-br from-[#12b6a4] to-[#31cbb5] text-[27px] font-bold leading-none text-white shadow-[0_8px_18px_rgba(18,165,148,0.24)]">
-              Q
-            </span>
-            <span className="font-sans text-2xl font-bold tracking-[0.04em] text-[#062831] dark:text-white">
-              QUZO
-            </span>
-          </Link> */}
           <Link href="/dashboard" className="flex items-center gap-2.5" aria-label="QUZO dashboard">
-            <span className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-[14px] bg-gradient-to-br from-[#12b6a4] to-[#31cbb5] shadow-[0_8px_18px_rgba(18,165,148,0.24)]">
+            <span className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-[14px] bg-gradient-to-br from-[#12b6a4] to-[#31cbb5] shadow-[0_8px_18px_rgba(18,165,148,0.24)]">
               <img
-                src="/logos/fyntix-logo-dark.png" // <-- Yahan apni image ka path daalein
+                src="/logos/fyntix-logo-dark.png"
                 alt="QUZO Logo"
                 width={40}
                 height={40}
                 className="h-full w-full object-cover"
               />
             </span>
-            <span className="font-sans text-2xl font-bold tracking-[0.04em] text-[#062831] dark:text-white">
+            <span className="hidden font-sans text-2xl font-bold tracking-[0.04em] text-[#062831] dark:text-white sm:block">
               QUZO
             </span>
           </Link>
         </div>
-        {/* {currentPageLabel && (
-          <div className="min-w-0 border-l border-gray-200 pl-3 dark:border-[#1E293B] sm:pl-4">
+
+        {currentPageLabel && (
+          <div className="hidden min-w-0 border-l border-gray-200 pl-3 dark:border-[#1E293B] sm:block sm:pl-4">
             <p className="truncate text-sm font-semibold text-slate-800 dark:text-slate-100 sm:text-base">
               {currentPageLabel}
             </p>
@@ -379,14 +370,11 @@ export function Navbar() {
               Welcome back, {displayAuthLogin}
             </p>
           </div>
-        )} */}
+        )}
       </div>
 
-      {/* <div>
-        <GoogleTranslate/>
-      </div> */}
-
-      <div className="flex items-center gap-2 sm:gap-4">
+      {/* Right Side Actions (z-10 and relative) */}
+      <div className="relative z-10 flex items-center gap-1 sm:gap-4">
         <GoogleTranslate />
         <button
           className="rounded-md p-2 hover:bg-gray-100 dark:hover:bg-white/5"
@@ -401,7 +389,6 @@ export function Navbar() {
           )}
         </button>
 
-        {/* ================= WALLET DROPDOWN START ================= */}
         <div ref={walletRef} className="relative hidden sm:block">
           <button
             onClick={() => setWalletOpen((open) => !open)}
@@ -414,7 +401,6 @@ export function Navbar() {
 
           {walletOpen && (
             <div className="absolute right-0 top-full z-50 mt-3 w-[320px] overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-2xl dark:border-[#1E293B] dark:bg-[#0B1021] dark:shadow-black/50">
-              {/* Header */}
               <div className="flex items-center justify-between border-b border-gray-100 p-4 dark:border-[#1E293B]">
                 <div className="flex items-center gap-3">
                   <div className="flex h-10 w-10 items-center justify-center rounded-full bg-green-100 text-green-600">
@@ -437,7 +423,6 @@ export function Navbar() {
                 </button>
               </div>
 
-              {/* Wallet List */}
               <div className="space-y-3 p-4">
                 {wallets.map((wallet) => (
                   <div
@@ -446,20 +431,15 @@ export function Navbar() {
                     style={{ backgroundColor: wallet.bg }}
                   >
                     <div className="flex items-center gap-3">
-                      {/* Colored Dot */}
                       <div
                         className="h-2 w-2 rounded-full"
                         style={{ backgroundColor: wallet.color }}
                       />
-
-                      {/* Icon & Name */}
                       <wallet.icon size={18} style={{ color: wallet.color }} />
                       <span className="text-sm font-semibold" style={{ color: wallet.color }}>
                         {wallet.name}
                       </span>
                     </div>
-
-                    {/* Balance */}
                     <span className="text-sm font-bold" style={{ color: wallet.color }}>
                       {wallet.balance}
                     </span>
@@ -469,7 +449,6 @@ export function Navbar() {
             </div>
           )}
         </div>
-        {/* ================= WALLET DROPDOWN END ================= */}
 
         <div ref={notificationsRef} className="relative">
           <button
@@ -641,7 +620,7 @@ export function Navbar() {
           </button>
 
           {accountMenuOpen && (
-            <div className="absolute right-0 top-full z-20 w-[min(280px,calc(100vw-1.5rem))] pt-3">
+            <div className="absolute right-0 top-full z-50 w-[min(280px,calc(100vw-1.5rem))] pt-3">
               <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-2xl dark:border-[#1E293B] dark:bg-[#0B1021] dark:shadow-black/50">
                 <div className="p-4 sm:p-5">
                   <div

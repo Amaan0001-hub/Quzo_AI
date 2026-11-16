@@ -22,6 +22,7 @@ export async function POST(request: NextRequest) {
       Password: body.password,
       Email: body.email,
       IntroAuth: body.introAuth || undefined,
+      OTP: body.OTP || undefined,
     };
 
     const { data } = await backend.post("/Authentication/userRegistration", backendBody);
