@@ -7,7 +7,7 @@ export type SiteConfig = {
 };
 
 export const SITE: SiteConfig = {
-  whitepaperUrl: "https://apis.tradeppips.com/quzo-v1.pdf",
+  whitepaperUrl: "https://apis.tradeppips.com/quzo-whitepaper.pdf",
   securityDocsUrl: "",
 };
 
