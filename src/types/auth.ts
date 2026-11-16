@@ -30,6 +30,7 @@ export interface RegistrationPayload {
   password: string;
   email: string;
   introAuth?: string;
+  OTP?: string; 
 }
 
 export interface Country {
