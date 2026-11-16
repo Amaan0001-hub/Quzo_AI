@@ -13,6 +13,7 @@ import {
   Wallet,
 } from "lucide-react";
 import { homePageData } from "@/features/dashboard/constants/home-page";
+import { useDashboardSummary } from "@/features/dashboard/hooks/useDashboardSummary";
 
 const coinPeriods = ["1D", "7D", "30D", "90D", "1Y"] as const;
 const performancePeriods = ["7D", "30D", "90D", "1Y"] as const;
@@ -371,6 +372,52 @@ function EarningsChart() {
 export function MemberHomeDashboard() {
   const [promotionIndex, setPromotionIndex] = useState(0);
 
+  const {
+    data: dashboardSummary,
+    isLoading: isDashboardLoading,
+  } = useDashboardSummary();
+  const walletData = dashboardSummary?.data?.[0];
+
+  const wallets = [
+    {
+      name: "USDT Wallet",
+      amount: walletData?.DepositWallet
+        ? `$${Number(walletData.DepositWallet).toFixed(2)}`
+        : "$0.00",
+      detail: "Available Balance",
+      color: "#12a594",
+    },
+    {
+      name: "Working Wallet",
+      amount: (walletData?.WorkingWallet ?? walletData?.IncomeWallet)
+        ? `$${Number(walletData.WorkingWallet ?? walletData.IncomeWallet).toFixed(2)}`
+        : "$0.00",
+      detail: "Available Balance",
+      color: "#3aa3c4",
+    },
+    {
+      name: "Yield Wallet",
+      amount: walletData?.YieldWallet
+        ? `$${Number(walletData.YieldWallet).toFixed(2)}`
+        : "$0.00",
+      detail: "Available Balance",
+      color: "#1f5f7a",
+    },
+    {
+      name: "QUZO Wallet",
+      amount: walletData?.QuzoWallet
+        ? `${Number(walletData.QuzoWallet).toFixed(4)} `
+        : "0.0000",
+      detail: "Available QUZO",
+      color: "#d9a441",
+    },
+  ];
+
+  const totalWalletBalance = (walletData?.DepositWallet || 0) +
+    (walletData?.WorkingWallet ?? walletData?.IncomeWallet ?? 0) +
+    (walletData?.YieldWallet || 0) +
+    (walletData?.QuzoWallet ? Number(walletData.QuzoWallet) * 0.3684 : 0);
+
   useEffect(() => {
     const timer = window.setInterval(
       () => setPromotionIndex((current) => (current + 1) % promotions.length),
@@ -379,7 +426,6 @@ export function MemberHomeDashboard() {
     return () => window.clearInterval(timer);
   }, []);
 
-  const totalWalletBalance = 920 + 3480.75 + 1245.6 + 18420 * 0.3685;
   const currentPromotion = promotions[promotionIndex] ?? promotions[0];
 
   return (
@@ -616,7 +662,7 @@ export function MemberHomeDashboard() {
           </div>
         </div>
         <div className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-          {homePageData.wallets.map((wallet, index) => (
+          {wallets.map((wallet, index) => (
             <Link
               key={wallet.name}
               href="/reports"

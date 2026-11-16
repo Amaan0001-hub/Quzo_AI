@@ -370,7 +370,7 @@ export function Navbar() {
             </span>
           </Link>
         </div>
-        {currentPageLabel && (
+        {/* {currentPageLabel && (
           <div className="min-w-0 border-l border-gray-200 pl-3 dark:border-[#1E293B] sm:pl-4">
             <p className="truncate text-sm font-semibold text-slate-800 dark:text-slate-100 sm:text-base">
               {currentPageLabel}
@@ -379,7 +379,7 @@ export function Navbar() {
               Welcome back, {displayAuthLogin}
             </p>
           </div>
-        )}
+        )} */}
       </div>
 
       {/* <div>

@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Loader2 } from "lucide-react";
+import { Loader2, Boxes, Coins } from "lucide-react";
 import type { IconType } from "react-icons";
 
 import {
@@ -248,8 +248,18 @@ export default function AIBUSINESSHUB() {
   const totalTeam = getText(affiliate?.TotalTeam, "0");
   const activeTeam = getText(affiliate?.ActiveTeam, "0");
 
+  // Income data from API
+  const directIncome = getNumber(affiliate?.DirectIncome);
+  const dailyProfitIncome = getNumber(affiliate?.DailyProfitIncome);
+  const levelIncomeAPI = getNumber(affiliate?.LevelIncome);
+  const boosterProfitAPI = getNumber(affiliate?.BoosterProfit);
+  const rewardIncome = getNumber(affiliate?.RewardIncome);
+  const salaryIncome = getNumber(affiliate?.SalaryIncome);
+  const daoIncome = getNumber(affiliate?.DaoIncome);
+
   // Package API values
-  const totalTradingPackage = getNumber(affiliate?.TotalTradingPackage);
+  const totalTradingPackage = getNumber(affiliate?.TotalEarning);
+   const remaningPackage = getNumber(affiliate?.RemainingLimit);
   const activeTradingPackage = getNumber(affiliate?.TradingPackage);
   const activeSmartBondPack = getNumber(affiliate?.SmartBondPack);
   const activeSecureBondPack = getNumber(affiliate?.SecureBondPack);
@@ -267,15 +277,47 @@ export default function AIBUSINESSHUB() {
   const powerLeg = Math.max(Number(leftBusvolume), Number(rightBusvolume));
   const weakLeg = Math.min(Number(leftBusvolume), Number(rightBusvolume));
 
+  // Package info
+  const packageInfo = {
+    multiplier: "Income Cap",
+    investment: activeTradingPackage || 0,
+    totalIncomeCap: totalTradingPackage || 0,
+    remainingCap: remaningPackage || 0,
+    capUsedPercent: totalTradingPackage > 0 ? ((activeTradingPackage / totalTradingPackage) * 100) : 0,
+  };
+
+  // QUZO price
+  const quzoPrice = {
+    value: "0.00000444",
+    unit: "BTC",
+    change: "3.12%",
+    period: "24h",
+  };
+
+  // Sparkline component
+  function Sparkline({ id, color, path }: { id: string; color: string; path: string }) {
+    return (
+      <svg viewBox="0 0 100 40" className="h-full w-full">
+        <defs>
+          <linearGradient id={`sparkline-${id}`} x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stopColor={color} stopOpacity=".4" />
+            <stop offset="1" stopColor={color} stopOpacity="0" />
+          </linearGradient>
+        </defs>
+        <path d={`${path} L100 40L0 40Z`} fill={`url(#sparkline-${id})`} />
+        <path d={path} fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+      </svg>
+    );
+  }
+
   const kpis = [
-    { label: "Dynamic Referral Yield", value: directBonus, prefix: "$", dec: 2, tone: "green", icon: "arrowUp", trend: "+12%", series: [12, 15, 18, 22, 25, 28, 30] },
-    { label: "Daily Revenue Sharing", value: matchingIncome, prefix: "$", dec: 2, tone: "blue", icon: "chart", trend: "+8%", series: [10, 12, 14, 16, 18, 20, 22] },
-    { label: "Booster Profit", value: rewardBonus, prefix: "$", dec: 2, tone: "violet", icon: "award", trend: "+15%", series: [8, 10, 12, 15, 18, 20, 25] },
-    { label: "Unity Revenue Yield", value: yieldIncome, prefix: "$", dec: 2, tone: "amber", icon: "rocket", trend: "+20%", series: [15, 18, 22, 25, 28, 32, 35] },
-    { label: "Performance Revenue", value: levelIncome, prefix: "$", dec: 2, tone: "violet", icon: "group", trend: "+10%", series: [10, 12, 14, 16, 18, 20, 22] },
-    { label: "Smart Bonds", value: smartBonds, prefix: "$", dec: 2, tone: "blue", icon: "briefcase", trend: "+18%", series: [12, 14, 16, 18, 20, 22, 24] },
-    { label: "Smart Growth", value: smartGrowth, prefix: "$", dec: 2, tone: "green", icon: "share", trend: "+25%", series: [15, 18, 21, 24, 27, 30, 33] },
-    { label: "Secure Bonds", value: secureBonds, prefix: "$", dec: 2, tone: "amber", icon: "refresh", trend: "+22%", series: [10, 13, 16, 19, 22, 25, 28] },
+    { label: "Direct Referral Income", value: directIncome, prefix: "$", dec: 2, tone: "green", icon: "arrowUp", trend: "+12%", series: [12, 15, 18, 22, 25, 28, 30] },
+    { label: "Daily Profit Income", value: dailyProfitIncome, prefix: "$", dec: 2, tone: "blue", icon: "chart", trend: "+8%", series: [10, 12, 14, 16, 18, 20, 22] },
+    { label: "Booster Income", value: boosterProfitAPI, prefix: "$", dec: 2, tone: "violet", icon: "award", trend: "+15%", series: [8, 10, 12, 15, 18, 20, 25] },
+    { label: "DAO Income", value: daoIncome, prefix: "$", dec: 2, tone: "amber", icon: "rocket", trend: "+20%", series: [15, 18, 22, 25, 28, 32, 35] },
+    { label: "Level Income", value: levelIncomeAPI, prefix: "$", dec: 2, tone: "violet", icon: "group", trend: "+10%", series: [10, 12, 14, 16, 18, 20, 22] },
+    { label: "Rewards Income", value: rewardIncome, prefix: "$", dec: 2, tone: "blue", icon: "share", trend: "+18%", series: [12, 14, 16, 18, 20, 22, 24] },
+    { label: "Salary Income", value: salaryIncome, prefix: "$", dec: 2, tone: "green", icon: "refresh", trend: "+25%", series: [15, 18, 21, 24, 27, 30, 33] },
   ];
 
   const wallets = [
@@ -316,11 +358,13 @@ export default function AIBUSINESSHUB() {
   ];
 
   const incomeHistory = [
-    { name: "Direct Income", amount: directBonus, icon: "arrowUp" },
-    { name: "Binary Income", amount: matchingIncome, icon: "chart" },
-    { name: "Rank & Reward", amount: rewardBonus, icon: "award" },
-    { name: "ROI Income", amount: yieldIncome, icon: "rocket" },
-    { name: "Level Income", amount: levelIncome, icon: "group" },
+    { name: "Direct Referral Income", amount: directIncome, icon: "arrowUp" },
+    { name: "Daily Profit Income", amount: dailyProfitIncome, icon: "chart" },
+    { name: "Level Income", amount: levelIncomeAPI, icon: "group" },
+    { name: "Booster Income", amount: boosterProfitAPI, icon: "award" },
+    { name: "DAO Income", amount: daoIncome, icon: "rocket" },
+    { name: "Rewards Income", amount: rewardIncome, icon: "share" },
+    { name: "Salary Income", amount: salaryIncome, icon: "refresh" },
   ];
 
   const incomeTotal = incomeHistory.reduce((a, i) => a + i.amount, 0);
@@ -394,117 +438,100 @@ export default function AIBUSINESSHUB() {
 
 
         {/* Trading Packages */}
-        <section className="mb-8">
-          <div className="flex items-baseline gap-3 mb-4">
-            <h2 style={{ fontSize: 22, fontWeight: 800, letterSpacing: '.2px' }}>Trading Packages</h2>
-            <span style={{ color: 'var(--hub-muted)', fontSize: 13 }}>Fund from $10 — choose how your capital works</span>
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            {packages.map((p, i) => {
-              const pct = p.limit > 0 ? ((p.limit - p.pending) / p.limit) * 100 : 0;
-              return (
-                <Reveal key={p.key} delay={i * 100}>
-                  <div className="hub-card pkg">
-                    <div className="hub-card-head">
-                      <div><h3>{p.name}</h3><div className="sub">{p.desc}</div></div>
-                      <span className="hub-chip green">Running</span>
-                    </div>
-                    <div style={{ display: 'flex', justifyContent: 'center' }}>
-                      <Ring pct={pct} size={116} color={p.tone === "blue" ? "var(--hub-blue)" : p.tone === "violet" ? "var(--hub-violet)" : "var(--hub-amber)"} sub="of limit used" />
-                    </div>
-                    <div className="hub-pkg-grid">
-                      <div className="hub-pkg-cell"><small className="mono">Active Investment</small><b className="mono">{money(p.active)}</b></div>
-                      <div className="hub-pkg-cell"><small className="mono">Total Investment</small><b className="mono">{money(p.total)}</b></div>
-                      <div className="hub-pkg-cell"><small className="mono">Earning Limit</small><b className="mono">{money(p.limit)}</b></div>
-                      <div className="hub-pkg-cell"><small className="mono">Pending Limit</small><b className="mono">{money(p.pending)}</b></div>
-                    </div>
-                    <div className="hub-bar"><div style={{ width: `${pct}%` }} /></div>
-                    <div className="sub" style={{ marginTop: 6 }}>{pct.toFixed(0)}% of limit used</div>
-                    <div className="flex gap-3" style={{ marginTop: 16 }}>
-                      <button className="hub-btn blue" style={{ flex: 1 }} onClick={() => router.push('/investment-amount')}>Invest</button>
-                      <button className="hub-btn" style={{ flex: 1 }} onClick={() => router.push('/investment-amount')}>Reinvest</button>
-                    </div>
+          <section aria-labelledby="trading-package-heading">
+          <h2 id="trading-package-heading" className="mb-3 text-lg font-semibold text-gray-900">
+            Trading package
+          </h2>
+          <div className="grid gap-4 xl:grid-cols-2">
+            <article className="flex flex-col items-center gap-4 rounded-2xl border border-gray-200 bg-white p-4 sm:p-5 shadow-sm">
+              <div className="flex items-center gap-2 text-sm font-medium text-gray-700">
+                <span className="grid h-8 w-8 place-items-center rounded-lg bg-[#12a594]/10 text-[#12a594]">
+                  <Boxes className="h-4 w-4" aria-hidden />
+                </span>
+                {packageInfo.multiplier}
+              </div>
+              <div className="relative grid h-36 w-36 place-items-center">
+                <svg viewBox="0 0 150 150" className="absolute inset-0 h-full w-full -rotate-90">
+                  <defs>
+                    <linearGradient id="package-ring-gradient">
+                      <stop offset="0" stopColor="#12a594" />
+                      <stop offset="1" stopColor="#1f5f7a" />
+                    </linearGradient>
+                  </defs>
+                  <circle cx="75" cy="75" r="60" fill="none" stroke="#e5e7eb" strokeWidth="10" />
+                  <circle
+                    className="dashboard-ring"
+                    cx="75"
+                    cy="75"
+                    r="60"
+                    fill="none"
+                    stroke="url(#package-ring-gradient)"
+                    strokeWidth="10"
+                    strokeDasharray={`${2 * Math.PI * 60}`}
+                    strokeDashoffset={`${2 * Math.PI * 60 * (1 - packageInfo.capUsedPercent / 100)}`}
+                    strokeLinecap="round"
+                  />
+                </svg>
+                <div className="text-center">
+                  <p className="text-2xl font-semibold text-gray-900">{packageInfo.capUsedPercent}%</p>
+                  <p className="mt-1 text-[11px] text-gray-500">cap used</p>
+                </div>
+              </div>
+              <div className="grid grid-cols-3 gap-2 w-full">
+                {[
+                  { label: "Investment", value: money(packageInfo.investment) },
+                  { label: "Total income cap", value: money(packageInfo.totalIncomeCap) },
+                  { label: "Remaining cap", value: money(packageInfo.remainingCap) },
+                ].map((item) => (
+                  <div key={item.label} className="rounded-xl bg-gray-50 p-3">
+                    <p className="text-[10px] leading-4 text-gray-500">{item.label}</p>
+                    <p className="mt-1 text-sm font-semibold text-gray-900">{item.value}</p>
                   </div>
-                </Reveal>
-              );
-            })}
+                ))}
+              </div>
+              <div className="h-2 overflow-hidden rounded-full bg-gray-200 w-full">
+                <div
+                  className="h-full rounded-full bg-gradient-to-r from-[#12a594] to-[#3aa3c4]"
+                  style={{ width: `${packageInfo.capUsedPercent}%` }}
+                />
+              </div>
+            </article>
+
+            <article className="flex flex-col justify-between rounded-2xl border border-gray-200 bg-white p-4 sm:p-5 shadow-sm">
+              <div>
+                <div className="flex items-center gap-2 text-sm font-medium text-gray-700">
+                  <span className="grid h-8 w-8 place-items-center rounded-lg bg-[#d9a441]/10 text-[#d9a441]">
+                    <Coins className="h-4 w-4" aria-hidden />
+                  </span>
+                  QUZO / BTC live price
+                </div>
+                <p className="mt-4 text-2xl font-semibold text-gray-900">
+                  {quzoPrice.value}{" "}
+                  <span className="text-base font-medium text-gray-500">{quzoPrice.unit}</span>
+                </p>
+                <p className="mt-1 text-xs text-green-600">
+                  ▲ {quzoPrice.change} · {quzoPrice.period}
+                </p>
+              </div>
+              <div className="mt-5">
+                <Sparkline
+                  id="quzo-price-sparkline"
+                  color="#d9a441"
+                  path="M0 28 C10 26, 15 30, 25 25 C35 20, 40 22, 50 18 C60 14, 65 16, 75 12 C85 8, 90 10, 100 6"
+                />
+              </div>
+            </article>
           </div>
         </section>
 
-        {/* Boosters */}
-        <section className="mb-8">
-          <div className="flex items-baseline gap-3 mb-4">
-            <h2 style={{ fontSize: 22, fontWeight: 800, letterSpacing: '.2px' }}>Booster Profit Protocol</h2>
-            <span style={{ color: 'var(--hub-muted)', fontSize: 13 }}>Hit direct targets in sequence for 20% &rarr; 30% &rarr; 50% monthly profit</span>
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            {boosters.map((b, i) => (
-              <Reveal key={b.key} delay={i * 100}>
-                <div className={`hub-card boost ${b.state === "LOCKED" ? "locked" : ""}`}>
-                  <span className={`hub-chip ${b.state === "LOCKED" ? "muted" : b.state === "IN PROGRESS" ? "amber" : "green"}`} style={{ position: 'absolute', top: 14, right: 14 }}>{b.state}</span>
-                  <div className="emoji">{b.icon}</div>
-                  <h4>{b.name}</h4>
-                  <div className="rw"><CountUp value={b.reward} dec={0} />%</div>
-                  <div className="sub">Monthly Profit</div>
-                  <div className="rq">{b.req}</div>
-                  <div className="hub-bar"><div style={{ width: `${(b.progress / b.target) * 100}%` }} /></div>
-                  <div className="hub-steps">{Array.from({ length: b.target }).map((_, s) => <i key={s} className={s < b.progress ? "on" : ""} />)}</div>
-                  <div className="sub" style={{ marginTop: 8 }}>{b.progress}/{b.target} complete</div>
-                </div>
-              </Reveal>
-            ))}
-          </div>
-        </section>
+       
 
-        {/* DRY + Unity */}
-        <section className="mb-8">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-            <Reveal>
-              <div className="hub-card">
-                <div className="hub-card-head">
-                  <div><h3>Dynamic Referral Yield</h3><div className="sub">Leader opportunity · 10% to 100%</div></div><span className="hub-chip blue">Leader</span>
-                </div>
-                <div className="hub-tiers">
-                  {dryTiers.map((t) => {
-                    const isReached = t.dir <= Number(activeDirectMembers);
-                    const isCurrent = t.dir === Number(activeDirectMembers);
-                    return (
-                      <div className={`hub-tier ${isCurrent ? "current" : ""}`} key={t.dir}>
-                        <span className="mono">{t.dir} direct{t.dir > 1 ? "s" : ""}</span><div className="hub-bar"><div style={{ width: `${isReached ? 100 : t.pct}%`, background: isReached ? '' : 'rgba(120, 160, 200, 0.3)' }} /></div><b className="mono">{t.pct}%</b>
-                      </div>
-                    );
-                  })}
-                </div>
-                <div className="sub" style={{ marginTop: 12 }}>You have {activeDirectMembers} active directs → <b style={{ color: 'var(--hub-amber)' }}>{dryTiers.filter(t => t.dir <= Number(activeDirectMembers)).pop()?.pct || 0}% yield</b></div>
-              </div>
-            </Reveal>
-            <Reveal delay={100}>
-              <div className="hub-card">
-                <div className="hub-card-head">
-                  <div><h3>Unity Revenue Yield</h3><div className="sub">Differential on total volume · 15% to 100%</div></div><span className="hub-chip green" style={{ cursor: 'pointer' }} onClick={() => { localStorage.setItem('incomeTab', 'Unity Revenue Yield'); router.push('/income-reports'); }}>Volume scaling</span>
-                </div>
-                <div style={{ marginTop: 16 }}>
-                  <div className="hub-bar" style={{ background: 'rgba(255,255,255,0.1)', position: 'relative' }}>
-                    <div style={{ width: '100%', height: '100%', background: `linear-gradient(90deg, var(--hub-blue) 0%, var(--hub-blue) ${rankPercentage}%, rgba(255,255,255,0.1) ${rankPercentage}%, rgba(255,255,255,0.1) 100%)` }} />
-                  </div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 8, fontSize: 12, color: 'var(--hub-muted)' }}>
-                    <span className="mono">15%</span>
-                    <span className="mono">100%</span>
-                  </div>
-                </div>
-                <div className="sub" style={{ marginTop: 12 }}>Higher volume → higher percentage. You earn the difference between your rate and your team&apos;s rate.</div>
-                <div style={{ marginTop: 16, padding: '12px 16px', background: 'rgba(255,255,255,0.05)', borderRadius: 8, border: '1px solid rgba(255,255,255,0.1)', textAlign: 'center' }}>
-                  <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--hub-text)' }}>Achived: {rankPercentage.toFixed(0)}%</div>
-                </div>
-              </div>
-            </Reveal>
-          </div>
-        </section>
+        
 
     
 
         {/* Team + Personal */}
-        <section className="mb-8">
+        <section className="mb-8 mt-3">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             <Reveal>
               <div className="hub-card">

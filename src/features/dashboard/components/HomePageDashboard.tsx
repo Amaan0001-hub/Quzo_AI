@@ -10,6 +10,7 @@ import {
   Wallet,
 } from "lucide-react";
 import { homePageData } from "@/features/dashboard/constants/home-page";
+import { useDashboardSummary } from "@/features/dashboard/hooks/useDashboardSummary";
 
 const periods = ["1D", "7D", "30D", "90D", "1Y"] as const;
 const pathForAnalytics = homePageData.analytics.values
@@ -52,6 +53,52 @@ export function HomePageDashboard() {
   const [currency, setCurrency] = useState<"BTC" | "USD">("BTC");
   const bot = homePageData.bot;
   const rank = homePageData.rank;
+
+  const {
+    data: dashboardSummary,
+    isLoading: isDashboardLoading,
+  } = useDashboardSummary();
+  const walletData = dashboardSummary?.data?.[0];
+
+  const wallets = [
+    {
+      name: "USDT Wallet",
+      amount: walletData?.DepositWallet
+        ? `$${Number(walletData.DepositWallet).toFixed(2)}`
+        : "$0.00",
+      detail: "≈ " + (walletData?.DepositWallet || 0).toFixed(2) + " USDT",
+      color: "#12a594",
+    },
+    {
+      name: "Working Wallet",
+      amount: (walletData?.WorkingWallet ?? walletData?.IncomeWallet)
+        ? `$${Number(walletData.WorkingWallet ?? walletData.IncomeWallet).toFixed(2)}`
+        : "$0.00",
+      detail: "Available balance",
+      color: "#3aa3c4",
+    },
+    {
+      name: "Yield Wallet",
+      amount: walletData?.YieldWallet
+        ? `$${Number(walletData.YieldWallet).toFixed(2)}`
+        : "$0.00",
+      detail: "Available balance",
+      color: "#1f5f7a",
+    },
+    {
+      name: "QUZO Wallet",
+      amount: walletData?.QuzoWallet
+        ? `${Number(walletData.QuzoWallet).toFixed(4)}`
+        : "0.0000",
+      detail: "Available QUZO",
+      color: "#d9a441",
+    },
+  ];
+
+  const totalBalance = (walletData?.DepositWallet || 0) +
+    (walletData?.WorkingWallet ?? walletData?.IncomeWallet ?? 0) +
+    (walletData?.YieldWallet || 0) +
+    (walletData?.QuzoWallet ? Number(walletData.QuzoWallet) * 0.3684 : 0);
 
   return (
     <main className="min-h-screen bg-[#f3f8f7] px-4 py-5 text-slate-900 dark:bg-[#0b1218] dark:text-slate-100 sm:px-6 lg:px-8">
@@ -246,7 +293,7 @@ export function HomePageDashboard() {
             <div className="sm:text-right">
               <p className="text-[10px] text-slate-500 dark:text-slate-400">Total balance (USD)</p>
               <p className="mt-1 text-2xl font-bold text-slate-900 dark:text-white">
-                $12,434.12{" "}
+                ${totalBalance.toFixed(2)}{" "}
                 <span className="rounded-full bg-emerald-500/10 px-2 py-1 text-[10px] font-semibold text-emerald-700 dark:text-emerald-300">
                   ▲ +12.64%
                 </span>
@@ -254,7 +301,7 @@ export function HomePageDashboard() {
             </div>
           </div>
           <div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-            {homePageData.wallets.map((wallet) => (
+            {wallets.map((wallet) => (
               <Link
                 key={wallet.name}
                 href="/reports"
