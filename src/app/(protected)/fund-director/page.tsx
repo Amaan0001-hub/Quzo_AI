@@ -1799,23 +1799,7 @@ export default function FundDirectorPage() {
                             {isSubmittingSelfDeposit ? "Processing..." : "USDT Deposit"}
                           </PrimaryButton>
                         </div>
-                        <div className="flex flex-col items-center gap-2">
-                          <div className="min-w-0 flex-none rounded-xl border border-slate-200 bg-white px-3 py-2 dark:border-slate-700 dark:bg-slate-900">
-                            <p className="text-[11px] text-slate-500 dark:text-slate-400">QUZO Balance</p>
-                            <p className="mt-0.5 text-sm font-semibold text-slate-900 dark:text-white">
-                              {money(selfBalances.velt)}
-                            </p>
-                          </div>
-                          <PrimaryButton
-                            type="button"
-                            disabled={isSubmittingSelfDeposit}
-                            onClick={() => void submitSelfDeposit("Quzo")}
-                            className="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg border border-slate-300 bg-white px-5 py-2.5 text-sm font-semibold text-slate-700 shadow-sm transition hover:-translate-y-0.5 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700"
-                          >
-                            <ArrowDownLeft className="h-4 w-4" />
-                            {isSubmittingSelfDeposit ? "Processing..." : "QUZO Deposit"}
-                          </PrimaryButton>
-                        </div>
+                      
                       </div>
                     </div>
 
