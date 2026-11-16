@@ -347,9 +347,23 @@ export function Navbar() {
 
       <div className="flex min-w-0 flex-1 items-center gap-8 sm:gap-28">
         <div className="flex items-center gap-2">
-          <Link href="/dashboard" className="flex items-center gap-2.5" aria-label="QUZO dashboard">
+          {/* <Link href="/dashboard" className="flex items-center gap-2.5" aria-label="QUZO dashboard">
             <span className="grid h-10 w-10 place-items-center rounded-[14px] bg-gradient-to-br from-[#12b6a4] to-[#31cbb5] text-[27px] font-bold leading-none text-white shadow-[0_8px_18px_rgba(18,165,148,0.24)]">
               Q
+            </span>
+            <span className="font-sans text-2xl font-bold tracking-[0.04em] text-[#062831] dark:text-white">
+              QUZO
+            </span>
+          </Link> */}
+          <Link href="/dashboard" className="flex items-center gap-2.5" aria-label="QUZO dashboard">
+            <span className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-[14px] bg-gradient-to-br from-[#12b6a4] to-[#31cbb5] shadow-[0_8px_18px_rgba(18,165,148,0.24)]">
+              <img
+                src="/logos/fyntix-logo-dark.png" // <-- Yahan apni image ka path daalein
+                alt="QUZO Logo"
+                width={40}
+                height={40}
+                className="h-full w-full object-cover"
+              />
             </span>
             <span className="font-sans text-2xl font-bold tracking-[0.04em] text-[#062831] dark:text-white">
               QUZO
