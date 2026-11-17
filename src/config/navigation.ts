@@ -23,7 +23,7 @@ export const primaryNav: NavItem[] = [
   },
 
   {
-    label: "Fund Director",
+    label: "My Assets",
     href: "/fund-director",
   },
   {
