@@ -23,12 +23,19 @@ interface Plan {
   investmentRange: string;
   features: PlanFeature[];
   min: number;
+  d: string;
+  rate: string;
   max: number | null;
-  investorLimit: number;
-  leadersLimit: number;
+  investorLimit: string;
+  leadersLimit: string;
   colors: { a: string; b: string };
   isPopular?: boolean;
   BoosterPackage: number;
+  minAmount: number;
+  maxAmount: number;
+  pop: string;
+  totalincome: string;
+  capmulti: string;
 }
 
 interface ActivatePlanModalProps {
@@ -243,7 +250,15 @@ function OfferCard({ o, i }: { o: Offer; i: number }) {
 function PlanCard({ plan, i, onActivate }: { plan: Plan; i: number; onActivate: () => void }) {
   const hi = plan.max || 10000;
   const [amt, setAmt] = useState<number>(plan.min);
+  // 1. Starter plan ke liye max 1000, aur Pro plan ke liye 10000 (ya 50000) tak slider
+  const isStarter = plan.title.includes("Cros-Dex");
+  const sliderMax = isStarter ? 1000 : 50000; // Pro plan ke liye slider 50,000 tak jayega
 
+  // const [amt, setAmt] = useState<number>(plan.min);
+
+  // Dynamic Total Income Calculation
+  const capMulti = parseFloat(plan.capmulti.replace('×', '')) || 1;
+  const dynamicIncome = amt * capMulti;
   return (
     <div
       className={CARD_PKG}
@@ -255,34 +270,24 @@ function PlanCard({ plan, i, onActivate }: { plan: Plan; i: number; onActivate: 
             <Ic n="pkg" size="h-6 w-6" />
           </span>
           <span className="rounded-full bg-[#ffffff33] px-[11px] py-1 text-[11.5px] font-semibold text-center">
-            {plan.isPopular ? '★ Most Popular' : plan.subtitle}
+            {plan.pop}
           </span>
         </div>
-        <div className="relative mt-3 text-[20px] font-semibold">{plan.icon} {plan.title}</div>
+        <div className="relative mt-3 text-[20px] font-semibold">{plan.title}</div>
         <div className="relative text-[12.5px] opacity-[.85]">{plan.subtitle}</div>
         <div className="relative mt-[14px]">
-          <small className="block text-[12px] opacity-[.85]">Investment range</small>
-          <b className="text-[34px] font-bold">{plan.investmentRange}</b>
+          <small className="block text-[12px] opacity-[.85]">{plan.d}</small>
+          <b className="text-[34px] font-bold">{plan.rate}</b>
         </div>
       </div>
 
       <div className="px-[18px] pt-4 pb-[18px]">
         <div className={KV_WRAP}>
           <div className={KV_CELL}><small className={KV_SMALL}>Minimum</small><b className={KV_B}>${fmt(plan.min, 0)}</b></div>
-          <div className={KV_CELL}><small className={KV_SMALL}>Investor limit</small><b className={KV_B}>{plan.investorLimit}×</b></div>
-          <div className={KV_CELL}><small className={KV_SMALL}>Leaders limit</small><b className={KV_B}>{plan.leadersLimit}×</b></div>
+          <div className={KV_CELL}><small className={KV_SMALL}>Maximum</small><b className={KV_B}>{plan.investorLimit}</b></div>
+          <div className={KV_CELL}><small className={KV_SMALL}>Income cap</small><b className={KV_B}>{plan.leadersLimit}</b></div>
         </div>
 
-        <ul className="mt-[14px] flex list-none flex-col gap-2 p-0">
-          {plan.features.map((f, k) => (
-            <li key={k} className="flex items-start gap-[9px] text-[12.5px] leading-[1.45] text-[color:var(--mut)]">
-              <span className="grid h-[18px] w-[18px] flex-none place-items-center rounded-full text-[10px] font-bold text-[color:var(--a)] [background:color-mix(in_srgb,var(--a)_14%,transparent)]">
-                ✓
-              </span>
-              {f.text}
-            </li>
-          ))}
-        </ul>
 
         <div className={`${LAB} mt-4`}>Investment amount (USDT)</div>
         <div className="mt-3 flex gap-2">
@@ -290,24 +295,50 @@ function PlanCard({ plan, i, onActivate }: { plan: Plan; i: number; onActivate: 
             type="number"
             className="min-w-0 flex-1 rounded-xl border border-[color:var(--line)] bg-transparent px-3 py-[10px] text-inherit outline-none"
             value={amt}
-            onChange={(e) => setAmt(+e.target.value || 0)}
+            // onChange={(e) => setAmt(+e.target.value || 0)}
+            onChange={(e) => {
+              const val = +e.target.value;
+              // Starter plan me 1000 se zyada type nahi kar sakte
+              const maxAllowed = isStarter ? 1000 : Infinity;
+              setAmt(val > maxAllowed ? maxAllowed : val);
+            }}
           />
         </div>
         <input
           className="mt-3 w-full [accent-color:var(--a)]"
           type="range"
           min={plan.min}
-          max={hi}
-          step={plan.min >= 100 ? 100 : 10}
-          value={Math.min(Math.max(amt, plan.min), hi)}
+          // max={hi}
+          // step={plan.min >= 100 ? 100 : 10}
+          // value={Math.min(Math.max(amt, plan.min), hi)}
+          // onChange={(e) => setAmt(+e.target.value)}
+          // 2. Slider ka max yahan set hoga
+          max={sliderMax}
+          // Agar Pro plan hai toh step 100, warna 10
+          step={isStarter ? 10 : 100}
+          value={Math.min(Math.max(amt, plan.min), sliderMax)}
           onChange={(e) => setAmt(+e.target.value)}
         />
 
+        {/* <div className="my-[14px] flex flex-col sm:flex-row sm:justify-between rounded-xl p-3 text-[12px] text-[color:var(--mut)] [background:color-mix(in_srgb,var(--a)_9%,transparent)] gap-2 sm:gap-0">
+          <span>Total income cap<b className="block text-[17px] text-[color:var(--ink)]">{plan.totalincome}</b></span>
+          <span className="sm:text-right">Cap multiple<b className="block text-[17px] text-[color:var(--ink)]">{plan.capmulti}</b></span>
+        </div> */}
         <div className="my-[14px] flex flex-col sm:flex-row sm:justify-between rounded-xl p-3 text-[12px] text-[color:var(--mut)] [background:color-mix(in_srgb,var(--a)_9%,transparent)] gap-2 sm:gap-0">
-          <span>Investor cap<b className="block text-[17px] text-[color:var(--ink)]">${fmt(amt * plan.investorLimit)}</b></span>
-          <span className="sm:text-right">Leaders cap<b className="block text-[17px] text-[color:var(--ink)]">${fmt(amt * plan.leadersLimit)}</b></span>
+          <span>
+            Total income cap
+            <b className="block text-[17px] text-[color:var(--ink)]">
+              {/* 3. Dynamic Income yahan lagaya */}
+              ${dynamicIncome.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+            </b>
+          </span>
+          <span className="sm:text-right">
+            Cap multiple
+            <b className="block text-[17px] text-[color:var(--ink)]">
+              {plan.capmulti}
+            </b>
+          </span>
         </div>
-
         <button className={`${GO} w-full`} onClick={onActivate}>
           Activate package
         </button>
@@ -469,44 +500,68 @@ const ActivatePlanModal: React.FC<ActivatePlanModalProps> = ({
     }
   };
 
+  // const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  //   const value = e.target.value;
+  //   setAmount(value);
+
+  //   if (value === "") {
+  //     setAmountError("");
+  //     return;
+  //   }
+
+  //   const numValue = Number(value);
+
+  //   if (plan.title === "Liquidity Provider") {
+  //     if (numValue < 10) {
+  //       setAmountError("Minimum investment is $10");
+  //     } else if (numValue > walletBalance) {
+  //       setAmountError("Insufficient balance");
+  //     } else {
+  //       setAmountError("");
+  //     }
+  //   } else if (plan.title === "Smart Bonds") {
+  //     if (numValue < 100) {
+  //       setAmountError("Minimum investment is $50");
+  //     } else if (numValue > walletBalance) {
+  //       setAmountError("Insufficient balance");
+  //     } else {
+  //       setAmountError("");
+  //     }
+  //   } else {
+  //     if (numValue < 100) {
+  //       setAmountError("Minimum investment is $100");
+  //     } else if (numValue > walletBalance) {
+  //       setAmountError("Insufficient balance");
+  //     } else {
+  //       setAmountError("");
+  //     }
+  //   }
+  // };
   const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setAmount(value);
 
-    if (value === "") {
+    if (value === "" || value === ".") {
       setAmountError("");
       return;
     }
 
     const numValue = Number(value);
 
-    if (plan.title === "Liquidity Provider") {
-      if (numValue < 10) {
-        setAmountError("Minimum investment is $10");
-      } else if (numValue > walletBalance) {
-        setAmountError("Insufficient balance");
-      } else {
-        setAmountError("");
-      }
-    } else if (plan.title === "Smart Bonds") {
-      if (numValue < 100) {
-        setAmountError("Minimum investment is $100");
-      } else if (numValue > walletBalance) {
-        setAmountError("Insufficient balance");
-      } else {
-        setAmountError("");
-      }
+    // Dynamic validation using plan data
+    const minLimit = plan.minAmount || 0;
+    const maxLimit = plan.maxAmount || Infinity;
+
+    if (numValue < minLimit) {
+      setAmountError(`Minimum investment is $${minLimit}`);
+    } else if (numValue > maxLimit) {
+      setAmountError(`Maximum investment is $${maxLimit}`);
+    } else if (numValue > walletBalance) {
+      setAmountError("Insufficient balance");
     } else {
-      if (numValue < 100) {
-        setAmountError("Minimum investment is $100");
-      } else if (numValue > walletBalance) {
-        setAmountError("Insufficient balance");
-      } else {
-        setAmountError("");
-      }
+      setAmountError("");
     }
   };
-
   const getModalTheme = () => {
     if (plan.title === "Normal") {
       return { btn: "bg-blue-500 hover:bg-blue-600 text-white", text: "text-blue-600", iconBg: "bg-blue-100" };
@@ -733,40 +788,54 @@ export default function PricingPage() {
             {
               id: "",
               title: "",
-              subtitle: "Perfect for New Investors",
+              subtitle: "Multi-DEX arbitrage execution",
               icon: "🚀",
-              investmentRange: "$10+",
+              investmentRange: "$50+",
+              d: "Proposed yield reward rate",
+              rate: "up to 12–16%",
               isPopular: true,
+              pop: "Starter",
               features: [
                 { text: "Accessible entry starting at just $10" },
                 { text: "Yields 0.33% daily revenue sharing (10% monthly)" },
                 { text: "Investor Limit 2.X" },
                 { text: "Leaders Limit 4X" },
               ],
-              min: 10,
+              min: 50,
               max: null,
-              investorLimit: 2,
-              leadersLimit: 4,
+              investorLimit: "$999",
+              leadersLimit: "2.25×",
               colors: { a: '#12a594', b: '#3aa3c4' },
               BoosterPackage: 1,
+              capmulti: "2.25×",
+              totalincome: "$112.50",
+              minAmount: 50,       // <-- ADD THIS
+              maxAmount: 999,
             },
             {
               id: "",
               title: "",
-              subtitle: "For Consistent Growth",
+              subtitle: "Advanced MEV strategy for larger entries",
+              pop: "Pro",
               icon: "📊",
-              investmentRange: "$100+",
+              investmentRange: "$1000+",
+              d: "Proposed yield reward rate",
+              rate: "up to 14–20%",
               features: [
                 { text: "Accessible entry starting at just $100" },
                 { text: "Investor Limit 1X" },
                 { text: "Leaders Limit 1X" },
               ],
-              min: 100,
+              min: 1000,
               max: null,
-              investorLimit: 1,
-              leadersLimit: 1,
+              investorLimit: "No limit",
+              leadersLimit: "3×",
               colors: { a: '#1f5f7a', b: '#3aa3c4' },
               BoosterPackage: 2,
+              capmulti: "3×",
+              totalincome: "$3,000.00",
+              minAmount: 1000,       
+              maxAmount: Infinity, 
             },
           ];
 
@@ -814,12 +883,7 @@ export default function PricingPage() {
       `}</style>
 
       <div data-qz className="mx-auto">
-        {showBanner && (
-          <div className="mb-[14px] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 rounded-[14px] px-4 py-[11px] text-[13px] text-[#2b1b00] animate-[qzrise_.5s_both] [background:linear-gradient(90deg,#d9a441,#ffbf5c)]">
-            <span><b>New:</b> the Daily Booster is live. Add 3 or 5 direct partners within 24 hours to lift your daily rewards.</span>
-            <button className="cursor-pointer text-[16px] font-bold self-end sm:self-auto mt-1 sm:mt-0" onClick={() => setShowBanner(false)} aria-label="Dismiss">✕</button>
-          </div>
-        )}
+      
 
         {/* Hero */}
         <div className={HERO}>
@@ -830,12 +894,7 @@ export default function PricingPage() {
               <div className="flex flex-wrap gap-x-5 gap-y-2 text-[12px] text-[#b9e3ea]">
                 AI Intelligence · Crypto &amp; Forex Trading · DeFi · Rewards
               </div>
-              <button
-                className={`${GO} mt-4`}
-                onClick={() => document.getElementById('qz-packages')?.scrollIntoView({ behavior: 'smooth' })}
-              >
-                Invest now
-              </button>
+             
             </div>
             <div className={ORB}>
               <span className={`${QMARK} h-[92px] w-[92px] rounded-[28px] text-[46px]`}>Q</span>
