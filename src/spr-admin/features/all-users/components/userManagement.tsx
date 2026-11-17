@@ -505,7 +505,7 @@ export default function UserManagement() {
                 <option value="0">Inactive</option>
               </select>
             </div>
-            <div>
+            {/* <div>
               <label className={labelClass} htmlFor="user-placed-by">
                 Placed By
               </label>
@@ -519,7 +519,7 @@ export default function UserManagement() {
                 <option value="Self">Self</option>
                 <option value="Admin">Admin</option>
               </select>
-            </div>
+            </div> */}
             <div>
               <label className={labelClass} htmlFor="user-from-date">
                 Registered From

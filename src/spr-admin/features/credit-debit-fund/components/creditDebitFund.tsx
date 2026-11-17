@@ -302,7 +302,7 @@ export default function CreditDebitFund() {
                     <label className="mb-2 block flex items-center gap-1.5 text-xs font-bold uppercase text-gray-500">
                       <Wallet className="h-3.5 w-3.5 text-blue-600" /> Current Wallet Balances
                     </label>
-                    <div className="spr-admin-wallet-balances grid grid-cols-1 gap-3 rounded-lg border border-blue-100 bg-blue-50 p-3 md:grid-cols-2 xl:grid-cols-4">
+                    <div className="spr-admin-wallet-balances grid grid-cols-1 gap-3 rounded-lg border border-blue-100 bg-blue-50 p-3 md:grid-cols-2 xl:grid-cols-3">
                       <div className="flex items-center gap-3 rounded-lg border border-gray-100 bg-white p-3">
                         <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-green-100">
                           <DollarSign className="h-4 w-4 text-green-600" />
@@ -331,7 +331,7 @@ export default function CreditDebitFund() {
                         </div>
                       </div>
 
-                      <div className="flex items-center gap-3 rounded-lg border border-gray-100 bg-white p-3">
+                      {/* <div className="flex items-center gap-3 rounded-lg border border-gray-100 bg-white p-3">
                         <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-orange-100">
                           <Coins className="h-4 w-4 text-orange-600" />
                         </div>
@@ -343,7 +343,7 @@ export default function CreditDebitFund() {
                             ${Number(walletDetails.FundWallet ?? 0).toFixed(4)}
                           </p>
                         </div>
-                      </div>
+                      </div> */}
 
                       <div className="flex items-center gap-3 rounded-lg border border-gray-100 bg-white p-3">
                         <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-purple-100">
@@ -351,10 +351,10 @@ export default function CreditDebitFund() {
                         </div>
                         <div>
                           <p className="text-[10px] font-bold uppercase text-gray-500">
-                            Mentor Wallet
+                            ROI Wallet
                           </p>
                           <p className="text-sm font-bold text-purple-700">
-                            ${Number(walletDetails.MentorWallet ?? 0).toFixed(4)}
+                            ${Number(walletDetails.ROIWallet ?? 0).toFixed(4)}
                           </p>
                         </div>
                       </div>

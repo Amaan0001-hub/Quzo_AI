@@ -462,7 +462,7 @@ export default function BulkRegistration() {
                       ))}
                     </select>
                   </FormField>
-                  <FormField label="Position">
+                  {/* <FormField label="Position">
                     <select
                       name="position"
                       value={form.position}
@@ -472,7 +472,7 @@ export default function BulkRegistration() {
                       <option value="Left">Left</option>
                       <option value="Right">Right</option>
                     </select>
-                  </FormField>
+                  </FormField> */}
                 </div>
                 {countriesError && (
                   <p className="text-sm text-red-700" role="alert">
