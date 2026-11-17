@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useWalletReportStore } from "@/store/wallet-report.store";
 import { walletReportService } from "@/services/wallet-report.service";
-import { Search, X, Calendar, DollarSign, FileText, Clock, TrendingUp } from "lucide-react";
+import { Search, X, Calendar, DollarSign, FileText, Clock, TrendingUp, CheckCircle } from "lucide-react";
 
 export default function TransactionData({ transType }: { transType: string }) {
   const { transactionhistorydata, setTransactionHistory } = useWalletReportStore();
@@ -34,7 +34,7 @@ export default function TransactionData({ transType }: { transType: string }) {
     transactionhistorydata?.filter(
       (transaction) =>
         transaction.Remark?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        transaction.message?.toLowerCase().includes(searchTerm.toLowerCase()),
+        transaction.messages?.toLowerCase().includes(searchTerm.toLowerCase()),
     ) || [];
 
   // Calculate pagination
@@ -137,6 +137,12 @@ export default function TransactionData({ transType }: { transType: string }) {
                         Remark
                       </span>
                     </th>
+                     <th className="whitespace-nowrap px-3 py-3 text-center text-xs font-bold uppercase tracking-wider text-gray-600 dark:text-gray-400 sm:px-6">
+                      <span className="flex items-center justify-center gap-1.5">
+                        <CheckCircle className="h-3.5 w-3.5" />
+                        Status
+                      </span>
+                    </th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
@@ -177,6 +183,18 @@ export default function TransactionData({ transType }: { transType: string }) {
                           title={rank.Remark}
                         >
                           {rank.Remark || "-"}
+                        </td>
+                         <td
+                          className={`truncate whitespace-nowrap px-3 py-3.5 text-center text-sm font-medium sm:px-6 ${
+                            rank.messages?.includes("Pending")
+                              ? "text-amber-600 dark:text-amber-400"
+                              : rank.messages?.includes("Credited")
+                              ? "text-emerald-600 dark:text-emerald-400"
+                              : "text-gray-600 dark:text-gray-300"
+                          }`}
+                          title={rank.messages}
+                        >
+                          {rank.messages || "-"}
                         </td>
                       </tr>
                     ))

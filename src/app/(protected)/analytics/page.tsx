@@ -62,10 +62,10 @@ export default function AnalyticsPage() {
       setSpreadValue((prev) => Math.max(0.2, Math.min(0.4, prev + (Math.random() - 0.5) * 0.02)));
       setExecsValue((prev) => prev + Math.floor(Math.random() * 10));
       setRoutedValue((prev) => prev + Math.floor(Math.random() * 50000));
-      setFillsValue((prev) => Math.max(80, Math.min(100, prev + (Math.random() - 0.5) * 5)));
+      setFillsValue((prev) =>Number(Math.max(80, Math.min(100, prev + (Math.random() - 0.5) * 5)).toFixed(5)));
       setReserveValue((prev) => Math.max(1.4, Math.min(1.6, prev + (Math.random() - 0.5) * 0.01)));
-      setP50((prev) => Math.max(50, Math.min(100, prev + (Math.random() - 0.5) * 10)));
-      setP95((prev) => Math.max(100, Math.min(180, prev + (Math.random() - 0.5) * 15)));
+      setP50((prev) =>Number(Math.max(50, Math.min(100, prev + (Math.random() - 0.5) * 10)).toFixed(5)));
+      setP95((prev) => Number(Math.max(100, Math.min(180, prev + (Math.random() - 0.5) * 15)).toFixed(5)));
     }, 2000);
 
     return () => clearInterval(interval);
@@ -92,7 +92,7 @@ export default function AnalyticsPage() {
             <span className="relative inline-flex rounded-full h-2 w-2" style={{ background: ACCENT_COLOR }}></span>
           </span>
           <span className="text-xs font-mono font-semibold tracking-wide text-gray-500 dark:text-gray-400">
-            HYPERGEN ENGINE
+            QUZO AI ENGINE
           </span>
         </div>
         <div className="text-xs font-mono text-gray-400">12 CHAINS · 38 VENUES · ONE ORDER BOOK</div>

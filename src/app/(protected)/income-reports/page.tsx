@@ -43,13 +43,13 @@ export default function Reports() {
   };
 
   const tabs = [
-    { id: "Direct Referral Income", label: "Direct Referral Income", icon: FaUserPlus },
-    { id: "Daily Profit Income", label: "Daily Profit Income", icon: FaMoneyBillWave },
+    { id: "Direct Referral Income", label: "Direct Partner Rewards", icon: FaUserPlus },
+    { id: "Daily Profit Income", label: "AI Strategy Rewards", icon: FaMoneyBillWave },
     { id: "Booster Income", label: "Booster Income", icon: FaGift },
     { id: "DAO Income", label: "DAO Income", icon: FaSeedling },
-    { id: "Rewards Income", label: "Rewards Income", icon: FaLayerGroup },
+    { id: "Rewards Income", label: "Achievement Rewards", icon: FaLayerGroup },
     { id: "Salary Income", label: "Salary Income", icon: FaUsers },
-    { id: "Level Income", label: "Level Income", icon: FaCrown },
+    { id: "Level Income", label: "Network Rewards", icon: FaCrown },
   ];
 
   return (
