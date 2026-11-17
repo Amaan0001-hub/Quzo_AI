@@ -141,104 +141,58 @@ function Pill({ children }: { children: React.ReactNode }) {
 function CoinChart() {
   const [period, setPeriod] = useState<(typeof coinPeriods)[number]>("30D");
   const [currency, setCurrency] = useState<"BTC" | "USD">("BTC");
-  const price = currency === "BTC" ? "0.00000444" : "$0.3684";
+  const price = currency === "BTC" ? "1" : "$0.3684";
+
+  const utilities = [
+    { icon: Coins, name: "Trading", text: "Trade QUZO on supported exchanges" },
+    { icon: Bot, name: "AI Services", text: "Access AI-powered trading tools" },
+    { icon: Wallet, name: "Staking", text: "Earn rewards by staking QUZO" },
+    { icon: ShieldCheck, name: "Governance", text: "Vote on platform decisions" },
+    { icon: Gift, name: "Rewards", text: "Earn QUZO through activities" },
+    { icon: ChartNoAxesCombined, name: "Analytics", text: "Track performance metrics" },
+  ];
 
   return (
-    <Panel className="p-4 sm:p-5">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div className="flex items-center gap-2 font-semibold">
-          <span className="grid h-9 w-9 place-items-center rounded-full bg-gradient-to-br from-[#10a67b] to-[#35d6c0] font-bold text-white">
-            Q
-          </span>
-          QUZO Coin (QZ)
-        </div>
-        <div className="flex gap-1 rounded-full bg-[#12a594]/[0.08] p-1">
-          {coinPeriods.map((item) => (
-            <button
-              key={item}
-              type="button"
-              onClick={() => setPeriod(item)}
-              className={`rounded-full px-2.5 py-1 text-[11px] transition ${period === item
-                  ? "bg-[#12a594] text-white shadow-sm"
-                  : "text-[#5b7885] hover:text-[#06262f] dark:text-[#84a2ad] dark:hover:text-white"
-                }`}
-              aria-pressed={period === item}
-            >
-              {item}
-            </button>
-          ))}
-        </div>
-      </div>
-      <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
-        <div className="flex flex-wrap items-baseline gap-2">
-          <strong className="text-2xl tabular-nums text-[#06262f] dark:text-white">{price}</strong>
-          <span className="text-xs text-[#5b7885] dark:text-[#84a2ad]">{currency}</span>
-          {currency === "BTC" && (
-            <span className="text-xs text-[#5b7885] dark:text-[#84a2ad]">≈ $0.3684</span>
-          )}
-          <Pill>▲ +46.27% ({period})</Pill>
-        </div>
-        <div className="flex gap-1 rounded-full bg-[#12a594]/[0.08] p-1">
-          {(["BTC", "USD"] as const).map((item) => (
-            <button
-              key={item}
-              type="button"
-              onClick={() => setCurrency(item)}
-              className={`rounded-full px-3 py-1 text-[11px] ${item === currency ? "bg-[#1f5f7a] text-white" : "text-[#5b7885] dark:text-[#84a2ad]"
-                }`}
-              aria-pressed={item === currency}
-            >
-              {item}
-            </button>
-          ))}
-        </div>
-      </div>
-      <div className="mt-3 flex gap-2">
-        <div className="min-w-0 flex-1">
-          <div className="h-[190px] overflow-hidden rounded-xl bg-[#edf4f5] p-2 dark:bg-[#031B23]">
-            <svg viewBox="0 0 600 190" preserveAspectRatio="none" className="h-full w-full">
-              <defs>
-                <linearGradient id="member-coin-area" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0" stopColor="#12a594" stopOpacity=".32" />
-                  <stop offset="1" stopColor="#12a594" stopOpacity="0" />
-                </linearGradient>
-              </defs>
-              {[47.5, 95, 142.5].map((y) => (
-                <line
-                  key={y}
-                  x1="0"
-                  x2="600"
-                  y1={y}
-                  y2={y}
-                  stroke="rgba(120,145,150,0.2)"
-                  strokeDasharray="3 5"
-                />
-              ))}
-              <path
-                d={`${homePageData.coin.chart} L600 190 L0 190 Z`}
-                fill="url(#member-coin-area)"
-              />
-              <path
-                className="member-chart-line"
-                d={homePageData.coin.chart}
-                fill="none"
-                stroke="#12a594"
-                strokeWidth="2.5"
-                vectorEffect="non-scaling-stroke"
-              />
-              <circle className="member-pulse" cx="600" cy="20" r="4" fill="#12a594" />
-            </svg>
+    <Panel className="overflow-hidden p-0">
+      <div className="grid overflow-hidden rounded-[28px] border border-[#d9e8ec] bg-[#f8fbfc] lg:grid-cols-[1fr_2fr] dark:border-[#153747] dark:bg-[#031B23]">
+        <div className="relative flex flex-col justify-between gap-10 bg-white p-8 md:p-10 dark:bg-[#052832]">
+          <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-[#5b7885] dark:text-slate-400">
+            Token utility
+          </p>
+          <div className="flex justify-center">
+            <div className="relative h-32 w-32">
+              <div className="absolute inset-0 rounded-full bg-gradient-to-br from-[#10a67b] to-[#35d6c0] shadow-2xl" />
+              <div className="absolute inset-2 flex items-center justify-center rounded-full bg-gradient-to-br from-[#0a6b4f] to-[#19a885]">
+                <img src="/logos/quzo-logo-light.png" alt="QUZO" className="h-16 w-16 object-contain" />
+              </div>
+            </div>
           </div>
-          <div className="mt-2 flex justify-between text-[9px] text-[#5b7885] dark:text-[#84a2ad]">
-            {homePageData.coin.labels.map((label) => (
-              <span key={label}>{label}</span>
-            ))}
+          <div className="text-center">
+            <p className="text-xl font-bold text-[#06262f] dark:text-white">{price} USDT</p>
+            <p className="mt-1 text-xs text-[#5b7885] dark:text-slate-300">QUZO Coin Pre Allocation Price 1 USDT</p>
+            
           </div>
         </div>
-        <div className="flex flex-col justify-between pb-5 text-[9px] text-[#5b7885] dark:text-[#84a2ad]">
-          {["4.44µ", "3.97µ", "3.50µ", "3.04µ"].map((item) => (
-            <span key={item}>{item}</span>
-          ))}
+        <div className="grid gap-px bg-[#d9e8ec] sm:grid-cols-2 lg:grid-cols-3 dark:bg-white/10">
+          {utilities.map((item, index) => {
+            const Icon = item.icon;
+            return (
+              <div key={item.name} className="min-h-[150px] bg-white p-3 dark:bg-[#031B23]">
+                <div className="flex gap-4">
+                  <span className="font-mono text-[10px] text-[#5b7885] pt-0.5 dark:text-slate-400 shrink-0">0{index + 1}</span>
+                  <div className="min-w-0 flex-1">
+                    <Icon
+                      size={18}
+                      className="text-[#12a594] dark:text-[#19D8D0]"
+                      aria-hidden="true"
+                    />
+                    <h3 className="mt-3 font-display text-sm font-semibold text-[#06262f] dark:text-white">{item.name}</h3>
+                    <p className="mt-2 text-xs leading-relaxed text-[#5b7885] dark:text-slate-300">{item.text}</p>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
         </div>
       </div>
     </Panel>

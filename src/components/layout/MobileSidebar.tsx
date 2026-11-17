@@ -53,6 +53,15 @@ const menuIcons: Record<string, LucideIcon> = {
   "Income Report": ChartNoAxesCombined,
   "Wallet Manager": WalletCards,
   Rank: Award,
+  "AI Subscriptions": WalletCards,
+  "My Assets": BriefcaseBusiness,
+  "Business Network": Network,
+  "Explore Plans": PackageOpen,
+  "Purchase History": ScrollText,
+  "Business Overview": PanelsTopLeft,
+  "My Partners": UserRoundPlus,
+  "Network Structure": GitBranch,
+  "Extended Network": Network,
 };
 
 function MenuIcon({ label, className }: { label: string; className?: string }) {

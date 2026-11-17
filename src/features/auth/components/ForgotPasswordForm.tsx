@@ -76,11 +76,9 @@ export function ForgotPassword() {
           <div className="relative z-10">
             <Link
               href="/"
-              className="flex items-center gap-3 text-3xl font-bold font-display text-white tracking-wide mb-12 w-max"
+              className="flex items-center text-3xl font-bold font-display text-white tracking-wide mb-12 w-max"
             >
-              <div className="h-12 w-12 rounded-xl bg-gradient-to-br from-[#19D8D0] to-[#64BDB7] flex items-center justify-center shadow-[0_0_30px_rgba(25,216,208,0.5)]">
-                <span className="text-[#031B23] text-2xl">Q</span>
-              </div>
+              <img src="/logos/quzo-logo-light.png" alt="Quzo" className="h-16 w-16" />
               Quzo
             </Link>
 

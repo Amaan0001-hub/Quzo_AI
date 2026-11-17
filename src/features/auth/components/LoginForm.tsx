@@ -75,10 +75,8 @@ export function Login() {
           <div className="absolute top-[-20%] left-[-20%] w-[80%] h-[80%] bg-[#19D8D0]/20 blur-[100px] rounded-full pointer-events-none" />
 
           <div className="relative z-10">
-            <div className="flex items-center gap-3 text-3xl font-bold font-display text-white tracking-wide mb-12">
-              <div className="h-12 w-12 rounded-xl bg-gradient-to-br from-[#19D8D0] to-[#64BDB7] flex items-center justify-center shadow-[0_0_30px_rgba(25,216,208,0.5)]">
-                <span className="text-[#031B23] text-2xl">Q</span>
-              </div>
+            <div className="flex items-center text-3xl font-bold font-display text-white tracking-wide mb-12">
+              <img src="/logos/quzo-logo-light.png" alt="Quzo" className="h-16 w-16" />
               Quzo
             </div>
 
