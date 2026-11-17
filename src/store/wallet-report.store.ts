@@ -7,7 +7,7 @@ export interface TransactionHistory {
   debit?: number;
   transType?: string;
   Remark?: string;
-  message?: string;
+  messages?: string;
 }
 
 interface WalletReportState {

@@ -576,7 +576,7 @@ export default function AIBUSINESSHUB() {
               <MetricRow
                 icon={<Users size={18} />}
                 label="Direct ID"
-                value={getText(affiliate?.AuthloginId, "N/A")}
+                value={getText(affiliate?.DirectID, "N/A")}
                 pct={100}
                 status="Direct line"
               />

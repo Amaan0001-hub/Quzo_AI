@@ -8,10 +8,10 @@ type ReportTab = "deposit" | "income" | "quzo" | "yield";
 type ReportRow = Record<string, unknown>;
 
 const tabs: { id: ReportTab; label: string }[] = [
-  { id: "deposit", label: "USDT Wallet" },
-  { id: "income", label: "Working Wallet" },
-  { id: "yield", label: "Yield Wallet" },
-  { id: "quzo", label: "Quzo Coin Wallet" },
+  { id: "deposit", label: "USDT Funding Wallet" },
+  { id: "income", label: "Working Reward Wallet" },
+  { id: "yield", label: "Trading Reward Wallet" },
+  { id: "quzo", label: "QUZO Coin Wallet" },
   
   
 ];

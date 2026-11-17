@@ -860,10 +860,7 @@ export default function AIAssistantPage() {
 
             {/* Generate Button */}
             <div className="p-4">
-              <div className="flex items-center justify-between mb-3 p-2 bg-muted rounded-lg border border-border">
-                <span className="text-xs text-muted-foreground">Credits Required</span>
-                <span className="text-sm font-bold text-[#1680ff]">⚡ 1 Credit</span>
-              </div>
+             
               <button
                 className="ata-gen-btn"
                 onClick={handleGenerate}
