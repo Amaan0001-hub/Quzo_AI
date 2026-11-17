@@ -104,7 +104,7 @@ export function Sidebar() {
       )}
     >
       {/* --- YAHAN SE LOGO SECTION START HAI --- */}
-      <div
+      {/* <div
         className={cn(
           "flex items-center border-b border-sidebar-border/50 px-5 py-6",
           isCollapsed ? "justify-center px-0" : "",
@@ -133,6 +133,52 @@ export function Sidebar() {
             )}
             priority
           />
+        </div>
+      </div> */}
+
+      <div
+        className={cn(
+          "flex items-center border-b border-sidebar-border/50 transition-all duration-300",
+          isCollapsed ? "justify-center px-0 py-4" : "px-5 py-4"
+        )}
+      >
+        <div className="flex items-center gap-3 overflow-hidden">
+
+          {/* 1. ICON IMAGE */}
+          <div className="shrink-0">
+            {/* Light Theme Icon */}
+            <Image
+              src="/logos/fyntix-logo-dark.png" // <-- Yahan sirf Icon (Q) ki image file dalein
+              alt="Quzo Icon"
+              width={40}
+              height={40}
+              className="block dark:hidden h-9 w-9 object-contain"
+              priority
+            />
+            {/* Dark Theme Icon */}
+            <Image
+              src="/logos/fyntix-logo-dark.png" // <-- Dark theme ke liye sirf Icon ki image dalein
+              alt="Quzo Icon"
+              width={40}
+              height={40}
+              className="hidden dark:block h-9 w-9 object-contain"
+              priority
+            />
+          </div>
+
+          {/* 2. TEXT (QUZO) */}
+          <span
+            className={cn(
+              "font-bold text-xl tracking-wider uppercase transition-all duration-300 whitespace-nowrap",
+              // Light/Dark theme ke hisaab se text color (Apne theme ke hisaab se adjust karein)
+              "text-slate-900 dark:text-white",
+              // Collapse hone par text gayab ho jayega smoothly
+              isCollapsed ? "opacity-0 w-0 hidden" : "opacity-100 w-auto"
+            )}
+          >
+            Quzo
+          </span>
+
         </div>
       </div>
       {/* --- LOGO SECTION END --- */}

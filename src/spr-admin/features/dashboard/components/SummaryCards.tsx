@@ -57,38 +57,39 @@ const metricGroups: {
         { key: "TotalJoining", label: "Total Joining", type: "count" },
         { key: "TotalToadyJoining", label: "Today's Joining", type: "count" },
         { key: "TotalActivated", label: "Total Activated", type: "count" },
-        { key: "NotActivated", label: "Not Activated", type: "count" },
+        // { key: "NotActivated", label: "Not Activated", type: "count" },
       ],
     },
     {
       title: "Business & Deposits Wallet Overview",
       icon: BriefcaseBusiness,
       metrics: [
-        { key: "TodayBusiness", label: "Today's Business", type: "currency" },
         { key: "TotalBusiness", label: "Total Business", type: "currency" },
+        { key: "TodayBusiness", label: "Today's Business", type: "currency" },
+        { key: "TotalDepositWallet", label: "Total USDT Deposit", type: "currency" },
         {
           key: "TodayDepositWallet",
           fallbackKey: "TodayDeposit",
-          label: "Today's Deposit Wallet",
+          label: "Today's USDT Deposit",
           type: "currency",
         },
-        { key: "TotalDepositWallet", label: "Total Deposit Wallet", type: "currency" },
+        
       ],
     },
     {
       title: "Working Wallet & Withdrawals Overview",
       icon: Wallet,
       metrics: [
-        { key: "TotalWorkingWallet", label: "Total Working Wallet", type: "currency" },
-        { key: "TodayWorkingWallet", label: "Today's Working Wallet", type: "currency" },
+        { key: "TotalWorkingWallet", label: "Working Balance", type: "currency" },
+        // { key: "TodayWorkingWallet", label: "Today's Working Wallet", type: "currency" },
         {
           key: "TotalWorkingWithdrawal",
-          label: "Total Working Withdrawal",
+          label: "Total Withdrawal",
           type: "currency",
         },
         {
           key: "TodayWorkingWithdrawal",
-          label: "Today's Working Withdrawal",
+          label: "Today's Withdrawal",
           type: "currency",
         },
       ],
@@ -97,14 +98,14 @@ const metricGroups: {
       title: "ROI Overview",
       icon: TrendingUp,
       metrics: [
-        { key: "TotalROIwallet", label: "Total ROI Wallet", type: "currency" },
-        { key: "TodayROIwallet", label: "Today's ROI Wallet", type: "currency" },
+        { key: "TotalROIwallet", label: "Yield Working Balance", type: "currency" },
+        // { key: "TodayROIwallet", label: "Today's ROI Wallet", type: "currency" },
         {
           key: "TotalROIWithdrawal",
-          label: "Total ROI Withdrawal",
+          label: "Total Withdrawal",
           type: "currency",
         },
-        { key: "TodayROIWithdrawal", label: "Today's ROI Withdrawal", type: "currency" },
+        { key: "TodayROIWithdrawal", label: "Today's Withdrawal", type: "currency" },
       ],
     },
 
