@@ -21,8 +21,8 @@ import {
 const walletOptions = [
   { value: 1, label: "Income Wallet" },
   { value: 2, label: "Deposit Wallet" },
-  { value: 3, label: "Fund Wallet" },
-  { value: 4, label: "Mentor Wallet" },
+  { value: 3, label: "Roi Wallet" },
+  { value: 4, label: "Quzo Wallet" },
 ];
 
 export default function WalletStatement() {
