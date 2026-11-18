@@ -2,27 +2,88 @@
 
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/store/auth.store";
 import { ThemeLogo } from "@/components/common/ThemeLogo";
 import { AuthThemeToggle } from "@/components/common/AuthThemeToggle";
 import { FaExclamationTriangle } from "react-icons/fa";
 import { FiArrowLeft } from "react-icons/fi";
 import { Sparkles } from "lucide-react";
+import { useMutation } from "@tanstack/react-query";
+import { authService } from "@/features/auth/services/auth.service";
+import { toast } from "sonner";
+import type { LoginCredentials } from "@/types/auth";
+import { useEffect, useState } from "react";
 
 export default function WelcomeLetter() {
   const searchParams = useSearchParams();
-  const { user } = useAuthStore();
+  const router = useRouter();
+  const { user, setUser } = useAuthStore();
+  const [mounted, setMounted] = useState(false);
 
-  // Get data from query params (passed from registration)
+  // Get data from query params (non-sensitive data only)
   const queryEmail = searchParams.get("email");
   const queryFirstName = searchParams.get("firstName");
   const queryLastName = searchParams.get("lastName");
+  const queryPass = typeof window !== "undefined" ? sessionStorage.getItem("reg_password") : null;
+  const [queryUserId, setQueryUserId] = useState<string | null>(null);
 
-  // Use query params if available, otherwise fallback to auth store
+  useEffect(() => {
+    if (mounted) {
+      fetch("/api/auth/temp-auth-login")
+        .then(res => res.json())
+        .then(data => {
+          if (data.authLogin) {
+            setQueryUserId(data.authLogin);
+          }
+        })
+        .catch(err => console.error("Failed to get temp auth login:", err));
+    }
+  }, [mounted]);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   const userName = queryFirstName
     ? `${queryFirstName} ${queryLastName || ""}`.trim()
     : user?.name?.split(" ")[0] || "User";
   const userEmail = queryEmail || user?.email || "Your registered email";
+  const userPassword = queryPass || "Your registered password";
+
+  // Auto-login mutation
+  const login = useMutation({
+    mutationFn: (credentials: LoginCredentials) => authService.login(credentials),
+    onSuccess: (user) => {
+      setUser(user);
+      toast.success("Login successful!");
+      if (typeof window !== "undefined") {
+        sessionStorage.removeItem("reg_password");
+        sessionStorage.removeItem("reg_email");
+        sessionStorage.removeItem("reg_firstName");
+        sessionStorage.removeItem("reg_lastName");
+      }
+      fetch("/api/auth/temp-auth-login", { method: "DELETE" }).catch(() => {});
+      router.push("/home");
+    },
+    onError: (error: unknown) => {
+      console.error("Auto-login error:", error);
+      toast.error("Auto-login failed. Please login manually.");
+      router.push("/login");
+    },
+  });
+
+  // Auto-login handler
+  const handleGoToDashboard = () => {
+    if (queryUserId && queryPass) {
+      login.mutate({
+        userid: queryUserId,
+        password: queryPass,
+      });
+    } else {
+      router.push("/home");
+    }
+  };
 
   return (
     <>
@@ -127,21 +188,30 @@ export default function WelcomeLetter() {
                 </p>
 
                 <div className="flex flex-col space-y-1">
-                  <Link href="/login">
-                    <button
-                      className="relative w-full py-3 rounded-lg font-semibold text-xs tracking-[0.15em] uppercase transition-all duration-300 overflow-hidden group text-[#031B23]"
-                      style={{
-                        background: "#19D8D0",
-                        boxShadow: "0 0 25px rgba(25,216,208,0.35), inset 0 1px 0 rgba(255,255,255,0.3)",
-                      }}
-                    >
-                      <span className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000 bg-gradient-to-r from-transparent via-white/40 to-transparent" />
-                      <span className="relative flex items-center justify-center gap-2">
-                        <FiArrowLeft className="text-lg" />
-                        Back to SignIn
-                      </span>
-                    </button>
-                  </Link>
+                  <button
+                    onClick={handleGoToDashboard}
+                    disabled={login.isPending}
+                    className="relative w-full py-3 rounded-lg font-semibold text-xs tracking-[0.15em] uppercase transition-all duration-300 overflow-hidden group text-[#031B23] disabled:opacity-60 disabled:cursor-not-allowed"
+                    style={{
+                      background: "#19D8D0",
+                      boxShadow: "0 0 25px rgba(25,216,208,0.35), inset 0 1px 0 rgba(255,255,255,0.3)",
+                    }}
+                  >
+                    <span className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000 bg-gradient-to-r from-transparent via-white/40 to-transparent" />
+                    <span className="relative flex items-center justify-center gap-2">
+                      {login.isPending ? (
+                        <>
+                          <span className="animate-spin">⟳</span>
+                          Logging in...
+                        </>
+                      ) : (
+                        <>
+                          <FiArrowLeft className="text-lg" />
+                          Go to Dashboard
+                        </>
+                      )}
+                    </span>
+                  </button>
 
                   <div className="flex items-start gap-3 p-3 border-l-4 rounded-md bg-[#19D8D0]/10 border-[#19D8D0]/40">
                     <FaExclamationTriangle className="text-[#19D8D0] text-lg mt-0.5 flex-shrink-0" />

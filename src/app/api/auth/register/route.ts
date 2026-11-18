@@ -1,5 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { createBackendClient } from "@/lib/backend-client";
+import { getServerEnv } from "@/lib/env";
 
 
 export async function POST(request: NextRequest) {
@@ -27,7 +28,25 @@ export async function POST(request: NextRequest) {
 
     const { data } = await backend.post("/Authentication/userRegistration", backendBody);
 
-    return NextResponse.json(data);
+    // Extract authLogin for temporary storage
+    const { authLogin, ...responseData } = data as { authLogin?: string; [key: string]: unknown };
+
+    // Create response
+    const response = NextResponse.json(responseData);
+
+    // Store authLogin in a temporary cookie (HttpOnly, short-lived)
+    if (authLogin) {
+      const { SESSION_COOKIE_NAME } = getServerEnv();
+      response.cookies.set("temp_auth_login", authLogin, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "lax",
+        path: "/",
+        maxAge: 60 * 5, // 5 minutes - short lived
+      });
+    }
+
+    return response;
   } catch (error) {
     console.error("Registration error:", error);
     return NextResponse.json(
