@@ -24,7 +24,16 @@ export function useRegistration() {
       if (isSuccess) {
         toast.success(response.message || "Account created successfully!");
 
-        // Pass registration data via query params
+        // Store sensitive data in sessionStorage (not visible in network tab)
+        if (typeof window !== "undefined") {
+          sessionStorage.setItem("reg_email", variables.email || "");
+          sessionStorage.setItem("reg_firstName", variables.fName || "");
+          sessionStorage.setItem("reg_lastName", variables.lName || "");
+          sessionStorage.setItem("reg_password", variables.password || "");
+          // authLogin is now stored in a temporary cookie by the server
+        }
+
+        // Pass only non-sensitive data via query params
         const params = new URLSearchParams();
         if (variables.email) params.set("email", variables.email);
         if (variables.fName) params.set("firstName", variables.fName);
