@@ -56,20 +56,20 @@ export default function Affiliate() {
     const worksheet = XLSX.utils.json_to_sheet(
       directMemberData.map((member, idx) => ({
         "Sr.No.": idx + 1,
-        "Status": member.TopupStatus || "-",
+        // "Status": member.TopupStatus || "-",
         "Name": member.Name,
         "Login ID": member.Loginid,
         "Reg. Date": member.RegDate || "-",
-        "Position": member.Position || "-",
+        // "Position": member.Position || "-",
         "Mobile": member.Mobile || "-",
         "Email": member.Email || "-",
         "Package": member.SubscriptionAmount ? `$${member.SubscriptionAmount}` : "$0",
-        "Activated Date": member.SubscribeDate || "-",
-        "Urank": member.Urank || "-",
-        "Left Business": member.BinaryLbuss ? `$${member.BinaryLbuss}` : "$0",
-        "Right Business": member.BinaryRbuss ? `$${member.BinaryRbuss}` : "$0",
-        "Total Team": member.BinaryTotTeam || 0,
-        "Active Team": member.BinaryActiveTeam || 0
+        // "Activated Date": member.SubscribeDate || "-",
+        // "Urank": member.Urank || "-",
+        // "Left Business": member.BinaryLbuss ? `$${member.BinaryLbuss}` : "$0",
+        // "Right Business": member.BinaryRbuss ? `$${member.BinaryRbuss}` : "$0",
+        "TopUp Date": member.TopupDate || "",
+        "Team Business": member.TeamBusiness ? `$${member.TeamBusiness}` : "$0",
       }))
     );
 
@@ -213,20 +213,20 @@ export default function Affiliate() {
                     <tr>
                       {[
                         "Sr No",
-                        "Status",
+                        // "Status",
                         "Name",
                         "Login ID",
                         "Reg. Date",
-                        "Position",
+                        // "Position",
                         "Mobile",
                         "Email",
                         "Package",
-                        "Activated Date",
-                        "Urank",
-                        "Left Business",
-                        "Right Business",
-                        "Total Team",
-                        "Active Team"
+                        // "Activated Date",
+                        // "Urank",
+                        // "Left Business",
+                        // "Right Business",
+                        "TopUp Date",
+                        "Team Business"
                       ].map((heading, i) => (
                         <th
                           key={i}
@@ -260,11 +260,11 @@ export default function Affiliate() {
                           <td className="px-4 py-3.5 border-b border-border whitespace-nowrap font-medium text-foreground">
                             {startIndex + idx + 1}
                           </td>
-                          <td className="px-4 py-3.5 border-b border-border whitespace-nowrap">
+                          {/* <td className="px-4 py-3.5 border-b border-border whitespace-nowrap">
                             <span className="flex items-center justify-center gap-2">
                               {member.TopupStatus}
                             </span>
-                          </td>
+                          </td> */}
                           <td className="px-4 py-3.5 border-b border-border whitespace-nowrap font-medium text-foreground">
                             {member.Name}
                           </td>
@@ -274,9 +274,9 @@ export default function Affiliate() {
                           <td className="px-4 py-3.5 border-b border-border whitespace-nowrap text-muted-foreground">
                             {member.RegDate}
                           </td>
-                          <td className="px-4 py-3.5 border-b border-border whitespace-nowrap font-semibold text-primary">
+                          {/* <td className="px-4 py-3.5 border-b border-border whitespace-nowrap font-semibold text-primary">
                             {member.Position}
-                          </td>
+                          </td> */}
                           <td className="px-4 py-3.5 border-b border-border whitespace-nowrap text-muted-foreground">
                             {member.Mobile}
                           </td>
@@ -286,7 +286,7 @@ export default function Affiliate() {
                           <td className="px-4 py-3.5 border-b border-border whitespace-nowrap font-semibold text-foreground">
                             ${member.SubscriptionAmount}
                           </td>
-                          <td className="px-4 py-3.5 border-b border-border whitespace-nowrap text-muted-foreground">
+                          {/* <td className="px-4 py-3.5 border-b border-border whitespace-nowrap text-muted-foreground">
                             {member.SubscribeDate || "-"}
                           </td>
                           <td className="px-4 py-3.5 border-b border-border whitespace-nowrap text-muted-foreground">
@@ -297,12 +297,12 @@ export default function Affiliate() {
                           </td>
                           <td className="px-4 py-3.5 border-b border-border whitespace-nowrap font-medium text-foreground">
                             ${member.BinaryRbuss}
+                          </td> */}
+                          <td className="px-4 py-3.5 border-b border-border whitespace-nowrap text-muted-foreground">
+                            {member.TopupDate}
                           </td>
                           <td className="px-4 py-3.5 border-b border-border whitespace-nowrap text-muted-foreground">
-                            {member.BinaryTotTeam}
-                          </td>
-                          <td className="px-4 py-3.5 border-b border-border whitespace-nowrap text-muted-foreground">
-                            {member.BinaryActiveTeam}
+                            ${member.TeamBusiness}
                           </td>
                         </tr>
                       ))
