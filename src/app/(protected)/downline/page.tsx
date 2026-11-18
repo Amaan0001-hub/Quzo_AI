@@ -104,7 +104,7 @@ const DownlineAffilates = () => {
                     onChange={(e) => handleLevelChange(e.target.value)}
                   >
                     <option value="">All</option>
-                    {Array.from({ length: 18 }, (_, i) => (
+                    {Array.from({ length: 20 }, (_, i) => (
                       <option key={i + 1} value={String(i + 1)}>
                         {i + 1}
                       </option>
