@@ -7,7 +7,7 @@ type RankRow = {
   RewardTitle: string;
   RewardAchvd: string;
   RequiredBusiness: string;
-  Amount: string;
+  RewardAmt: string;
   Statusx: string;
   PowerTeamBusines: number;
   WeakerTeamBusines: number;
@@ -412,17 +412,7 @@ export default function RankPage() {
                   </div>
                 </div>
 
-                <div className="relative overflow-hidden rounded-2xl border border-slate-200/80 bg-white/90 shadow-sm dark:border-slate-700/70 dark:bg-slate-900/75">
-                  <div className="flex items-center justify-between border-b border-slate-200 px-4 py-3 dark:border-slate-700">
-                    <span className="text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300">
-                      Next Release Date
-                    </span>
-                    <Info className="h-4 w-4 text-blue-500" aria-hidden />
-                  </div>
-                  <div className="px-4 py-4">
-                    <p className="text-2xl font-extrabold text-slate-900 dark:text-white">{nextReleaseDate}</p>
-                  </div>
-                </div>
+              
 
                 <div className="relative overflow-hidden rounded-2xl border border-slate-200/80 bg-white/90 shadow-sm dark:border-slate-700/70 dark:bg-slate-900/75">
                   <div className="flex items-center justify-between border-b border-slate-200 px-4 py-3 dark:border-slate-700">
@@ -505,7 +495,7 @@ export default function RankPage() {
                                 {formatBusinessVolume(row.RequiredBusiness)}
                               </td>
                               <td className="whitespace-nowrap px-4 py-3">
-                                {row.Amount}
+                                {row.RewardAmt}
                               </td>
                               <td className="whitespace-nowrap px-4 py-3">
                                 <span
@@ -557,31 +547,7 @@ export default function RankPage() {
           {!daoError && (
             <>
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                <div className="relative overflow-hidden rounded-2xl border border-slate-200/80 bg-white/90 shadow-sm dark:border-slate-700/70 dark:bg-slate-900/75">
-                  <div className="flex items-center justify-between border-b border-slate-200 px-4 py-3 dark:border-slate-700">
-                    <span className="text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300">
-                      Total Pools
-                    </span>
-                    <Coins className="h-4 w-4 text-[#1680ff] dark:text-[#25c6e8]" aria-hidden />
-                  </div>
-                  <div className="px-4 py-4">
-                    <p className="text-2xl font-extrabold text-slate-900 dark:text-white">{dao.length}</p>
-                  </div>
-                </div>
-
-                <div className="relative overflow-hidden rounded-2xl border border-slate-200/80 bg-white/90 shadow-sm dark:border-slate-700/70 dark:bg-slate-900/75">
-                  <div className="flex items-center justify-between border-b border-slate-200 px-4 py-3 dark:border-slate-700">
-                    <span className="text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300">
-                      Total Shares
-                    </span>
-                    <TrendingUp className="h-4 w-4 text-emerald-500" aria-hidden />
-                  </div>
-                  <div className="px-4 py-4">
-                    <p className="text-2xl font-extrabold text-slate-900 dark:text-white">
-                      {dao.reduce((sum, row) => sum + row.NoofShares, 0)}
-                    </p>
-                  </div>
-                </div>
+               
 
                 <div className="relative overflow-hidden rounded-2xl border border-slate-200/80 bg-white/90 shadow-sm dark:border-slate-700/70 dark:bg-slate-900/75">
                   <div className="flex items-center justify-between border-b border-slate-200 px-4 py-3 dark:border-slate-700">
@@ -600,7 +566,7 @@ export default function RankPage() {
                 <div className="relative overflow-hidden rounded-2xl border border-slate-200/80 bg-white/90 shadow-sm dark:border-slate-700/70 dark:bg-slate-900/75">
                   <div className="flex items-center justify-between border-b border-slate-200 px-4 py-3 dark:border-slate-700">
                     <span className="text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300">
-                      Qualified Pools
+                      Qualified Members
                     </span>
                     <Zap className="h-4 w-4 text-[#1680ff] dark:text-[#25c6e8]" aria-hidden />
                   </div>
@@ -628,9 +594,7 @@ export default function RankPage() {
                     <thead className="bg-gradient-to-r from-blue-50/80 via-cyan-50/60 to-violet-50/80 text-xs uppercase tracking-wider text-slate-600 dark:from-blue-900/20 dark:via-cyan-900/10 dark:to-violet-900/20 dark:text-slate-300">
                       <tr>
                         <th className="whitespace-nowrap px-4 py-3">#</th>
-                        <th className="whitespace-nowrap px-4 py-3">POOL NAME</th>
-                        <th className="whitespace-nowrap px-4 py-3">MATCHING BUSINESS</th>
-                        <th className="whitespace-nowrap px-4 py-3">NO. OF SHARES</th>
+                        <th className="whitespace-nowrap px-4 py-3">DIRECT BUSINESS</th>
                         <th className="whitespace-nowrap px-4 py-3">DAO REWARD</th>
                         <th className="whitespace-nowrap px-4 py-3">STATUS</th>
                       </tr>
@@ -658,14 +622,8 @@ export default function RankPage() {
                               className="text-slate-700 transition-colors hover:bg-blue-50/50 dark:text-slate-200 dark:hover:bg-cyan-900/10"
                             >
                               <td className="whitespace-nowrap px-4 py-3">{index + 1}</td>
-                              <td className="whitespace-nowrap px-4 py-3 font-semibold">
-                                {row.PoolName}
-                              </td>
                               <td className="whitespace-nowrap px-4 py-3">
                                 {formatMoney(row.MatchingBusiness)}
-                              </td>
-                              <td className="whitespace-nowrap px-4 py-3">
-                                {row.NoofShares}
                               </td>
                               <td className="whitespace-nowrap px-4 py-3">
                                 {formatMoney(row.DAOReward)}
