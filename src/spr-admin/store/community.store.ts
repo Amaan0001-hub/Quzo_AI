@@ -15,6 +15,8 @@ export interface DirectMember {
   BinaryRbuss: number;
   BinaryTotTeam: number;
   BinaryActiveTeam: number;
+  TeamBusiness: number;
+  TopupDate: string | null; 
 }
 
 export interface DownlineMember {

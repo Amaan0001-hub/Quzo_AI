@@ -244,7 +244,7 @@ const CustomNode = ({
           className="px-3 py-1 text-center text-gray-500"
           style={{ fontSize: `${fontSize * 0.85}px` }}
         >
-          <span>Lease: </span>
+          <span>Package: </span>
           <span
             className={`font-bold ${
               leaseAmount > 0 ? "text-green-600" : "text-red-600"
@@ -512,7 +512,7 @@ export default function IntelligentTreeView() {
         <div className="border border-border rounded-lg bg-card shadow-sm overflow-hidden">
           <div
             ref={containerRef}
-            className="flex items-center justify-center w-full h-[500px] sm:h-[600px] lg:h-[700px] bg-gradient-to-br from-gray-50 to-gray-100"
+            className="flex items-center justify-center w-full h-[500px] sm:h-[600px] lg:h-[700px] bg-gradient-to-br from-gray-50 to-gray-100 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900"
           >
             {loading ? (
               <div className="flex flex-col items-center justify-center">
