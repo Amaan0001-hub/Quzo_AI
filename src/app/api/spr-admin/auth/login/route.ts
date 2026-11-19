@@ -1,7 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { getServerEnv } from "@/spr-admin/lib/env";
 import { createBackendClient } from "@/spr-admin/lib/backend-client";
-import { rateLimit, getClientIp } from "@/spr-admin/lib/rate-limiter";
 
 interface BackendAdminUser {
   adminUserId?: string | number;
@@ -92,30 +91,6 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(
       { success: false, message: "Username and password are required" },
       { status: 400 },
-    );
-  }
-
-  // Rate limiting: 5 login attempts per 15 minutes per IP
-  const ip = getClientIp(request);
-  const limiter = rateLimit({ limit: 5, windowMs: 15 * 60 * 1000 });
-  const rateLimitResult = await limiter(`${ip}:login`);
-
-  if (!rateLimitResult.success) {
-    return NextResponse.json(
-      {
-        success: false,
-        message: "Too many login attempts. Please try again later.",
-        retryAfter: Math.ceil((rateLimitResult.resetTime - Date.now()) / 1000),
-      },
-      {
-        status: 429,
-        headers: {
-          'Retry-After': String(Math.ceil((rateLimitResult.resetTime - Date.now()) / 1000)),
-          'X-RateLimit-Limit': '5',
-          'X-RateLimit-Remaining': '0',
-          'X-RateLimit-Reset': String(rateLimitResult.resetTime),
-        },
-      },
     );
   }
 

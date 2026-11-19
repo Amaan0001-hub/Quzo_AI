@@ -763,7 +763,6 @@ export default function AIAssistantPage() {
           <div className="lg:col-span-1 bg-card border border-border rounded-lg overflow-hidden">
             <div className="p-4 border-b border-border bg-muted/50">
               <h2 className="font-bold text-lg">✦ Generate AI Market Analysis</h2>
-              <p className="text-xs text-muted-foreground mt-1">Configure your request · 1 credit per analysis</p>
             </div>
 
             {/* Step 1: Category */}

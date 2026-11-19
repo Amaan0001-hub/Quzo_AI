@@ -38,5 +38,9 @@ export function useLogin() {
       router.replace(APP_ROUTES.dashboard);
       router.refresh();
     },
+    onError: (error) => {
+      const errorMessage = error instanceof Error ? error.message : "Unable to sign in. Please check your username and password.";
+      showToast(errorMessage, "error");
+    },
   });
 }

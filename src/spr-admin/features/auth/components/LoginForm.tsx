@@ -104,14 +104,6 @@ export function LoginForm() {
             )}
           </button>
 
-          {login.isError && (
-            <p className="text-center text-sm text-red-600" role="alert">
-              {login.error instanceof Error
-                ? login.error.message
-                : "Unable to sign in. Please check your username and password."}
-            </p>
-          )}
-
           <p className="text-center text-xs text-slate-500">
             Secure access to your Quzo dashboard
           </p>
