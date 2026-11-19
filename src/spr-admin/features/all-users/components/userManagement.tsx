@@ -140,7 +140,6 @@ function exportUsers(users: UserRecord[]) {
     "Email",
     "Wallet Address",
     "Package ($)",
-    "Package Status",
     "Reg Date",
     "Status",
     "Actions",
@@ -291,66 +290,6 @@ export default function UserManagement() {
     setPage(1);
   }
 
-  // async function handleUserLogin(username: string) {
-  //   setLoggingInUser(username);
-  //   try {
-  //     // Step 1: Call checkAdminUserVerify
-  //     const verifyResponse = await axios.get("/api/AdminAuthentication/checkAdminUserVerify", {
-  //       params: {
-  //         LoginID: username,
-  //       },
-  //     });
-
-  //     if (!verifyResponse.data?.data || !Array.isArray(verifyResponse.data.data) || verifyResponse.data.data.length === 0) {
-  //       showToast("User verification failed: No data returned", "error");
-  //       return;
-  //     }
-
-  //     const verifyData = verifyResponse.data.data[0];
-  //     const authLogin = verifyData.AuthLogin;
-  //     const authPass = verifyData.AuthPass;
-
-  //     if (!authLogin || !authPass) {
-  //       showToast("User verification failed: Missing credentials", "error");
-  //       return;
-  //     }
-
-  //     // Step 2: Call adminUserLogin with the credentials
-  //     const loginResponse = await axios.post("/api/AdminAuthentication/adminUserLogin", {
-  //       userid: authLogin,
-  //       password: authPass,
-  //     });
-
-  //     if (loginResponse.data?.success === false) {
-  //       showToast(loginResponse.data.message || "Login failed", "error");
-  //     } else {
-  //       // Store tokens in localStorage for user-side
-  //       const { accessToken, refreshToken } = loginResponse.data;
-  //       if (accessToken) {
-  //         localStorage.setItem("userAccessToken", accessToken);
-  //       }
-  //       if (refreshToken) {
-  //         localStorage.setItem("userRefreshToken", refreshToken);
-  //       }
-
-  //       showToast("Login successful! Redirecting to dashboard...");
-  //       // Redirect to user-side dashboard in new tab
-  //       setTimeout(() => {
-  //         window.open("https://kaliki-user.vercel.app/dashboard", "_blank");
-  //       }, 1000);
-  //     }
-  //   } catch (error) {
-  //     console.error("User login error:", error);
-  //     if (axios.isAxiosError(error)) {
-  //       const message = error.response?.data?.message || error.message;
-  //       showToast(message, "error");
-  //     } else {
-  //       showToast("Login failed", "error");
-  //     }
-  //   } finally {
-  //     setLoggingInUser(null);
-  //   }
-  // }
 
   async function handleUserLogin(username: string) {
     setLoggingInUser(username);
@@ -659,16 +598,17 @@ export default function UserManagement() {
                 <tr>
                   {[
                     "S.No.",
+                    "Actions",
                     "User Login",
                     "Name",
                     "Mobile",
                     "Email",
                     "Wallet Address",
                     "Package ($)",
-                    "Package Status",
+                    "Admin Package ($)",
                     "Reg Date",
                     "Status",
-                    "Actions",
+                    
                   ].map((title) => (
                     <th key={title} className="px-4 py-3">
                       {title}
@@ -710,20 +650,18 @@ export default function UserManagement() {
                         ]),
                       )
                       : "—";
-                  const packageStatus = getText(user, [
-                    "PacakgateStatus",
-                    "PackageStatus",
-                    "PackageName",
-                    "PackageType",
-                  ]);
-                  const normalizedPackageStatus = packageStatus.toLowerCase();
-                  const isInactivePackage =
-                    normalizedPackageStatus.includes("inactive") ||
-                    normalizedPackageStatus === "not active";
-                  const isActivePackage =
-                    !isInactivePackage &&
-                    (normalizedPackageStatus.includes("active") ||
-                      normalizedPackageStatus === "active");
+                        const adminPackageAmount =
+                    typeof packageValue === "number" || typeof packageValue === "string"
+                      ? formatMoney(
+                        getAmount(user, [
+                          "AdminTopup",
+                          "AdminTopupAmount",
+                          "AdminTopupPrice",
+                          "AdminTopupValue",
+                          "AdminTopupTotal",
+                        ]),
+                      )
+                      : "—";
                   const joined = getField(user, [
                     "RegDate",
                     "CreatedDate",
@@ -739,6 +677,22 @@ export default function UserManagement() {
                     >
                       <td className="px-4 py-4 font-medium">
                         {(currentPage - 1) * pageSize + index + 1}
+                      </td>
+                       <td className="px-4 py-4">
+                        <button
+                          type="button"
+                          onClick={() => handleUserLogin(username)}
+                          disabled={loggingInUser === username}
+                          className="inline-flex items-center gap-1.5 rounded-md bg-blue-600 px-3 py-1.5 text-[10px] font-medium text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
+                          aria-label={`Login as ${username}`}
+                        >
+                          {loggingInUser === username ? (
+                            <Spinner className="h-3 w-3" />
+                          ) : (
+                            <LogIn className="h-3 w-3" aria-hidden />
+                          )}
+                          {loggingInUser === username ? "Logging in..." : "Login"}
+                        </button>
                       </td>
                       <td className="px-4 py-4 font-medium text-slate-800">{username}</td>
                       <td className="px-4 py-4">{fullName}</td>
@@ -771,18 +725,8 @@ export default function UserManagement() {
                         )}
                       </td>
                       <td className="px-4 py-4 font-medium">{packageAmount}</td>
-                      <td className="px-4 py-4">
-                        <span
-                          className={`rounded-full px-2 py-1 text-[10px] font-semibold ${isInactivePackage
-                              ? "bg-red-100 text-red-700"
-                              : isActivePackage
-                                ? "bg-green-100 text-green-700"
-                                : "bg-slate-100 text-slate-600"
-                            }`}
-                        >
-                          {packageStatus}
-                        </span>
-                      </td>
+                      <td className="px-4 py-4 font-medium">{adminPackageAmount}</td>
+                     
                       <td className="px-4 py-4">{formatDate(joined)}</td>
                       <td className="px-4 py-4">
                         <span
@@ -791,22 +735,7 @@ export default function UserManagement() {
                           {status.label}
                         </span>
                       </td>
-                      <td className="px-4 py-4">
-                        <button
-                          type="button"
-                          onClick={() => handleUserLogin(username)}
-                          disabled={loggingInUser === username}
-                          className="inline-flex items-center gap-1.5 rounded-md bg-blue-600 px-3 py-1.5 text-[10px] font-medium text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
-                          aria-label={`Login as ${username}`}
-                        >
-                          {loggingInUser === username ? (
-                            <Spinner className="h-3 w-3" />
-                          ) : (
-                            <LogIn className="h-3 w-3" aria-hidden />
-                          )}
-                          {loggingInUser === username ? "Logging in..." : "Login"}
-                        </button>
-                      </td>
+                     
                     </tr>
                   );
                 })}

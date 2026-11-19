@@ -1,7 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { getServerEnv } from "@/spr-admin/lib/env";
 import { createBackendClient } from "@/spr-admin/lib/backend-client";
-import { rateLimit, getClientIp } from "@/spr-admin/lib/rate-limiter";
 
 type RoiStatusPayload = {
   action: "approve" | "reject";
@@ -90,29 +89,6 @@ export async function POST(request: NextRequest) {
   }
   if (typeof token !== "string" || !token) {
     return NextResponse.json({ message: "Invalid session" }, { status: 401 });
-  }
-
-  // Rate limiting: 15 requests per minute per IP (financial endpoint)
-  const ip = getClientIp(request);
-  const limiter = rateLimit({ limit: 15, windowMs: 60 * 1000 });
-  const rateLimitResult = await limiter(`${ip}:roi-withdrawal-action`);
-
-  if (!rateLimitResult.success) {
-    return NextResponse.json(
-      {
-        message: "Too many requests. Please slow down.",
-        retryAfter: Math.ceil((rateLimitResult.resetTime - Date.now()) / 1000),
-      },
-      {
-        status: 429,
-        headers: {
-          'Retry-After': String(Math.ceil((rateLimitResult.resetTime - Date.now()) / 1000)),
-          'X-RateLimit-Limit': '15',
-          'X-RateLimit-Remaining': '0',
-          'X-RateLimit-Reset': String(rateLimitResult.resetTime),
-        },
-      },
-    );
   }
 
   let payload: unknown;

@@ -146,8 +146,6 @@ function CoinChart() {
   const utilities = [
     { icon: Coins, name: "Trading", text: "Trade QUZO on supported exchanges" },
     { icon: Bot, name: "AI Services", text: "Access AI-powered trading tools" },
-    { icon: Wallet, name: "Staking", text: "Earn rewards by staking QUZO" },
-    { icon: ShieldCheck, name: "Governance", text: "Vote on platform decisions" },
     { icon: Gift, name: "Rewards", text: "Earn QUZO through activities" },
     { icon: ChartNoAxesCombined, name: "Analytics", text: "Track performance metrics" },
   ];
@@ -173,7 +171,7 @@ function CoinChart() {
             
           </div>
         </div>
-        <div className="grid gap-px bg-[#d9e8ec] sm:grid-cols-2 lg:grid-cols-3 dark:bg-white/10">
+        <div className="grid gap-px bg-[#d9e8ec] sm:grid-cols-2 lg:grid-cols-2 dark:bg-white/10">
           {utilities.map((item, index) => {
             const Icon = item.icon;
             return (
@@ -353,36 +351,40 @@ export function MemberHomeDashboard() {
 
   const wallets = [
     {
-      name: "USDT Wallet",
+      name: "USDT Funding Wallet",
       amount: walletData?.DepositWallet
         ? `$${Number(walletData.DepositWallet).toFixed(2)}`
         : "$0.00",
       detail: "Available Balance",
       color: "#12a594",
+      tab: "deposit",
     },
     {
-      name: "Working Wallet",
+      name: "Working Reward Wallet",
       amount: (walletData?.WorkingWallet ?? walletData?.IncomeWallet)
         ? `$${Number(walletData.WorkingWallet ?? walletData.IncomeWallet).toFixed(2)}`
         : "$0.00",
       detail: "Available Balance",
       color: "#3aa3c4",
+      tab: "income",
     },
     {
-      name: "Yield Wallet",
+      name: "Trading Reward Wallet",
       amount: walletData?.YieldWallet
         ? `$${Number(walletData.YieldWallet).toFixed(2)}`
         : "$0.00",
       detail: "Available Balance",
       color: "#1f5f7a",
+      tab: "yield",
     },
     {
-      name: "QUZO Wallet",
+      name: "QUZO Coin Wallet",
       amount: walletData?.QuzoWallet
         ? `${Number(walletData.QuzoWallet).toFixed(4)} `
         : "0.0000",
       detail: "Available QUZO",
       color: "#d9a441",
+      tab: "quzo",
     },
   ];
 
@@ -628,9 +630,6 @@ export function MemberHomeDashboard() {
             <p className="text-[10px] text-[#5b7885] dark:text-[#84a2ad]">Total balance (USD)</p>
             <p className="mt-1 text-xl font-bold text-[#06262f] dark:text-white">
               ${formatMoney(totalWalletBalance)}
-              <span className="ml-2 align-middle">
-                <Pill>▲ +12.64%</Pill>
-              </span>
             </p>
           </div>
         </div>
@@ -638,7 +637,7 @@ export function MemberHomeDashboard() {
           {wallets.map((wallet, index) => (
             <Link
               key={wallet.name}
-              href="/reports"
+              href={`/reports?tab=${wallet.tab}`}
               className="group flex items-center gap-3 rounded-2xl border p-3.5 transition hover:-translate-y-0.5 hover:shadow-md"
               style={{
                 borderColor: `${wallet.color}3d`,

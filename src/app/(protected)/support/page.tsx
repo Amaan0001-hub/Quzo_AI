@@ -13,19 +13,16 @@ import {
   X,
 } from "lucide-react";
 import { toast } from "sonner";
+import { useTheme } from "next-themes";
 import { PageHeader } from "@/components/common/PageHeader";
 
 type Ticket = Record<string, unknown>;
 const TICKETS_PER_PAGE = 10;
 
 const ticketTypes = [
-  { value: "trading", label: "Trading Investment" },
-  { value: "Legacy", label: "Legacy Reborn" },
+  { value: "AI strategy packages", label: "AI strategy packages" },
   { value: "Withdrawal", label: "Withdrawal" },
-  { value: "LegacyReborn", label: "Legacy Reborn 2.0" },
-  { value: "WithdrawalBooster", label: "Withdrawal Booster" },
   { value: "fund", label: "Fund Deposit" },
-  { value: "LevelBooster", label: "Level Booster" },
 ];
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -154,6 +151,7 @@ export default function SupportPage() {
   const [replyMessage, setReplyMessage] = useState("");
   const [replySubmitting, setReplySubmitting] = useState(false);
   const [ticketPage, setTicketPage] = useState(1);
+  const { theme } = useTheme();
 
   const loadTickets = useCallback(async () => {
     setLoading(true);
@@ -524,7 +522,7 @@ export default function SupportPage() {
                   <th className="px-5 py-3 font-medium">Subject</th>
                   <th className="px-5 py-3 font-medium">Status</th>
                   <th className="px-5 py-3 font-medium">Time</th>
-                  <th className="px-5 py-3 text-center font-medium">Image</th>
+                  {/* <th className="px-5 py-3 text-center font-medium">Image</th> */}
                   <th className="px-5 py-3 text-center font-medium">Action</th>
                 </tr>
               </thead>
@@ -561,7 +559,7 @@ export default function SupportPage() {
                       <td className="whitespace-nowrap px-5 py-4 text-muted-foreground">
                         {displayValue(valueOf(ticket, "CreatedDate", "createdDate", "Date"))}
                       </td>
-                      <td className="px-5 py-4 text-center">
+                      {/* <td className="px-5 py-4 text-center">
                         <button
                           type="button"
                           onClick={() => void openTicketImage(ticket)}
@@ -571,7 +569,7 @@ export default function SupportPage() {
                           <FileImage className="h-4 w-4" />
                           View
                         </button>
-                      </td>
+                      </td> */}
                       <td className="px-5 py-4 text-center">
                         <button
                           type="button"
@@ -633,16 +631,20 @@ export default function SupportPage() {
             role="dialog"
             aria-modal="true"
             aria-labelledby="ticket-detail-title"
-            className="bg-card flex max-h-[90vh] w-full max-w-2xl flex-col overflow-hidden rounded-2xl border border-border bg-black shadow-2xl"
+            className={`flex max-h-[90vh] w-full max-w-2xl flex-col overflow-hidden rounded-2xl border shadow-2xl ${
+              theme === "dark" ? "border-gray-700 bg-gray-900" : "border-gray-200 bg-white"
+            }`}
           >
-            <header className="flex items-start justify-between gap-4 border-b border-border p-5">
+            <header className={`flex items-start justify-between gap-4 border-b p-5 ${
+              theme === "dark" ? "border-gray-700" : "border-gray-200"
+            }`}>
               <div>
-                <h2 id="ticket-detail-title" className="text-lg font-semibold text-foreground">
+                <h2 id="ticket-detail-title" className={`text-lg font-semibold ${theme === "dark" ? "text-white" : "text-gray-900"}`}>
                   {ticketStatus(selectedTicket).toLowerCase() === "open"
                     ? "Ticket Details"
                     : "Closed Ticket Details"}
                 </h2>
-                <p className="mt-1 text-sm text-muted-foreground">
+                <p className={`mt-1 text-sm ${theme === "dark" ? "text-gray-400" : "text-gray-500"}`}>
                   {displayValue(valueOf(selectedTicket, "Subject", "subject"))}
                 </p>
               </div>
@@ -650,16 +652,22 @@ export default function SupportPage() {
                 type="button"
                 aria-label="Close ticket details"
                 onClick={() => setSelectedTicket(null)}
-                className="rounded-lg p-2 text-muted-foreground hover:bg-muted hover:text-foreground"
+                className={`rounded-lg p-2 transition ${
+                  theme === "dark"
+                    ? "text-gray-400 hover:bg-gray-800 hover:text-white"
+                    : "text-gray-500 hover:bg-gray-100 hover:text-gray-900"
+                }`}
               >
                 <X className="h-5 w-5" />
               </button>
             </header>
 
-            <div className="grid grid-cols-2 gap-4 border-b border-border p-5 text-sm">
+            <div className={`grid grid-cols-2 gap-4 border-b p-5 text-sm ${
+              theme === "dark" ? "border-gray-700" : "border-gray-200"
+            }`}>
               <div>
-                <p className="text-xs text-muted-foreground">Type</p>
-                <p className="mt-1 font-medium text-foreground">
+                <p className={`text-xs ${theme === "dark" ? "text-gray-400" : "text-gray-500"}`}>Type</p>
+                <p className={`mt-1 font-medium ${theme === "dark" ? "text-white" : "text-gray-900"}`}>
                   {displayValue(
                     valueOf(
                       getTicketDetail(ticketDetails) ?? selectedTicket,
@@ -670,35 +678,38 @@ export default function SupportPage() {
                 </p>
               </div>
               <div>
-                <p className="text-xs text-muted-foreground">Status</p>
+                <p className={`text-xs ${theme === "dark" ? "text-gray-400" : "text-gray-500"}`}>Status</p>
                 <span
-                  className={`mt-1 inline-flex items-center rounded-full px-2.5 py-1 text-xs font-medium ${ticketStatus(selectedTicket).toLowerCase() === "open"
-                    ? "bg-emerald-500/10 text-emerald-600"
-                    : "bg-slate-500/10 text-slate-600 dark:text-slate-300"
+                  className={`mt-1 inline-flex items-center rounded-full px-2.5 py-1 text-xs font-medium ${
+                    ticketStatus(selectedTicket).toLowerCase() === "open"
+                      ? theme === "dark" ? "bg-emerald-900/50 text-emerald-300" : "bg-emerald-500/10 text-emerald-600"
+                      : theme === "dark" ? "bg-slate-700/50 text-slate-300" : "bg-slate-500/10 text-slate-600"
                     }`}
                 >
                   {ticketStatus(selectedTicket)}
                 </span>
               </div>
               <div className="col-span-2">
-                <p className="text-xs text-muted-foreground">Created</p>
-                <p className="mt-1 font-medium text-foreground">
+                <p className={`text-xs ${theme === "dark" ? "text-gray-400" : "text-gray-500"}`}>Created</p>
+                <p className={`mt-1 font-medium ${theme === "dark" ? "text-white" : "text-gray-900"}`}>
                   {displayValue(valueOf(selectedTicket, "CreatedDate", "createdDate", "Date"))}
                 </p>
               </div>
 
-              <p className="text-sm font-medium text-foreground">Conversation</p>
+              <p className={`text-sm font-medium ${theme === "dark" ? "text-white" : "text-gray-900"}`}>Conversation</p>
             </div>
 
 
 
             {detailsLoading ? (
               <div className="space-y-3 p-5">
-                <div className="h-12 animate-pulse rounded-lg bg-muted" />
-                <div className="h-12 animate-pulse rounded-lg bg-muted" />
+                <div className={`h-12 animate-pulse rounded-lg ${theme === "dark" ? "bg-gray-800" : "bg-gray-200"}`} />
+                <div className={`h-12 animate-pulse rounded-lg ${theme === "dark" ? "bg-gray-800" : "bg-gray-200"}`} />
               </div>
             ) : (
-              <div className="min-h-32 flex-1 space-y-1 overflow-y-auto bg-muted/20 p-5">
+              <div className={`min-h-32 flex-1 space-y-1 overflow-y-auto p-5 ${
+                theme === "dark" ? "bg-gray-800/50" : "bg-gray-50/50"
+              }`}>
                 {getTicketReplies(ticketDetails).length ? (
                   getTicketReplies(ticketDetails).map((reply, index) => {
                     const fromUser = Number(valueOf(reply, "Status", "status")) === 1;
@@ -708,9 +719,12 @@ export default function SupportPage() {
                         className={`flex ${fromUser ? "justify-end" : "justify-start"}`}
                       >
                         <article
-                          className={`max-w-[85%] rounded-2xl px-4 py-3 text-sm ${fromUser
-                            ? "rounded-br-sm bg-gradient-to-br from-[#1680ff] via-[#25c6e8] to-[#7d75ff] text-white"
-                            : "bg-card rounded-bl-sm border border-border text-foreground"
+                          className={`max-w-[85%] rounded-2xl px-4 py-3 text-sm ${
+                            fromUser
+                              ? "rounded-br-sm bg-gradient-to-br from-[#1680ff] via-[#25c6e8] to-[#7d75ff] text-white"
+                              : theme === "dark"
+                                ? "rounded-bl-sm border border-gray-600 bg-gray-700 text-gray-100"
+                                : "rounded-bl-sm border border-gray-200 bg-white text-gray-900"
                             }`}
                         >
 
@@ -718,8 +732,9 @@ export default function SupportPage() {
                             {displayValue(valueOf(reply, "Messages", "messages"), "")}
                           </p>
                           <p
-                            className={`mt-2 text-right text-[11px] ${fromUser ? "text-blue-100" : "text-muted-foreground"
-                              }`}
+                            className={`mt-2 text-right text-[11px] ${
+                              fromUser ? "text-blue-100" : theme === "dark" ? "text-gray-400" : "text-gray-500"
+                            }`}
                           >
                             {displayValue(valueOf(reply, "ReplyDate", "CreatedDate", "Date"), "")}
                           </p>
@@ -728,7 +743,7 @@ export default function SupportPage() {
                     );
                   })
                 ) : (
-                  <p className="py-8 text-center text-sm text-muted-foreground">
+                  <p className={`py-8 text-center text-sm ${theme === "dark" ? "text-gray-400" : "text-gray-500"}`}>
                     No conversation messages yet.
                   </p>
                 )}
@@ -736,10 +751,12 @@ export default function SupportPage() {
             )}
 
             {ticketStatus(selectedTicket).toLowerCase() === "open" && (
-              <form onSubmit={submitReply} className="border-t border-border p-4 sm:p-5">
+              <form onSubmit={submitReply} className={`border-t p-4 sm:p-5 ${
+                theme === "dark" ? "border-gray-700" : "border-gray-200"
+              }`}>
                 <label
                   htmlFor="ticket-reply"
-                  className="mb-2 block text-sm font-medium text-foreground"
+                  className={`mb-2 block text-sm font-medium ${theme === "dark" ? "text-white" : "text-gray-900"}`}
                 >
                   Reply
                 </label>
@@ -751,10 +768,14 @@ export default function SupportPage() {
                   value={replyMessage}
                   onChange={(event) => setReplyMessage(event.target.value)}
                   placeholder="Type your reply..."
-                  className="w-full resize-y rounded-lg border border-border bg-background px-3 py-2.5 text-sm outline-none transition focus:border-[#1680ff] focus:ring-2 focus:ring-blue-500/10"
+                  className={`w-full resize-y rounded-lg border px-3 py-2.5 text-sm outline-none transition ${
+                    theme === "dark"
+                      ? "border-gray-600 bg-gray-800 text-white placeholder:text-gray-400 focus:border-[#1680ff] focus:ring-2 focus:ring-blue-500/10"
+                      : "border-gray-300 bg-white text-gray-900 placeholder:text-gray-400 focus:border-[#1680ff] focus:ring-2 focus:ring-blue-500/10"
+                  }`}
                 />
                 <div className="mt-3 flex items-center justify-between gap-3">
-                  <span className="text-xs text-muted-foreground">{replyMessage.length}/1000</span>
+                  <span className={`text-xs ${theme === "dark" ? "text-gray-400" : "text-gray-500"}`}>{replyMessage.length}/1000</span>
                   <button
                     type="submit"
                     disabled={replySubmitting || detailsLoading || !replyMessage.trim()}

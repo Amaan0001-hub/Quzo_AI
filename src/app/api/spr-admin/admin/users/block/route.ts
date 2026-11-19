@@ -1,7 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { createBackendClient } from "@/spr-admin/lib/backend-client";
 import { getServerEnv } from "@/spr-admin/lib/env";
-import { rateLimit, getClientIp } from "@/spr-admin/lib/rate-limiter";
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
@@ -33,29 +32,6 @@ export async function POST(request: NextRequest) {
   }
   if (typeof token !== "string" || !token) {
     return NextResponse.json({ message: "Invalid session" }, { status: 401 });
-  }
-
-  // Rate limiting: 10 requests per minute per IP
-  const ip = getClientIp(request);
-  const limiter = rateLimit({ limit: 10, windowMs: 60 * 1000 });
-  const rateLimitResult = await limiter(`${ip}:block-user`);
-
-  if (!rateLimitResult.success) {
-    return NextResponse.json(
-      {
-        message: "Too many requests. Please slow down.",
-        retryAfter: Math.ceil((rateLimitResult.resetTime - Date.now()) / 1000),
-      },
-      {
-        status: 429,
-        headers: {
-          'Retry-After': String(Math.ceil((rateLimitResult.resetTime - Date.now()) / 1000)),
-          'X-RateLimit-Limit': '10',
-          'X-RateLimit-Remaining': '0',
-          'X-RateLimit-Reset': String(rateLimitResult.resetTime),
-        },
-      },
-    );
   }
 
   try {

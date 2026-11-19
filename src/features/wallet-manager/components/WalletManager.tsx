@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { Clock3, Loader2, RefreshCw, Search, TrendingDown, TrendingUp, Wallet } from "lucide-react";
 import { useDashboardSummary } from "@/features/dashboard/hooks/useDashboardSummary";
 
@@ -141,7 +142,9 @@ function formatMoney(value: unknown): string {
 }
 
 export function WalletManager() {
-  const [activeTab, setActiveTab] = useState<ReportTab>("deposit");
+  const searchParams = useSearchParams();
+  const tabParam = searchParams.get("tab") as ReportTab | null;
+  const [activeTab, setActiveTab] = useState<ReportTab>(tabParam || "deposit");
   const [reports, setReports] = useState<Partial<Record<ReportTab, ReportRow[]>>>({});
   const [loaded, setLoaded] = useState<Partial<Record<ReportTab, boolean>>>({});
   const [loading, setLoading] = useState(false);
@@ -151,6 +154,12 @@ export function WalletManager() {
   const [pageSize, setPageSize] = useState(10);
   const [pageIndex, setPageIndex] = useState(0);
   const { data: dashboard } = useDashboardSummary();
+
+  useEffect(() => {
+    if (tabParam && ["deposit", "income", "yield", "quzo"].includes(tabParam)) {
+      setActiveTab(tabParam);
+    }
+  }, [tabParam]);
 
   const loadReport = useCallback(
     async (tab: ReportTab, force = false) => {

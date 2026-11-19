@@ -20,7 +20,7 @@ const STORAGE_KEY = "spr-admin-theme";
 const AdminThemeContext = createContext<AdminThemeContextValue | null>(null);
 
 export function AdminThemeProvider({ children }: { children: ReactNode }) {
-  const [theme, setTheme] = useState<AdminTheme>("dark");
+  const [theme, setTheme] = useState<AdminTheme>("light");
 
   useEffect(() => {
     const savedTheme = window.localStorage.getItem(STORAGE_KEY);

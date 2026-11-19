@@ -213,7 +213,7 @@ export function TicketDetailsDialog({ ticket, readOnly, onClose }: TicketDetails
                     {replies.length} {replies.length === 1 ? "message" : "messages"}
                   </span>
                 </div>
-                <div className="flex min-h-32 flex-col gap-3 rounded-xl border border-gray-200 bg-white/70 p-3 sm:p-4">
+                <div className="flex min-h-32 flex-col gap-3 rounded-xl p-3 sm:p-4">
                   {replies.length === 0 ? (
                     <p className="flex min-h-32 items-center justify-center py-6 text-center text-base text-gray-500">
                       No replies yet.
