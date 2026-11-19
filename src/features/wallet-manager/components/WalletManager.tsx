@@ -5,12 +5,12 @@ import { useSearchParams } from "next/navigation";
 import { Clock3, Loader2, RefreshCw, Search, TrendingDown, TrendingUp, Wallet } from "lucide-react";
 import { useDashboardSummary } from "@/features/dashboard/hooks/useDashboardSummary";
 
-type ReportTab = "deposit" | "income" | "quzo" | "yield";
+type ReportTab = "deposit" | "performance" | "quzo" | "yield";
 type ReportRow = Record<string, unknown>;
 
 const tabs: { id: ReportTab; label: string }[] = [
   { id: "deposit", label: "USDT Funding Wallet" },
-  { id: "income", label: "Working Reward Wallet" },
+  { id: "performance", label: "Working Reward Wallet" },
   { id: "yield", label: "Trading Reward Wallet" },
   { id: "quzo", label: "QUZO Coin Wallet" },
   
@@ -21,7 +21,7 @@ const reportColumns: Record<ReportTab, string[]> = {
   deposit: ["Transaction Type", "Date", "Credit", "Debit", "Remark"],
   quzo: ["Transaction Type", "Date", "Credit", "Debit", "Remark"],
   yield: ["Transaction Type", "Date", "Credit", "Debit", "Remark"],
-  income: ["Transaction Type", "Date", "Credit", "Debit", "Remark"],
+  performance: ["Transaction Type", "Date", "Credit", "Debit", "Remark"],
 };
 
 const fieldAliases: Record<string, string[]> = {
@@ -237,19 +237,19 @@ export function WalletManager() {
   const summary = dashboard?.data?.[0];
   const walletBalanceFields: Partial<Record<ReportTab, { label: string; value: number }>> = {
     deposit: {
-      label: "USDT Wallet Balance",
+      label: "USDT Funding Wallet Balance",
       value: Number(summary?.DepositWallet ?? 0),
     },
     quzo: {
-      label: "Quzo Wallet Balance",
+      label: "QUZO Coin Wallet Balance",
       value: Number(summary?.QuzoWallet ?? 0),
     },
     yield: {
-      label: "Yield Wallet Balance",
-      value: Number(summary?.FundWallet ?? 0),
+      label: "Trading Reward Wallet Balance",
+      value: Number(summary?.YieldWallet ?? 0),
     },
-    income: {
-      label: "Income Wallet Balance",
+    performance: {
+      label: "Working Reward Wallet Balance",
       value: Number(summary?.IncomeWallet ?? 0),
     },
   };

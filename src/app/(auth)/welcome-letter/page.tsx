@@ -50,6 +50,7 @@ export default function WelcomeLetter() {
     : user?.name?.split(" ")[0] || "User";
   const userEmail = queryEmail || user?.email || "Your registered email";
   const userPassword = queryPass || "Your registered password";
+  const userId = queryUserId || user?.id || "Your UserID";
 
   // Auto-login mutation
   const login = useMutation({
@@ -176,9 +177,9 @@ export default function WelcomeLetter() {
                     Sign Into Your Account
                   </h3>
                   <div className="grid grid-cols-1 text-xs sm:grid-cols-3 gap-y-2 gap-x-12">
-                    <div className="font-semibold text-slate-700 dark:text-white">Email</div>
+                    <div className="font-semibold text-slate-700 dark:text-white">UserID</div>
                     <div className="text-slate-800 dark:text-white sm:col-span-2 break-all">
-                      {userEmail}
+                      {userId}
                     </div>
                   </div>
                 </div>

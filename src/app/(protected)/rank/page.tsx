@@ -13,7 +13,8 @@ type RankRow = {
   WeakerTeamBusines: number;
   PendingPowerTeam: number;
   PendingWeakerTeam: number;
-  NextReleaseDate: string;
+  NextSalaryDate: string;
+  MonthlySalary: string;
 };
 
 type UnityRow = {
@@ -331,7 +332,7 @@ export default function RankPage() {
   const weakerTeamBusiness = firstRank?.WeakerTeamBusines || 0;
   const pendingPowerTeamBusiness = firstRank?.PendingPowerTeam || 0;
   const pendingWeakerTeamBusiness = firstRank?.PendingWeakerTeam || 0;
-  const nextReleaseDate = firstRank?.NextReleaseDate || "N/A";
+  const nextSalaryDate = firstRank?.NextSalaryDate || "N/A";
 
   return (
     <div className="space-y-6">
@@ -412,6 +413,18 @@ export default function RankPage() {
                   </div>
                 </div>
 
+                 <div className="relative overflow-hidden rounded-2xl border border-slate-200/80 bg-white/90 shadow-sm dark:border-slate-700/70 dark:bg-slate-900/75">
+                  <div className="flex items-center justify-between border-b border-slate-200 px-4 py-3 dark:border-slate-700">
+                    <span className="text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300">
+                      Next Salary Date
+                    </span>
+                    <Zap className="h-4 w-4 text-[#1680ff] dark:text-[#25c6e8]" aria-hidden />
+                  </div>
+                  <div className="px-4 py-4">
+                    <p className="text-2xl font-extrabold text-slate-900 dark:text-white">{nextSalaryDate}</p>
+                  </div>
+                </div>
+
               
 
                 <div className="relative overflow-hidden rounded-2xl border border-slate-200/80 bg-white/90 shadow-sm dark:border-slate-700/70 dark:bg-slate-900/75">
@@ -462,6 +475,7 @@ export default function RankPage() {
                         <th className="whitespace-nowrap px-4 py-3">TITLE</th>
                         <th className="whitespace-nowrap px-4 py-3">BUSINESS VOLUME</th>
                         <th className="whitespace-nowrap px-4 py-3">REWARD</th>
+                        <th className="whitespace-nowrap px-4 py-3">MONTHLY SALARY</th>
                         <th className="whitespace-nowrap px-4 py-3">STATUS</th>
                       </tr>
                     </thead>
@@ -495,7 +509,10 @@ export default function RankPage() {
                                 {formatBusinessVolume(row.RequiredBusiness)}
                               </td>
                               <td className="whitespace-nowrap px-4 py-3">
-                                {row.RewardAmt}
+                                ${row.RewardAmt}
+                              </td>
+                              <td className="whitespace-nowrap px-4 py-3">
+                                ${row.MonthlySalary}
                               </td>
                               <td className="whitespace-nowrap px-4 py-3">
                                 <span

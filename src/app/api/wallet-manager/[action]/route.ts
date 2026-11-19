@@ -18,6 +18,10 @@ const walletActions = {
     path: "/WalletReport/getRentWalletStatement",
     needsTransactionType: true,
   },
+  yield: {
+    path: "/WalletReport/getRentWalletStatement",
+    needsTransactionType: true,
+  },
   fund: {
     path: "/WalletReport/getFundWalletStatement",
     needsTransactionType: true,
@@ -150,7 +154,6 @@ export async function POST(request: NextRequest, context: { params: Promise<{ ac
     }
 
     if (["performance", "yield", "legacy"].includes(actionName)) {
-      // Velvora's report requests send a null URID and let the authenticated token scope the report.
       body.urid = null;
     }
 
