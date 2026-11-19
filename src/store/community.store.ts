@@ -55,7 +55,7 @@ function getLeftRightRows(payload: unknown): LeftRightDownlineMember[] {
   }
 
   if (!Array.isArray(value)) {
-    throw new Error("Left/right downline response has an invalid format.");
+    throw new Error("No data found for this user.");
   }
 
   return value.filter((row): row is LeftRightDownlineMember => isRecord(row));

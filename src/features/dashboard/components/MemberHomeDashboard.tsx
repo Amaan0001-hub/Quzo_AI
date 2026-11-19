@@ -175,7 +175,7 @@ function CoinChart() {
           {utilities.map((item, index) => {
             const Icon = item.icon;
             return (
-              <div key={item.name} className="min-h-[150px] bg-white p-3 dark:bg-[#031B23]">
+              <div key={item.name} className="min-h-[150px] bg-white p-5 dark:bg-[#031B23]">
                 <div className="flex gap-4">
                   <span className="font-mono text-[10px] text-[#5b7885] pt-0.5 dark:text-slate-400 shrink-0">0{index + 1}</span>
                   <div className="min-w-0 flex-1">
@@ -688,7 +688,7 @@ export function MemberHomeDashboard() {
               {[
                 ["Invested amount", walletData?.TradingPackage ? `$${Number(walletData.TradingPackage).toFixed(2)}` : "$0"],
                 ["Booster Status", walletData?.BoosterPackage ?? "N/A"],
-                ["Package Status", walletData?.Boostertype ?? "N/A"],
+                ["Booster Left Time", (walletData?.Boostertype ?? "00:00:00") + " Hrs"],
                 ["Rank", walletData?.UserRank ?? "N/A"],
               ].map(([label, value], index) => (
                 <div

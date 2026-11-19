@@ -462,7 +462,7 @@ function RecordsTable({
                         "Date",
                         "Wallet Type",
                         "Request",
-                        "Charges",
+                        "Swap Charges",
                         "Release",
                         "Status",
                         "Wallet Address",
@@ -527,7 +527,7 @@ function RecordsTable({
                     <>
                       <td className="p-3">
                         <span className="rounded-full border border-blue-200 bg-blue-100 px-3 py-1 text-xs font-bold text-blue-700 dark:border-cyan-700/50 dark:bg-cyan-900/30 dark:text-cyan-300">
-                          {record.walletType || "General"}
+                          {record.walletType || "N/A"}
                         </span>
                       </td>
                       <td className="whitespace-nowrap p-3 font-medium text-blue-700 dark:text-cyan-300">
@@ -1268,8 +1268,8 @@ export default function FundDirectorPage() {
           date: String(
             getFirstValue(item, "CreatedDate", "createdDate", "Date", "date", "TransDate"),
           ),
-          type: String(getFirstValue(item, "WalletType", "walletType") || "General"),
-          walletType: String(getFirstValue(item, "WalletType", "walletType") || "General"),
+          type: String(getFirstValue(item, "WalletType", "walletType", "wallettype") || "N/A"),
+          walletType: String(getFirstValue(item, "WalletType", "walletType", "wallettype") || "N/A"),
           amount:
             Number(
               getFirstValue(item, "Request", "request", "Debit", "debit", "Amount", "amount"),
@@ -1573,8 +1573,8 @@ export default function FundDirectorPage() {
   const submitWithdrawal = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const amount = Number(withdrawAmount);
-    if (!Number.isFinite(amount) || amount < 10 || amount > balances[withdrawWallet]) {
-      toast.error("Enter a valid amount from 10 up to the selected wallet balance");
+    if (!Number.isFinite(amount) || amount < 5 || amount > balances[withdrawWallet]) {
+      toast.error("Enter a valid amount from 5 up to the selected wallet balance");
       return;
     }
 
@@ -2096,8 +2096,8 @@ export default function FundDirectorPage() {
                         }
                         className="w-full rounded-xl border-2 border-slate-200 bg-white px-4 py-2.5 font-medium outline-none transition focus:border-[#1680ff] focus:ring-4 focus:ring-blue-500/10 dark:border-slate-700 dark:bg-slate-800 dark:text-white sm:w-auto"
                       >
-                        <option value="income">Income Wallet</option>
-                        <option value="yield">Yield Wallet</option>
+                        <option value="income">Working Reward Wallet</option>
+                        <option value="yield">Trading Reward Wallet</option>
                       </select>
                     </label>
                   )}
@@ -2107,7 +2107,7 @@ export default function FundDirectorPage() {
                   <p className="text-sm font-semibold text-slate-700 dark:text-slate-300">
                     {otpSent
                       ? "Transfer confirmation"
-                      : `${incomeWallet === "income" ? "Income" : "yield"} Wallet Balance`}
+                      : `${incomeWallet === "income" ? "Working Reward Wallet" : "Trading Reward Wallet"} Balance`}
                   </p>
                   <p className="text-sm font-semibold text-slate-700 dark:text-white">
                     Balance:{" "}
@@ -2353,8 +2353,8 @@ export default function FundDirectorPage() {
                       }
                       className="w-full rounded-xl border-2 border-slate-200 bg-white px-4 py-2.5 font-medium outline-none transition focus:border-[#1680ff] focus:ring-4 focus:ring-blue-500/10 dark:border-slate-700 dark:bg-slate-800 dark:text-white sm:w-auto"
                     >
-                      <option value="performance">Income Wallet</option>
-                      <option value="yield">Yield Wallet</option>
+                      <option value="performance">Working Reward Wallet</option>
+                      <option value="yield">Trading Reward Wallet</option>
                     </select>
                   </label>
                   <div className="w-full text-sm font-semibold text-slate-700 dark:text-slate-100 sm:w-auto">
@@ -2373,7 +2373,7 @@ export default function FundDirectorPage() {
                       onChange={setWithdrawAmount}
                       placeholder="Enter amount"
                       type="number"
-                      min="10"
+                      min="5"
                     />
                     <label className="block space-y-1.5 text-sm font-medium text-slate-700 dark:text-slate-300">
                       Wallet Address (BEP20)

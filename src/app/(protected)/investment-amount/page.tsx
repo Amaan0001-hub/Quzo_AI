@@ -250,9 +250,9 @@ function OfferCard({ o, i }: { o: Offer; i: number }) {
 function PlanCard({ plan, i, onActivate }: { plan: Plan; i: number; onActivate: () => void }) {
   const hi = plan.max || 10000;
   const [amt, setAmt] = useState<number>(plan.min);
-  // 1. Starter plan ke liye max 1000, aur Pro plan ke liye 10000 (ya 50000) tak slider
+  // 1. Starter plan ke liye max 999, aur Pro plan ke liye 10000 (ya 50000) tak slider
   const isStarter = plan.title.includes("Cros-Dex");
-  const sliderMax = isStarter ? 1000 : 50000; // Pro plan ke liye slider 50,000 tak jayega
+  const sliderMax = isStarter ? 999 : 50000; // Pro plan ke liye slider 50,000 tak jayega
 
   // const [amt, setAmt] = useState<number>(plan.min);
 
@@ -298,8 +298,8 @@ function PlanCard({ plan, i, onActivate }: { plan: Plan; i: number; onActivate: 
             // onChange={(e) => setAmt(+e.target.value || 0)}
             onChange={(e) => {
               const val = +e.target.value;
-              // Starter plan me 1000 se zyada type nahi kar sakte
-              const maxAllowed = isStarter ? 1000 : Infinity;
+              // Starter plan me 999 se zyada type nahi kar sakte
+              const maxAllowed = isStarter ? 999 : Infinity;
               setAmt(val > maxAllowed ? maxAllowed : val);
             }}
           />
@@ -804,10 +804,10 @@ export default function PricingPage() {
               min: 50,
               max: null,
               investorLimit: "$999",
-              leadersLimit: "2.25×",
+              leadersLimit: "2X",
               colors: { a: '#12a594', b: '#3aa3c4' },
               BoosterPackage: 1,
-              capmulti: "2.25×",
+              capmulti: "2X",
               totalincome: "$112.50",
               minAmount: 50,       // <-- ADD THIS
               maxAmount: 999,
@@ -820,7 +820,7 @@ export default function PricingPage() {
               icon: "📊",
               investmentRange: "$1000+",
               d: "Proposed yield reward rate",
-              rate: "up to 14–20%",
+              rate: "up to 15–20%",
               features: [
                 { text: "Accessible entry starting at just $100" },
                 { text: "Investor Limit 1X" },
@@ -829,10 +829,10 @@ export default function PricingPage() {
               min: 1000,
               max: null,
               investorLimit: "No limit",
-              leadersLimit: "3×",
+              leadersLimit: "2.5X",
               colors: { a: '#1f5f7a', b: '#3aa3c4' },
               BoosterPackage: 2,
-              capmulti: "3×",
+              capmulti: "2.5X",
               totalincome: "$3,000.00",
               minAmount: 1000,       
               maxAmount: Infinity, 
