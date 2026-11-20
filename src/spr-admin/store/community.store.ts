@@ -8,7 +8,7 @@ export interface DirectMember {
   RegDate: string;
   Mobile: string;
   Email: string;
-  SubscriptionAmount: number;
+  Package: number;
   SubscribeDate: string;
   Urank: string;
   BinaryLbuss: number;
