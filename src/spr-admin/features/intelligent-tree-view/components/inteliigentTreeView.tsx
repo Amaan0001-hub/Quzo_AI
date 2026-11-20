@@ -342,10 +342,7 @@ const CustomNode = ({
                   <span className="text-gray-400">Team Business:</span>{" "}
                   {`$${formatAmount(attrs.teamBusiness ?? 0)}`}
                 </p>
-                <p>
-                  <span className="text-gray-400">AFLB Rank:</span>{" "}
-                  {String(attrs.urank ?? "")}
-                </p>
+          
               </div>
             </div>,
             document.body

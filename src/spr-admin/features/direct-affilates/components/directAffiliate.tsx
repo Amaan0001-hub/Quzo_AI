@@ -63,7 +63,7 @@ export default function Affiliate() {
         // "Position": member.Position || "-",
         "Mobile": member.Mobile || "-",
         "Email": member.Email || "-",
-        "Package": member.SubscriptionAmount ? `$${member.SubscriptionAmount}` : "$0",
+        "Package": member.Package ? `$${member.Package}` : "$0",
         // "Activated Date": member.SubscribeDate || "-",
         // "Urank": member.Urank || "-",
         // "Left Business": member.BinaryLbuss ? `$${member.BinaryLbuss}` : "$0",
@@ -284,7 +284,7 @@ export default function Affiliate() {
                             {member.Email}
                           </td>
                           <td className="px-4 py-3.5 border-b border-border whitespace-nowrap font-semibold text-foreground">
-                            ${member.SubscriptionAmount}
+                            ${member.Package}
                           </td>
                           {/* <td className="px-4 py-3.5 border-b border-border whitespace-nowrap text-muted-foreground">
                             {member.SubscribeDate || "-"}

@@ -292,12 +292,12 @@ export default function ROIWithdrawalRequests() {
       setStats(fetchedStats);
       setIsSearched(true);
       setCurrentPage(1);
-      if (data.length === 0) toast.info("No Mentor withdrawal requests found.");
-      else toast.success(`${data.length} Mentor withdrawal request(s) found.`);
+      if (data.length === 0) toast.info("No withdrawal requests found.");
+      else toast.success(`${data.length} withdrawal request(s) found.`);
     } catch (fetchError) {
-      console.error("Failed to fetch Mentor withdrawal requests:", fetchError);
-      setError("Unable to load Mentor withdrawal requests. Please try again.");
-      toast.error("Unable to load Mentor withdrawal requests. Please try again.");
+      console.error("Failed to fetch withdrawal requests:", fetchError);
+      setError("Unable to load withdrawal requests. Please try again.");
+      toast.error("Unable to load withdrawal requests. Please try again.");
       setRequests([]);
       setIsSearched(false);
     } finally {
@@ -412,9 +412,9 @@ export default function ROIWithdrawalRequests() {
             <RotateCw className="h-6 w-6" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">Mentor Withdrawal Requests</h1>
+            <h1 className="text-2xl font-bold text-gray-900">Trading Withdrawal Requests</h1>
             <p className="mt-0.5 text-sm text-gray-500">
-              Manage and process Mentor withdrawal requests
+              Manage and process Trading withdrawal requests
             </p>
           </div>
         </div>
@@ -459,7 +459,7 @@ export default function ROIWithdrawalRequests() {
               Search Filters
             </h2>
             <p className="mt-1 text-xs text-white/90">
-              Filter Mentor withdrawal requests by date or user
+              Filter Trading withdrawal requests by date or user
             </p>
           </div>
 
