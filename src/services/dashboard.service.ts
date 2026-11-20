@@ -40,6 +40,11 @@ export interface DashboardData {
   LevelBoosterPackage?: number;
   Boostertype?: string;
   YieldPer?: string;
+  CurrentSalary?: number;
+  RewardAmtQualify?: number;
+  RewardTotal?: number;
+  NextRank?: string;
+  NextSalary?: number;
 }
 
 export interface DashboardSummary {

@@ -365,8 +365,8 @@ export default function AIBUSINESSHUB() {
 
   // QUZO price
   const quzoPrice = {
-    value: "0.00000444",
-    unit: "BTC",
+    value: "1",
+    unit: "USDT",
     change: "3.12%",
     period: "24h",
   };
@@ -539,7 +539,7 @@ export default function AIBUSINESSHUB() {
                   <span className="grid h-8 w-8 place-items-center rounded-lg bg-[#d9a441]/10 text-[#d9a441]">
                     <Coins className="h-4 w-4" aria-hidden />
                   </span>
-                  QUZO / BTC live price
+                  QUZO Coin Pre Allocation
                 </div>
                 <p className="mt-4 text-2xl font-semibold text-gray-900 dark:text-white">
                   {quzoPrice.value}{" "}

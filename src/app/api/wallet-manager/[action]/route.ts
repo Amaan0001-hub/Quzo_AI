@@ -14,6 +14,10 @@ const walletActions = {
     path: "/WalletReport/getIncomeWalletStatement",
     needsTransactionType: true,
   },
+  quzo: {
+    path: "/WalletReport/getQuzoWalletStatement",
+    needsTransactionType: true,
+  },
   mentor: {
     path: "/WalletReport/getRentWalletStatement",
     needsTransactionType: true,

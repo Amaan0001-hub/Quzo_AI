@@ -243,96 +243,7 @@ function PerformancePanel() {
   );
 }
 
-function EarningsChart() {
-  const [period, setPeriod] = useState<(typeof earningsPeriods)[number]>("Week");
-  const multiplier = period === "Week" ? 1 : period === "Month" ? 4 : 9;
-  const total = incomeItems.reduce((sum, item) => sum + item.amount, 0) * multiplier;
-  const chartValues =
-    period === "Week"
-      ? [38, 55, 43, 68, 52, 86, 72]
-      : period === "Month"
-        ? [25, 38, 57, 48, 72, 81, 95]
-        : [20, 29, 42, 38, 53, 65, 78, 70, 90, 100];
-  const path = chartValues
-    .map((value, index) => {
-      const x = (index / (chartValues.length - 1)) * 600;
-      const y = 155 - value * 1.3;
-      return `${index === 0 ? "M" : "L"}${x.toFixed(1)} ${y.toFixed(1)}`;
-    })
-    .join(" ");
 
-  return (
-    <Panel>
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <SectionHeading>Earnings analytics</SectionHeading>
-          <p className="mt-2 text-2xl font-bold text-[#06262f] dark:text-white">
-            ${formatMoney(total)}
-          </p>
-          <span className="text-[11px] text-[#12a594]">
-            ▲ 8.4% vs previous {period.toLowerCase()} · avg $
-            {formatMoney(total / chartValues.length)}
-          </span>
-        </div>
-        <div className="flex gap-1 rounded-full bg-[#12a594]/[0.08] p-1">
-          {earningsPeriods.map((item) => (
-            <button
-              key={item}
-              type="button"
-              onClick={() => setPeriod(item)}
-              className={`rounded-full px-3 py-1.5 text-xs ${item === period ? "bg-[#12a594] text-white" : "text-[#5b7885] dark:text-[#84a2ad]"
-                }`}
-              aria-pressed={item === period}
-            >
-              {item}
-            </button>
-          ))}
-        </div>
-      </div>
-      <div className="mt-4 h-[190px] rounded-xl bg-[#edf4f5] p-2 dark:bg-[#031B23]">
-        <svg viewBox="0 0 600 180" preserveAspectRatio="none" className="h-full w-full">
-          <defs>
-            <linearGradient id="member-earnings-area" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0" stopColor="#12a594" stopOpacity=".32" />
-              <stop offset="1" stopColor="#12a594" stopOpacity="0" />
-            </linearGradient>
-          </defs>
-          {[45, 90, 135].map((y) => (
-            <line
-              key={y}
-              x1="0"
-              x2="600"
-              y1={y}
-              y2={y}
-              stroke="rgba(120,145,150,0.18)"
-              strokeDasharray="3 5"
-            />
-          ))}
-          <path d={`${path} L600 180 L0 180 Z`} fill="url(#member-earnings-area)" />
-          <path
-            className="member-chart-line"
-            d={path}
-            fill="none"
-            stroke="#12a594"
-            strokeWidth="2.5"
-            vectorEffect="non-scaling-stroke"
-          />
-        </svg>
-      </div>
-      <div className="mt-3 flex flex-wrap gap-x-4 gap-y-2">
-        {incomeItems.map((item) => (
-          <span
-            key={item.label}
-            className="inline-flex items-center gap-1.5 text-[10px] text-[#5b7885] dark:text-[#84a2ad]"
-          >
-            <i className="h-2 w-2 rounded-full" style={{ backgroundColor: item.color }} />
-            {item.label.replace(" Income", "")}
-          </span>
-        ))}
-      </div>
-    </Panel>
-  );
-}
 
 export function MemberHomeDashboard() {
   const [promotionIndex, setPromotionIndex] = useState(0);
@@ -711,42 +622,47 @@ export function MemberHomeDashboard() {
           <div className="flex items-center justify-between gap-2">
             <SectionHeading>
               <Bot className="h-4 w-4 text-[#12a594]" aria-hidden />
-              AI bot status
+              Rank progress
             </SectionHeading>
-            <Pill>● Running</Pill>
+            <Pill>
+              {walletData?.UserRank ?? "N/A"}
+            </Pill>
           </div>
-          <div className="mt-5 grid grid-cols-3 gap-2">
+          <div className="mt-4 flex items-end justify-between gap-2">
+            <strong className="text-2xl text-[#06262f] dark:text-white">
+              {walletData?.RewardTotal && walletData?.RewardAmtQualify !== undefined
+                ? `${((walletData.RewardAmtQualify / walletData.RewardTotal) * 100).toFixed(1)}`
+                : "0"}%
+            </strong>
+            <span className="text-right text-[11px] text-[#5b7885] dark:text-[#84a2ad]">
+              ${formatMoney(walletData?.RewardAmtQualify ?? 0, 0)} / $
+              {formatMoney(walletData?.RewardTotal ?? 0, 0)}
+            </span>
+          </div>
+          <div className="mt-2 h-2.5 overflow-hidden rounded-full bg-[#12a594]/[0.12]">
+            <div
+              className="h-full rounded-full bg-gradient-to-r from-[#12a594] to-[#35d6c0]"
+              style={{
+                width: `${walletData?.RewardTotal && walletData?.RewardAmtQualify !== undefined
+                  ? (walletData.RewardAmtQualify / walletData.RewardTotal) * 100
+                  : 0}%`
+              }}
+            />
+          </div>
+          <div className="mt-4 grid grid-cols-3 gap-2">
             {[
-              ["Avg. monthly ROI", "24.8%"],
-              ["Bot uptime", "98.7%"],
-              ["Current version", "AI v3.2"],
+              ["Current Salary", `$${formatMoney(walletData?.CurrentSalary ?? 0, 0)}`],
+              ["Next Rank", `${walletData?.NextRank ?? "N/A"}`],
+              ["Next Salary", `$${formatMoney(walletData?.NextSalary ?? 0, 0)}`],
             ].map(([label, value]) => (
-              <div
-                key={label}
-                className="border-l border-[#d9e8ec] pl-2 first:border-0 first:pl-0 dark:border-[#153747]"
-              >
-                <span className="block text-[10px] leading-4 text-[#5b7885] dark:text-[#84a2ad]">
-                  {label}
-                </span>
-                <strong className="mt-1 block text-sm text-[#06262f] dark:text-white">
+              <div key={label} className="rounded-xl bg-[#edf4f5] p-2.5 dark:bg-[#031B23]">
+                <span className="block text-[9px] text-[#5b7885] dark:text-[#84a2ad]">{label}</span>
+                <strong className="mt-1 block text-xs text-[#06262f] dark:text-white">
                   {value}
                 </strong>
               </div>
             ))}
           </div>
-          <svg
-            viewBox="0 0 240 44"
-            preserveAspectRatio="none"
-            className="mt-5 h-10 w-full"
-            aria-hidden="true"
-          >
-            <path
-              d="M0 22H40L50 8L62 36L72 16L80 22H140L150 8L162 36L172 16L180 22H240"
-              fill="none"
-              stroke="#12a594"
-              strokeWidth="2"
-            />
-          </svg>
         </Panel>
       </div>
 
@@ -829,49 +745,6 @@ export function MemberHomeDashboard() {
         </section>
       </div>
 
-      <div className="grid gap-4 xl:grid-cols-[1.35fr_0.8fr]">
-        <EarningsChart />
-        <Panel>
-          <div className="flex items-center justify-between gap-2">
-            <SectionHeading>
-              <Gift className="h-4 w-4 text-[#d9a441]" aria-hidden />
-              Rank progress
-            </SectionHeading>
-            <Pill>
-              {homePageData.rank.from} → {homePageData.rank.to}
-            </Pill>
-          </div>
-          <div className="mt-4 flex items-end justify-between gap-2">
-            <strong className="text-2xl text-[#06262f] dark:text-white">
-              {homePageData.rank.progress}%
-            </strong>
-            <span className="text-right text-[11px] text-[#5b7885] dark:text-[#84a2ad]">
-              ${formatMoney(homePageData.rank.business, 0)} / $
-              {formatMoney(homePageData.rank.target, 0)}
-            </span>
-          </div>
-          <div className="mt-2 h-2.5 overflow-hidden rounded-full bg-[#12a594]/[0.12]">
-            <div
-              className="h-full rounded-full bg-gradient-to-r from-[#12a594] to-[#35d6c0]"
-              style={{ width: `${homePageData.rank.progress}%` }}
-            />
-          </div>
-          <div className="mt-4 grid grid-cols-3 gap-2">
-            {[
-              ["Remaining", `$${formatMoney(homePageData.rank.remaining, 0)}`],
-              ["Reward", `$${formatMoney(homePageData.rank.reward, 0)}`],
-              ["Salary", homePageData.rank.salary],
-            ].map(([label, value]) => (
-              <div key={label} className="rounded-xl bg-[#edf4f5] p-2.5 dark:bg-[#031B23]">
-                <span className="block text-[9px] text-[#5b7885] dark:text-[#84a2ad]">{label}</span>
-                <strong className="mt-1 block text-xs text-[#06262f] dark:text-white">
-                  {value}
-                </strong>
-              </div>
-            ))}
-          </div>
-        </Panel>
-      </div>
 
       <div className="grid gap-4 xl:grid-cols-2">
         <Panel>
