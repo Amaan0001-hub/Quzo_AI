@@ -685,9 +685,6 @@ export default function AIBUSINESSHUB() {
               <div className="hub-kv"><span>Email</span><span className="mono">{getText(affiliate?.EmailId, "N/A")}</span></div>
               <div className="hub-kv"><span>Mobile</span><span className="mono">{getText(affiliate?.Mobile, "N/A")}</span></div>
               <div className="hub-kv"><span>Sponsor</span><span className="mono">{getText(affiliate?.SponsorId, "N/A")}</span></div>
-              <div className="hub-kv"><span>Current Rank</span><span>{leadershipRank}</span></div>
-              <div className="hub-kv"><span>Rank Progress</span><span>{rankPercentage}%</span></div>
-              <div className="hub-kv"><span>Strong Team ID</span><span className="mono">{strongLegID}</span></div>
             </div>
           </Reveal>
         </section>
