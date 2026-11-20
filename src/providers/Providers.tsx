@@ -6,6 +6,7 @@ import { ThemeProvider } from "@/providers/ThemeProvider";
 import { useCurrentUser } from "@/features/auth/hooks/useCurrentUser";
 import { useAuthStore } from "@/store/auth.store";
 import { useEffect } from "react";
+import { usePathname } from "next/navigation";
 
 
 function AuthProvider({ children }: { children: ReactNode }) {
@@ -24,10 +25,13 @@ function AuthProvider({ children }: { children: ReactNode }) {
 }
 
 export function Providers({ children }: { children: ReactNode }) {
+  const pathname = usePathname();
+  const isAdminRoute = pathname?.startsWith("/spr-admin");
+
   return (
     <ThemeProvider attribute="class" defaultTheme="light" storageKey="fyntix-theme">
       <QueryProvider>
-        <AuthProvider>{children}</AuthProvider>
+        {isAdminRoute ? children : <AuthProvider>{children}</AuthProvider>}
       </QueryProvider>
     </ThemeProvider>
   );

@@ -38,7 +38,7 @@ httpClient.interceptors.response.use(
     if (axios.isAxiosError(error) && error.response?.status === 401) {
       if (typeof window !== "undefined" && !window.location.pathname.includes("/login")) {
         // Only redirect if on protected routes, not on landing page or other public pages
-        const publicRoutes = ["/", "/landing", "/privacy", "/terms", "/auth/callback"];
+        const publicRoutes = ["/", "/landing", "/privacy", "/terms", "/auth/callback", "/register", "/login", "/forgot-password", "/reset-password"];
         const isPublicRoute = publicRoutes.some(route => window.location.pathname === route || window.location.pathname.startsWith(route + "/"));
 
         if (!isPublicRoute) {
