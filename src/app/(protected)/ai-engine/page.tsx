@@ -63,7 +63,7 @@ const shuffleArray = <T,>(array: T[]): T[] => {
 
 export default function AIEnginePage() {
   const [status, setStatus] = useState("Running");
-  const [uptime, setUptime] = useState("69d 15:21:38");
+  const [uptime, setUptime] = useState("Last 2days 15:21:38");
   const [strategies, setStrategies] = useState("3 active");
   const [openPositions, setOpenPositions] = useState("0");
   const [realisedToday, setRealisedToday] = useState("+724.2 bps");
@@ -157,16 +157,23 @@ export default function AIEnginePage() {
   useEffect(() => {
     const interval = setInterval(() => {
       setUptime((prev) => {
-        const [days, time] = prev.split(" ");
-        const timeStr = time ?? "00:00:00";
+        const parts = prev.split(" ");
+        const prefix = parts[0];
+        const daysStr = parts[1] ?? "0days";
+        const timeStr = parts[2] ?? "00:00:00";
+        
+        const dayNum = parseInt(daysStr.replace("days", "")) || 0;
         const timeParts = timeStr.split(":").map(Number);
         const h = timeParts[0] ?? 0;
         const m = timeParts[1] ?? 0;
         const s = timeParts[2] ?? 0;
+        
         const newS = s + 1;
         const newM = newS >= 60 ? m + 1 : m;
         const newH = newM >= 60 ? h + 1 : h;
-        return `${days} ${newH}:${String(newM % 60).padStart(2, "0")}:${String(newS % 60).padStart(2, "0")}`;
+        const newDayNum = newH >= 24 ? dayNum + 1 : dayNum;
+        
+        return `${prefix} ${newDayNum}days ${String(newH % 24).padStart(2, "0")}:${String(newM % 60).padStart(2, "0")}:${String(newS % 60).padStart(2, "0")}`;
       });
 
       setMidValue((prev) => (parseFloat(prev) + (Math.random() - 0.5) * 0.1).toFixed(2));
@@ -309,7 +316,7 @@ export default function AIEnginePage() {
             </span>
             <div>
               <div className="text-[11px] font-mono font-semibold tracking-wide text-gray-500 dark:text-gray-400">
-                HYPERBOT · EXECUTION
+                QUZOBOT · EXECUTION
               </div>
               <div className="flex items-baseline gap-2">
                 <span className="text-2xl font-bold text-gray-900 dark:text-white">{status}</span>

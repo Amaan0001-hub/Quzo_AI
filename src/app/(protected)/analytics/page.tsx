@@ -297,8 +297,8 @@ export default function AnalyticsPage() {
                   <th className="text-right px-3 py-2 text-[11px] font-medium text-gray-400">ENTRY PRICE</th>
                   <th className="text-right px-3 py-2 text-[11px] font-medium text-gray-400">EXIT PRICE</th>
                   <th className="text-right px-3 py-2 text-[11px] font-medium text-gray-400">CAPITAL</th>
-                  <th className="text-right px-3 py-2 text-[11px] font-medium text-gray-400">PROFIT %</th>
                   <th className="text-right px-3 py-2 text-[11px] font-medium text-gray-400">TOTAL PROFIT</th>
+                  <th className="text-right px-3 py-2 text-[11px] font-medium text-gray-400"> YOUR PROFIT</th>
                 </tr>
               </thead>
               <tbody>
@@ -326,11 +326,12 @@ export default function AnalyticsPage() {
                     <td className="px-3 py-2.5 text-right font-mono font-semibold text-gray-900 dark:text-white">
                       {formatCurrency(row.Capital)}
                     </td>
+                    
                     <td className="px-3 py-2.5 text-right font-mono text-gray-500 dark:text-gray-400">
-                      {row.ProfitPercentage}%
+                      {(row.TotalProfit)}
                     </td>
                     <td className="px-3 py-2.5 text-right font-mono text-gray-500 dark:text-gray-400">
-                      {formatCurrency(row.TotalProfit)}
+                      {row.Profit}
                     </td>
                   </tr>
                 ))}

@@ -295,7 +295,7 @@ export default function AIBUSINESSHUB() {
   // Data from affiliate
   const activeDirectMembers = getText(affiliate?.ActiveDirectMembers, "0");
   const directBusiness = getNumber(affiliate?.DirectBusiness);
-  const subscription = getNumber(affiliate?.EarningLimit);
+  const levelOpen = getNumber(affiliate?.LevelOpen);
   const teamBusiness = getNumber(affiliate?.TeamBusiness);
   const directBonus = getNumber(affiliate?.DynamicReferralYield);
   const matchingIncome = getNumber(affiliate?.DailyRevenueSharing);
@@ -622,6 +622,7 @@ export default function AIBUSINESSHUB() {
                 from="#a8b860"
                 to="#34cdb8"
               />
+           
               <MetricRow
                 icon={<TrendingUp size={18} />}
                 label="Team Business"
@@ -631,6 +632,16 @@ export default function AIBUSINESSHUB() {
                 accent="#d9a441"
                 from="#a8b860"
                 to="#34cdb8"
+              />
+                 <MetricRow
+                icon={<Zap size={18} />}
+                label="Level Open"
+                value={<CountUp value={levelOpen} prefix="" dec={0} />}
+                pct={pctOf(levelOpen, 20)}
+                status={`${pctOf(levelOpen, 20).toFixed(0)}%`}
+                accent="#8a5cf0"
+                from="#a855f7"
+                to="#c084fc"
               />
               <MetricRow
                 icon={<Zap size={18} />}
