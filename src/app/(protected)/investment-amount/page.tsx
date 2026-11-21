@@ -373,7 +373,8 @@ const ActivatePlanModal: React.FC<ActivatePlanModalProps> = ({
 
   useEffect(() => {
     if (isOpen) {
-      setUserIdInput(userId);
+      const authLogin = localStorage.getItem('authLogin');
+      setUserIdInput(authLogin || userId);
       setUserName("");
       setUserNameError("");
       fetchWalletDetails();
