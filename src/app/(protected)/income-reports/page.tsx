@@ -35,7 +35,7 @@ export default function Reports() {
       "Level Income": "Level Income",
       "Booster Income": "Booster Income",
       "DAO Income": "DAO Income",
-      "Rewards Income": "Rewards Income",
+      "Achievement Rewards": "Achievement Rewards",
       "Salary Income": "Salary Income",
 
     };
@@ -46,10 +46,11 @@ export default function Reports() {
     { id: "Direct Referral Income", label: "Direct Partner Rewards", icon: FaUserPlus },
     { id: "Daily Profit Income", label: "AI Strategy Rewards", icon: FaMoneyBillWave },
     { id: "Booster Income", label: "Booster Income", icon: FaGift },
-    { id: "DAO Income", label: "DAO Income", icon: FaSeedling },
-    { id: "Rewards Income", label: "Achievement Rewards", icon: FaLayerGroup },
-    { id: "Salary Income", label: "Salary Income", icon: FaUsers },
     { id: "Level Income", label: "Network Rewards", icon: FaCrown },
+    { id: "DAO Income", label: "DAO Income", icon: FaSeedling },
+    { id: "Achievement Rewards", label: "Achievement Rewards", icon: FaLayerGroup },
+    { id: "Salary Income", label: "Salary Income", icon: FaUsers },
+ 
   ];
 
   return (
