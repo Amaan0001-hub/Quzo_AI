@@ -39,13 +39,9 @@ function Logo() {
   );
 }
 
-/* ============================================================
-   Inline LINKS
-   ============================================================ */
-const SITE = "https://velvoraai.vercel.app";
 const LINKS = {
-  signIn: `${SITE}/login`,
-  getStarted: `${SITE}/register`,
+  signIn: /login,
+  getStarted: /register,
 };
 
 const NAV: [string, string, string][] = [
