@@ -1,5 +1,5 @@
 "use client";
-
+import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import {
@@ -8,821 +8,853 @@ import {
   Bot,
   ChartNoAxesCombined,
   Coins,
+  ArrowDownToLine,
+  Plus,
   Gift,
   ShieldCheck,
   Wallet,
+  Users,
+  TrendingUp,
+  LayoutGrid,
+  Bell,
+  CircleDollarSign,
+  Settings,
+  Briefcase,
+  Layers,
+  Sparkles,
+  Globe,
 } from "lucide-react";
-import { homePageData } from "@/features/dashboard/constants/home-page";
-import { useDashboardSummary } from "@/features/dashboard/hooks/useDashboardSummary";
-import { useNotifications } from "@/features/dashboard/hooks/useNotifications";
-import Qurobot from "@/components/common/Qurobot";
 
-function formatNotificationDate(dateString: string): string {
-  const date = new Date(dateString);
-  const now = new Date();
-  const diffMs = now.getTime() - date.getTime();
-  const diffMins = Math.floor(diffMs / 60000);
-  const diffHours = Math.floor(diffMs / 3600000);
-  const diffDays = Math.floor(diffMs / 86400000);
+/* ============================================================
+   DUMMY DATA & CONSTANTS
+   ============================================================ */
 
-  if (diffMins < 1) return "Just now";
-  if (diffMins < 60) return `${diffMins} min ago`;
-  if (diffHours < 24) return `${diffHours}h ago`;
-  if (diffDays === 1) return "Yesterday";
-  if (diffDays < 7) return `${diffDays} days ago`;
+// Global AI Market Data
+const MARKET_VIEWS = {
+  spending: {
+    tab: "AI spending",
+    note: "Worldwide AI spending, US$ trillion. 2026 and 2027 are forecasts. Source: Gartner, Sep 2026.",
+    unit: "T",
+    data: [
+      { year: "2025", v: 1.79 },
+      { year: "2026", v: 2.67 },
+      { year: "2027", v: 3.64 },
+    ],
+  },
+  market: {
+    tab: "AI market size",
+    note: "Global AI market size, US$ trillion. 2033 is a projection; only these two points are shown. Source: UNCTAD.",
+    unit: "T",
+    data: [
+      { year: "2023", v: 0.189 },
+      { year: "2033", v: 4.8 },
+    ],
+  },
+  jobs: {
+    tab: "Jobs by 2030",
+    note: "Projected jobs by 2030, millions, all industries and all drivers. Source: WEF Future of Jobs 2025.",
+    unit: "M",
+    data: [
+      { year: "Created", v: 170 },
+      { year: "Displaced", v: 92 },
+      { year: "Net", v: 78 },
+    ],
+  },
+};
 
-  return date.toLocaleDateString("en-US", { month: "short", day: "numeric" });
-}
-
-function getNotificationColor(remarks: string): string {
-  const lower = remarks.toLowerCase();
-  if (lower.includes("credit") || lower.includes("deposit") || lower.includes("roi")) {
-    return "#12a594";
-  }
-  if (lower.includes("debit") || lower.includes("withdrawal")) {
-    return "#e94f4f";
-  }
-  if (lower.includes("ai") || lower.includes("strategy")) {
-    return "#3b8df0";
-  }
-  if (lower.includes("reply") || lower.includes("query") || lower.includes("ticket")) {
-    return "#d9a441";
-  }
-  return "#8b6cf0";
-}
-
-const coinPeriods = ["1D", "7D", "30D", "90D", "1Y"] as const;
-const performancePeriods = ["7D", "30D", "90D", "1Y"] as const;
-const earningsPeriods = ["Week", "Month", "Year"] as const;
-
-const incomeItems = [
-  { label: "Direct Referral Income", amount: 2184.5, color: "#12a594", change: "8.4%" },
-  { label: "Daily Profit Income", amount: 1245.6, color: "#3aa3c4", change: "2.1%" },
-  { label: "Level Income", amount: 968.2, color: "#1f5f7a", change: "5.7%" },
-  { label: "Booster Income", amount: 312.4, color: "#d9a441", change: "0.5%" },
-  { label: "DAO Income", amount: 540, color: "#4a7f8f", change: "12%" },
-  { label: "Rewards Income", amount: 250, color: "#8fc9cf", change: "New" },
-  { label: "Salary Income", amount: 183.33, color: "#1fa88a", change: "1%" },
+const MARKET_STATS = [
+  { value: "$2.67T", label: "Projected worldwide AI spending", type: "Spending", year: "2026", source: "Gartner, Sep 2026" },
+  { value: "$4.8T", label: "Projected global AI market size", type: "Market size", year: "2033", source: "UNCTAD, 2025" },
+  { value: "78M", label: "Net new jobs, all industries", type: "Employment", year: "By 2030", source: "WEF Future of Jobs 2025" },
+  { value: "170M", label: "New jobs created, all industries", type: "Employment", year: "By 2030", source: "WEF Future of Jobs 2025" },
 ];
 
-const partners = [
-  { initials: "AM", name: "Alex M.", amount: "$2,500", volume: "$125,000 vol." },
-  { initials: "SR", name: "Sophia R.", amount: "$1,850", volume: "$98,400 vol." },
-  { initials: "DK", name: "Daniel K.", amount: "$1,420", volume: "$76,200 vol." },
-  { initials: "PS", name: "Priya S.", amount: "$1,180", volume: "$61,800 vol." },
-  { initials: "ML", name: "Marco L.", amount: "$960", volume: "$54,300 vol." },
+const INCOME_BARS = [
+  { label: 'Wk 1', yield: 45, performance: 25, affiliate: 15 },
+  { label: 'Wk 2', yield: 45, performance: 30, affiliate: 15 },
+  { label: 'Wk 3', yield: 45, performance: 30, affiliate: 20 },
+  { label: 'Wk 4', yield: 45, performance: 35, affiliate: 15 },
+  { label: 'Wk 5', yield: 45, performance: 40, affiliate: 20 },
 ];
 
-const achievers = [
-  { initials: "NT", name: "Nina T.", rank: "Elite", time: "2h ago", reward: "+$2,000" },
-  { initials: "OF", name: "Omar F.", rank: "Navigator", time: "5h ago", reward: "+$1,000" },
-  { initials: "LW", name: "Lena W.", rank: "Trader", time: "Yesterday", reward: "+$500" },
-  { initials: "RK", name: "Ravi K.", rank: "Pioneer", time: "Yesterday", reward: "+$250" },
-  { initials: "CY", name: "Chen Y.", rank: "Nova", time: "2 days ago", reward: "+$100" },
+const INCOME_SOURCES = [
+  { label: 'Yield', value: '$663 · 50%', percent: 50, color: '#3b82f6' },
+  { label: 'Performance', value: '$399 · 30%', percent: 30, color: '#10b981' },
+  { label: 'Affiliate', value: '$266 · 20%', percent: 20, color: '#8b5cf6' },
+];
+// Income Chart Data for different ranges
+const INCOME_RANGES = {
+  "7D": {
+    total: "$320.50",
+    growth: "+5.2%",
+    data: [
+      { label: "Day 1", yield: 25, performance: 10, affiliate: 5 },
+      { label: "Day 2", yield: 30, performance: 15, affiliate: 5 },
+      { label: "Day 3", yield: 20, performance: 12, affiliate: 8 },
+      { label: "Day 4", yield: 35, performance: 18, affiliate: 10 },
+      { label: "Day 5", yield: 40, performance: 20, affiliate: 12 },
+      { label: "Day 6", yield: 30, performance: 15, affiliate: 8 },
+      { label: "Day 7", yield: 45, performance: 22, affiliate: 15 },
+    ],
+  },
+  "30D": {
+    total: "$1,328.00",
+    growth: "+11.8%",
+    data: [
+      { label: "Wk 1", yield: 125, performance: 50, affiliate: 30 },
+      { label: "Wk 2", yield: 150, performance: 65, affiliate: 35 },
+      { label: "Wk 3", yield: 140, performance: 60, affiliate: 40 },
+      { label: "Wk 4", yield: 160, performance: 70, affiliate: 35 },
+      { label: "Wk 5", yield: 180, performance: 80, affiliate: 45 },
+    ],
+  },
+  "90D": {
+    total: "$4,150.00",
+    growth: "+24.5%",
+    data: [
+      { label: "Mo 1", yield: 450, performance: 200, affiliate: 120 },
+      { label: "Mo 2", yield: 520, performance: 250, affiliate: 150 },
+      { label: "Mo 3", yield: 600, performance: 300, affiliate: 180 },
+    ],
+  },
+  "1Y": {
+    total: "$18,500.00",
+    growth: "+45.2%",
+    data: [
+      { label: "Q1", yield: 1500, performance: 800, affiliate: 400 },
+      { label: "Q2", yield: 1800, performance: 900, affiliate: 500 },
+      { label: "Q3", yield: 2200, performance: 1100, affiliate: 600 },
+      { label: "Q4", yield: 2500, performance: 1200, affiliate: 700 },
+    ],
+  },
+};
+
+const INCOME_SOURCES_DATA = [
+  { label: 'Yield', value: '$663 · 50%', percent: 50, color: '#3b82f6' },
+  { label: 'Performance', value: '$399 · 30%', percent: 30, color: '#10b981' },
+  { label: 'Affiliate', value: '$266 · 20%', percent: 20, color: '#8b5cf6' },
 ];
 
-const promotions = [
-  {
-    title: "Expand your investment in QUZO",
-    detail: "Add more investment, run advanced AI bots and maximise your returns.",
-    action: "Invest more",
-    href: "/investment-amount",
-    color: "#12a594",
-  },
-  {
-    title: "Daily Booster is live",
-    detail: "Add 3 directs in 24 hours for +0.3%, or 5 directs for +0.5% on daily rewards.",
-    action: "View offers",
-    href: "/booster",
-    color: "#3aa3c4",
-  },
-  {
-    title: "DAO Partner: 280 seats",
-    detail: "Generate $3,000 direct business in 15 days and share 5% of company deposits.",
-    action: "See how it works",
-    href: "/ai-business-hub",
-    color: "#1f5f7a",
-  },
-] as const;
+const RECENT_TX_DATA = [
+  { type: 'Performance income', date: '24 Nov · Credited', amount: '+$42.60' },
+  { type: 'Affiliate income', date: '23 Nov · Credited', amount: '+$60.00' },
+  { type: 'Yield income', date: '22 Nov · Pending', amount: '+$28.40' },
+  { type: 'Affiliate income', date: '20 Nov · Credited', amount: '+$35.00' },
+];
 
-function formatMoney(value: number, digits = 2) {
-  return value.toLocaleString("en-US", {
-    minimumFractionDigits: digits,
-    maximumFractionDigits: digits,
-  });
-}
+const RECENT_TX = [
+  { type: 'Performance income', date: '24 Nov · Credited', amount: '+$42.60' },
+  { type: 'Affiliate income', date: '23 Nov · Credited', amount: '+$60.00' },
+  { type: 'Yield income', date: '22 Nov · Pending', amount: '+$28.40' },
+  { type: 'Affiliate income', date: '20 Nov · Credited', amount: '+$35.00' },
+];
 
-function Panel({ children, className = "" }: { children: React.ReactNode; className?: string }) {
+const LEVEL_INCOME = [
+  { level: 'Level 1', members: '14 members', value: '$48,200', percent: 100 },
+  { level: 'Level 2', members: '21 members', value: '$32,100', percent: 75 },
+  { level: 'Level 3', members: '13 members', value: '$16,100', percent: 40 },
+];
+
+const AFFILIATE_STATS = [
+  { label: "Direct Referrals", value: "14" },
+  { label: "Total Team Members", value: "48" },
+  { label: "Active Members", value: "36" },
+  { label: "Team Business Volume", value: "$96,400" },
+];
+
+const RECENT_JOINED = [
+  { name: "Sample Member A", level: 1, joined: "Today", status: "Active" },
+  { name: "Sample Member B", level: 2, joined: "Yesterday", status: "Active" },
+  { name: "Sample Member C", level: 1, joined: "3 days ago", status: "Inactive" },
+  { name: "Sample Member D", level: 3, joined: "5 days ago", status: "Active" },
+];
+
+const OPPORTUNITIES = [
+  { title: "AI Agents License", desc: "Access curated AI services using x402 payments and earn commissions.", icon: Bot },
+  { title: "Vendor Deployment", desc: "Deploy your AI tools on the marketplace, list services and receive payments.", icon: LayoutGrid },
+  { title: "Affiliate Program", desc: "Earn rewards by inviting new users to join the ecosystem.", icon: Users },
+  { title: "AI Agent Services", desc: "Launch AI service requests and connect with enterprise users.", icon: Sparkles },
+];
+
+const QUICK_LINKS = [
+  { label: "My OTC", icon: CircleDollarSign },
+  { label: "My Coins", icon: Coins },
+  { label: "My Customers", icon: Users },
+  { label: "My Payouts", icon: Wallet },
+  { label: "My Team", icon: Users },
+  { label: "My Vendors", icon: Briefcase },
+  { label: "My Plans", icon: Layers },
+  { label: "My Assets", icon: Settings },
+];
+
+const NOTIFICATIONS = [
+  { title: "Income credited", desc: "A yield deposit has been added", time: "2 min ago", icon: "plus" },
+  { title: "Your team has completed a business milestone", desc: "New tier unlocked for your team", time: "1 hr ago", icon: "trophy" },
+  { title: "Your AI agent deployment has been approved.", desc: "Ready to start accepting service requests", time: "3 hrs ago", icon: "bot" },
+];
+
+/* ============================================================
+   MAIN COMPONENT
+   ============================================================ */
+export function MemberHomeDashboard() {
+  const [mounted, setMounted] = useState(false);
+  
+  
+  // State for Global AI Market Chart Tabs
+  const [marketView, setMarketView] = useState<keyof typeof MARKET_VIEWS>("spending");
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) return null;
+
   return (
-    <section
-      className={`min-w-0 rounded-[18px] border border-[#d9e8ec] bg-white p-4 shadow-[0_10px_30px_-14px_rgba(10,60,80,0.2)] dark:border-[#153747] dark:bg-[#07242e] ${className}`}
-    >
-      {children}
-    </section>
-  );
-}
-
-function SectionHeading({ children }: { children: React.ReactNode }) {
-  return (
-    <h2 className="flex items-center gap-2 text-[15px] font-semibold tracking-wide text-[#06262f] before:h-4 before:w-1 before:rounded-full before:bg-gradient-to-b before:from-[#12a594] before:to-[#35d6c0] dark:text-[#e6f7f9]">
-      {children}
-    </h2>
-  );
-}
-
-function Pill({ children }: { children: React.ReactNode }) {
-  return (
-    <span className="whitespace-nowrap rounded-full bg-[#12a594]/[0.12] px-2.5 py-1 text-[11px] font-semibold text-[#118b7d] dark:text-[#6be2d2]">
-      {children}
-    </span>
-  );
-}
-
-function CoinChart() {
-  const [period, setPeriod] = useState<(typeof coinPeriods)[number]>("30D");
-  const [currency, setCurrency] = useState<"BTC" | "USD">("BTC");
-  const price = currency === "BTC" ? "1" : "$0.3684";
-
-  const utilities = [
-    { icon: Coins, name: "Trading", text: "Trade QUZO on supported exchanges" },
-    { icon: Bot, name: "AI Services", text: "Access AI-powered trading tools" },
-    { icon: Gift, name: "Rewards", text: "Earn QUZO through activities" },
-    { icon: ChartNoAxesCombined, name: "Analytics", text: "Track performance metrics" },
-  ];
-
-  return (
-    <Panel className="overflow-hidden p-0">
-      <div className="grid overflow-hidden rounded-[28px] border border-[#d9e8ec] bg-[#f8fbfc] lg:grid-cols-[1fr_2fr] dark:border-[#153747] dark:bg-[#031B23]">
-        <div className="relative flex flex-col justify-between gap-10 bg-white p-8 md:p-10 dark:bg-[#052832]">
-          <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-[#5b7885] dark:text-slate-400">
-            Token utility
-          </p>
-          <div className="flex justify-center">
-            <div className="relative h-32 w-32">
-              <div className="absolute inset-0 rounded-full bg-gradient-to-br from-[#10a67b] to-[#35d6c0] shadow-2xl" />
-              <div className="absolute inset-2 flex items-center justify-center rounded-full bg-gradient-to-br from-[#0a6b4f] to-[#19a885]">
-                <img src="/logos/quzo-logo-light.png" alt="QUZO" className="h-16 w-16 object-contain" />
-              </div>
+    <div className="w-full min-h-screen bg-[#f4f7f9] dark:bg-[#03161f] text-[#06262f] dark:text-[#e6f7f9] font-sans selection:bg-[#12a594]/30">
+      
+      {/* ================= HERO SECTION (COMPACT) ================= */}
+      <div className="bg-[#03161f] w-full px-4 pt-6 pb-12 sm:px-6 md:px-8 lg:px-12 relative overflow-hidden rounded-b-[2rem]">
+        
+        {/* Background Glow Effects */}
+        <div className="absolute top-1/2 right-0 w-[600px] h-[600px] -translate-y-1/2 translate-x-1/4 bg-[#12a594]/10 rounded-full blur-[100px] pointer-events-none" />
+        <div className="absolute top-0 right-1/4 w-[300px] h-[300px] bg-[#35d6c0]/10 rounded-full blur-[80px] pointer-events-none" />
+        
+        {/* Subtle Grid Pattern */}
+        <div className="absolute inset-0 opacity-20 pointer-events-none" 
+             style={{ backgroundImage: 'linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px)', backgroundSize: '40px 40px' }} />
+        
+        <div className="max-w-[1300px] mx-auto grid grid-cols-1 lg:grid-cols-[1.1fr_0.9fr] gap-8 items-center relative z-10">
+          
+          {/* ================= LEFT CONTENT ================= */}
+          <div className="relative z-20 flex flex-col items-start pt-4 lg:pt-0">
+            
+            {/* Top Badge */}
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-[#12a594]/30 bg-[#12a594]/10 backdrop-blur-md text-[#35d6c0] text-[10px] font-semibold tracking-[0.15em] uppercase mb-4">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#35d6c0] shadow-[0_0_10px_#35d6c0]" />
+              YOUR AI BUSINESS PANEL
+            </div>
+            
+            {/* Heading */}
+            <h1 className="text-3xl sm:text-4xl lg:text-[3.2rem] font-extrabold text-white leading-[1.1] mb-3 tracking-tight">
+              THE FUTURE IS NO LONGER COMING. <br />
+             <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#12a594] to-[#35d6c0]">
+  {"IT'S HERE."}
+</span>
+            </h1>
+            
+            {/* Subtitle */}
+            <p className="text-[13px] sm:text-[14px] text-slate-400 max-w-[480px] mb-6 leading-relaxed">
+              Discover the next generation of AI agents, autonomous robotics, intelligent automation and global business opportunities.
+            </p>
+            
+            {/* Buttons */}
+            <div className="flex flex-wrap items-center gap-3 relative z-20">
+              <button className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#12a594] to-[#35d6c0] hover:opacity-90 text-white text-[13px] font-semibold transition-all shadow-[0_0_20px_rgba(18,165,148,0.3)] flex items-center gap-2">
+                <Bot className="w-4 h-4" /> Explore AI Marketplace <ArrowRight className="w-4 h-4 ml-1" />
+              </button>
+              <button className="px-5 py-2.5 rounded-xl border border-[#12a594]/30 bg-white/5 hover:bg-white/10 text-white text-[13px] font-semibold transition-all flex items-center gap-2 backdrop-blur-sm">
+                <Globe className="w-4 h-4 text-[#35d6c0]" /> Discover Opportunities
+              </button>
+              <button className="px-5 py-2.5 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 text-white text-[13px] font-semibold transition-all flex items-center gap-2 backdrop-blur-sm mt-2 sm:mt-0">
+                <Sparkles className="w-4 h-4 text-[#12a594]" /> Deploy Agents
+              </button>
             </div>
           </div>
-          <div className="text-center">
-            <p className="text-xl font-bold text-[#06262f] dark:text-white">{price} USDT</p>
-            <p className="mt-1 text-xs text-[#5b7885] dark:text-slate-300">QUZO Coin Pre Allocation Price 1 USDT</p>
+          
+          {/* ================= RIGHT ILLUSTRATION ================= */}
+          <div className="relative h-[300px] lg:h-[380px] flex items-center justify-center z-10">
+            
+            {/* Central Glow */}
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(18,165,148,0.15)_0%,transparent_60%)] pointer-events-none" />
+
+            {/* Floating Glassmorphism Cards */} 
+            <div className="absolute top-[5%] left-[0%] lg:-left-[5%] z-20 flex items-center gap-2.5 p-2.5 pr-4 rounded-xl border border-[#12a594]/20 bg-[#03161f]/80 backdrop-blur-xl shadow-lg">
+              <div className="w-8 h-8 rounded-full bg-[#0a2a33] flex items-center justify-center border border-[#12a594]/30">
+                <Bot className="w-4 h-4 text-[#35d6c0]" />
+              </div>
+              <div>
+                <div className="text-[11px] font-bold text-white">AI Agents</div>
+                <div className="text-[9px] text-[#84a2ad]">Digital workforce</div>
+              </div>
+            </div>
+
+            <div className="absolute top-[0%] right-[0%] lg:-right-[5%] z-20 flex items-center gap-2.5 p-2.5 pr-4 rounded-xl border border-[#12a594]/20 bg-[#03161f]/80 backdrop-blur-xl shadow-lg">
+              <div className="w-8 h-8 rounded-full bg-[#0a2a33] flex items-center justify-center border border-[#12a594]/30">
+                <Globe className="w-4 h-4 text-[#35d6c0]" />
+              </div>
+              <div>
+                <div className="text-[11px] font-bold text-white">Global Network</div>
+                <div className="text-[9px] text-[#84a2ad]">Connected intelligence</div>
+              </div>
+            </div>
+
+            <div className="absolute bottom-[15%] right-[0%] lg:-right-[2%] z-20 flex items-center gap-2.5 p-2.5 pr-4 rounded-xl border border-[#12a594]/20 bg-[#03161f]/80 backdrop-blur-xl shadow-lg">
+              <div className="w-8 h-8 rounded-full bg-[#0a2a33] flex items-center justify-center border border-[#12a594]/30">
+                <LayoutGrid className="w-4 h-4 text-[#35d6c0]" />
+              </div>
+              <div>
+                <div className="text-[11px] font-bold text-white">Smart Factories</div>
+                <div className="text-[9px] text-[#84a2ad]">Robotic production</div>
+              </div>
+            </div>
+
+            <div className="absolute bottom-[5%] left-[0%] lg:left-[2%] z-20 flex items-center gap-2.5 p-2.5 pr-4 rounded-xl border border-[#12a594]/20 bg-[#03161f]/80 backdrop-blur-xl shadow-lg">
+              <div className="w-8 h-8 rounded-full bg-[#0a2a33] flex items-center justify-center border border-[#12a594]/30">
+                <Globe className="w-4 h-4 text-[#35d6c0]" />
+              </div>
+              <div>
+                <div className="text-[11px] font-bold text-white">Autonomous Mobility</div>
+                <div className="text-[9px] text-[#84a2ad]">Robo taxi and drones</div>
+              </div>
+            </div>
+
+            <Image 
+              src="/quzo-hero-robot.webp" 
+              alt="QUZO AI Robot" 
+              width={400}
+              height={400}
+              priority
+              className="relative z-10 w-[200px] lg:w-[300px] h-auto object-contain drop-shadow-[0_0_40px_rgba(18,165,148,0.2)] animate-[float_6s_ease-in-out_infinite]"
+            />
             
           </div>
         </div>
-        <div className="grid gap-px bg-[#d9e8ec] sm:grid-cols-2 lg:grid-cols-2 dark:bg-white/10">
-          {utilities.map((item, index) => {
-            const Icon = item.icon;
-            return (
-              <div key={item.name} className="min-h-[150px] bg-white p-5 dark:bg-[#031B23]">
-                <div className="flex gap-4">
-                  <span className="font-mono text-[10px] text-[#5b7885] pt-0.5 dark:text-slate-400 shrink-0">0{index + 1}</span>
-                  <div className="min-w-0 flex-1">
-                    <Icon
-                      size={18}
-                      className="text-[#12a594] dark:text-[#19D8D0]"
-                      aria-hidden="true"
-                    />
-                    <h3 className="mt-3 font-display text-sm font-semibold text-[#06262f] dark:text-white">{item.name}</h3>
-                    <p className="mt-2 text-xs leading-relaxed text-[#5b7885] dark:text-slate-300">{item.text}</p>
+      </div>
+
+      {/* ================= OVERLAPPING STATS CARDS ================= */}
+      <div className="w-full bg-[#f4f7f9] dark:bg-[#03161f] pb-8">
+        <div className="max-w-[1300px] mx-auto px-4 sm:px-6 md:px-8 lg:px-12 -mt-10 relative z-20">
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+            {/* Card 1: Total Income */}
+            <div className="bg-white dark:bg-[#07242e] rounded-2xl p-5 border border-slate-100 dark:border-[#153747] shadow-sm flex items-center justify-between">
+              <div>
+                <p className="text-[13px] font-medium text-slate-500 dark:text-slate-400 mb-1">Total Income</p>
+                <h3 className="text-2xl font-bold text-slate-900 dark:text-white">$8,420.75</h3>
+              </div>
+              <div className="w-12 h-12 rounded-xl bg-[#12a594]/10 flex items-center justify-center">
+                <CircleDollarSign className="w-6 h-6 text-[#12a594]" />
+              </div>
+            </div>
+
+            {/* Card 2: Yield Wallet */}
+            <div className="bg-white dark:bg-[#07242e] rounded-2xl p-5 border border-slate-100 dark:border-[#153747] shadow-sm flex items-center justify-between">
+              <div>
+                <p className="text-[13px] font-medium text-slate-500 dark:text-slate-400 mb-1">Yield Wallet</p>
+                <h3 className="text-2xl font-bold text-slate-900 dark:text-white">$1,240.50</h3>
+              </div>
+              <div className="w-12 h-12 rounded-xl bg-[#12a594]/10 flex items-center justify-center">
+                <Wallet className="w-6 h-6 text-[#12a594]" />
+              </div>
+            </div>
+
+            {/* Card 3: Performance Wallet */}
+            <div className="bg-white dark:bg-[#07242e] rounded-2xl p-5 border border-slate-100 dark:border-[#153747] shadow-sm flex items-center justify-between">
+              <div>
+                <p className="text-[13px] font-medium text-slate-500 dark:text-slate-400 mb-1">Performance Wallet</p>
+                <h3 className="text-2xl font-bold text-slate-900 dark:text-white">$386.20</h3>
+              </div>
+              <div className="w-12 h-12 rounded-xl bg-[#12a594]/10 flex items-center justify-center">
+                <TrendingUp className="w-6 h-6 text-[#12a594]" />
+              </div>
+            </div>
+
+            {/* Card 4: Deposit Wallet */}
+            <div className="bg-white dark:bg-[#07242e] rounded-2xl p-5 border border-slate-100 dark:border-[#153747] shadow-sm flex items-center justify-between">
+              <div>
+                <p className="text-[13px] font-medium text-slate-500 dark:text-slate-400 mb-1">Deposit Wallet</p>
+                <h3 className="text-2xl font-bold text-slate-900 dark:text-white">$5,000.00</h3>
+              </div>
+              <div className="w-12 h-12 rounded-xl bg-[#12a594]/10 flex items-center justify-center">
+                <ArrowDownToLine className="w-6 h-6 text-[#12a594]" />
+              </div>
+            </div>
+
+            {/* Card 5: Active Licenses */}
+            <div className="bg-white dark:bg-[#07242e] rounded-2xl p-5 border border-slate-100 dark:border-[#153747] shadow-sm flex items-center justify-between">
+              <div>
+                <p className="text-[13px] font-medium text-slate-500 dark:text-slate-400 mb-1">Active Licenses</p>
+                <h3 className="text-2xl font-bold text-slate-900 dark:text-white">3</h3>
+              </div>
+              <div className="w-12 h-12 rounded-xl bg-[#12a594]/10 flex items-center justify-center">
+                <ShieldCheck className="w-6 h-6 text-[#12a594]" />
+              </div>
+            </div>
+
+            {/* Card 6: Total Team */}
+            <div className="bg-white dark:bg-[#07242e] rounded-2xl p-5 border border-slate-100 dark:border-[#153747] shadow-sm flex items-center justify-between">
+              <div>
+                <p className="text-[13px] font-medium text-slate-500 dark:text-slate-400 mb-1">Total Team</p>
+                <h3 className="text-2xl font-bold text-slate-900 dark:text-white">48</h3>
+              </div>
+              <div className="w-12 h-12 rounded-xl bg-[#12a594]/10 flex items-center justify-center">
+                <Users className="w-6 h-6 text-[#12a594]" />
+              </div>
+            </div>
+          </div>
+
+          {/* Bottom Bar: AI Credits Progress & Actions */}
+          <div className="mt-4 bg-white dark:bg-[#07242e] rounded-2xl p-5 border border-slate-100 dark:border-[#153747] shadow-sm flex flex-col xl:flex-row items-center gap-6">
+            <div className="flex-1 w-full">
+              <div className="flex justify-between text-[13px] font-medium text-slate-600 dark:text-slate-300 mb-3">
+                <span>AI credits available</span>
+                <span className="text-slate-400">31,200 of 50,000</span>
+              </div>
+              <div className="h-2.5 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+                <div className="h-full bg-gradient-to-r from-[#12a594] to-[#35d6c0] rounded-full w-[62%]" />
+              </div>
+            </div>
+
+            <div className="flex items-center gap-3 w-full xl:w-auto shrink-0">
+              <button className="flex-1 xl:flex-none px-6 py-2.5 rounded-xl bg-gradient-to-r from-[#12a594] to-[#35d6c0] hover:opacity-90 text-white text-[13px] font-semibold transition-opacity flex items-center justify-center gap-2 shadow-[0_4px_14px_rgba(18,165,148,0.3)]">
+                <Plus className="w-4 h-4" /> Add Funds
+              </button>
+              <button className="flex-1 xl:flex-none px-6 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-[13px] font-semibold transition-colors flex items-center justify-center gap-2">
+                <ArrowDownToLine className="w-4 h-4" /> Withdraw
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* ================= MAIN CONTENT GRID ================= */}
+      <div className="max-w-[1200px] mx-auto px-4 sm:px-6 md:px-8 lg:px-12 py-8 space-y-6">
+        
+        {/* --- SECTION: INCOME STATISTICS --- */}
+        <section>
+          <div className="text-[10px] font-semibold tracking-[0.15em] text-slate-400 uppercase mb-2">Income Statistics</div>
+          
+          <div className="flex flex-col gap-6">
+            {/* Header & Time Filters */}
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+              <h2 className="text-2xl font-bold text-slate-900 dark:text-white">Your Income Overview</h2>
+              <div className="flex gap-2">
+                {["7 Days", "30 Days", "90 Days", "1 Year"].map((t, i) => (
+                  <button 
+                    key={t} 
+                    className={`px-4 py-1.5 text-[11px] font-medium rounded-full transition-colors border ${
+                      i === 1 
+                        ? "bg-[#6b4eff] text-white border-[#6b4eff]" 
+                        : "bg-white text-slate-600 border-slate-200 hover:bg-slate-50 dark:bg-[#07242e] dark:border-slate-700 dark:text-slate-300"
+                    }`}
+                  >
+                    {t}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Main Chart Card */}
+            <div className="bg-white dark:bg-[#07242e] rounded-3xl p-6 shadow-sm border border-slate-100 dark:border-[#153747]">
+              <div className="flex justify-between items-start mb-8">
+                <div>
+                  <div className="text-[11px] text-slate-500 mb-1">Income in selected period</div>
+                  <div className="text-3xl font-bold text-slate-900 dark:text-white">$1,328</div>
+                </div>
+                <div className="flex items-center gap-1 text-[11px] font-semibold text-[#12a594] bg-[#12a594]/10 px-2.5 py-1 rounded-md">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg>
+                  +11.8% <span className="text-slate-500 font-normal ml-0.5">vs previous period</span>
+                </div>
+              </div>
+
+              {/* Chart Area */}
+              <div className="relative w-full h-[250px] mb-4">
+                <div className="absolute inset-0 flex flex-col justify-between pointer-events-none pb-6 pl-10">
+                  {[320, 240, 160, 80, 0].map((val) => (
+                    <div key={val} className="flex items-center w-full relative">
+                      <span className="text-[10px] text-slate-400 w-10 absolute -left-10 -mt-2">{val === 0 ? '$0' : `$${val}`}</span>
+                      <div className="flex-1 border-t border-slate-100 dark:border-slate-800"></div>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="absolute inset-0 flex justify-around items-end pl-12 pb-6 z-10">
+                  {INCOME_BARS.map((item, i) => (
+                    <div key={i} className="flex flex-col items-center group w-12 h-full justify-end">
+                      <div className="w-8 flex flex-col justify-end h-full">
+                        <div className="w-full bg-[#8b5cf6] rounded-t-sm" style={{ height: `${item.affiliate}%` }} />
+                        <div className="w-full bg-[#10b981]" style={{ height: `${item.performance}%` }} />
+                        <div className="w-full bg-[#3b82f6]" style={{ height: `${item.yield}%` }} />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="absolute bottom-0 left-0 right-0 flex justify-around pl-12">
+                  {INCOME_BARS.map((item, i) => (
+                    <div key={i} className="w-12 flex justify-center">
+                      <span className="text-[10px] text-slate-400">{item.label}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="flex justify-center gap-6 mt-6">
+                <div className="flex items-center gap-2 text-[11px] text-slate-600 dark:text-slate-300">
+                  <span className="w-2.5 h-2.5 rounded-full bg-[#8b5cf6]" /> Affiliate
+                </div>
+                <div className="flex items-center gap-2 text-[11px] text-slate-600 dark:text-slate-300">
+                  <span className="w-2.5 h-2.5 rounded-full bg-[#10b981]" /> Performance
+                </div>
+                <div className="flex items-center gap-2 text-[11px] text-slate-600 dark:text-slate-300">
+                  <span className="w-2.5 h-2.5 rounded-full bg-[#3b82f6]" /> Yield
+                </div>
+              </div>
+            </div>
+
+            {/* Bottom Row Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="bg-white dark:bg-[#07242e] rounded-3xl p-6 shadow-sm border border-slate-100 dark:border-[#153747]">
+                <h3 className="text-sm font-bold text-slate-900 dark:text-white mb-6">Income by source</h3>
+                <div className="space-y-5">
+                  {INCOME_SOURCES.map((src, i) => (
+                    <div key={i}>
+                      <div className="flex justify-between text-[11px] mb-2">
+                        <span className="font-medium text-slate-700 dark:text-slate-300">{src.label}</span>
+                        <span className="text-slate-500">{src.value}</span>
+                      </div>
+                      <div className="h-2 w-full rounded-full bg-slate-100 dark:bg-slate-800 overflow-hidden">
+                        <div className="h-full rounded-full" style={{ width: `${src.percent}%`, backgroundColor: src.color }} />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="bg-white dark:bg-[#07242e] rounded-3xl p-6 shadow-sm border border-slate-100 dark:border-[#153747]">
+                <div className="flex justify-between items-center mb-6">
+                  <h3 className="text-sm font-bold text-slate-900 dark:text-white">Recent transactions</h3>
+                  <a href="#" className="text-[11px] text-blue-600 dark:text-blue-400 hover:underline">View all</a>
+                </div>
+                <div className="space-y-4">
+                  {RECENT_TX.map((tx, i) => (
+                    <div key={i} className="flex justify-between items-start pb-3 border-b border-slate-50 dark:border-slate-800/50 last:border-0 last:pb-0">
+                      <div>
+                        <div className="text-[11px] font-semibold text-slate-800 dark:text-slate-200 mb-0.5">{tx.type}</div>
+                        <div className="text-[10px] text-slate-400">{tx.date}</div>
+                      </div>
+                      <span className={`text-[11px] font-bold ${tx.date.includes('Pending') ? 'text-slate-400' : 'text-emerald-600 dark:text-emerald-400'}`}>
+                        {tx.amount}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* --- SECTION: AFFILIATE TEAM GROWTH --- */}
+        <section>
+          <div className="text-[10px] font-semibold tracking-[0.15em] text-[#6b4eff] uppercase mb-2">Affiliate</div>
+          <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-6">Affiliate Team Growth</h2>
+          
+          <div className="flex flex-col gap-6">
+            {/* Referral Link Bar */}
+            <div className="bg-white dark:bg-[#07242e] rounded-2xl p-4 border border-slate-100 dark:border-[#153747] shadow-sm flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+              <div>
+                <p className="text-[11px] text-slate-500 mb-1">Your referral link</p>
+                <p className="text-sm font-bold text-slate-900 dark:text-white">http://localhost:3002/register?ref=DEMO1234</p>
+              </div>
+              <div className="flex items-center gap-2 w-full md:w-auto">
+                <button className="flex-1 md:flex-none px-4 py-2 rounded-xl bg-[#6b4eff] hover:bg-[#5a3ee6] text-white text-[12px] font-semibold transition-colors flex items-center justify-center gap-2">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg> 
+                  Copy link
+                </button>
+                <button className="flex-1 md:flex-none px-4 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-[12px] font-semibold transition-colors">
+                  Affiliate dashboard
+                </button>
+              </div>
+            </div>
+
+            {/* Stats Cards */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              {AFFILIATE_STATS.map((stat, i) => (
+                <div key={i} className="bg-white dark:bg-[#07242e] rounded-2xl p-5 border border-slate-100 dark:border-[#153747] shadow-sm">
+                  <p className="text-[11px] text-slate-500 mb-1">{stat.label}</p>
+                  <h3 className="text-2xl font-bold text-slate-900 dark:text-white">{stat.value}</h3>
+                </div>
+              ))}
+            </div>
+
+            {/* Time Filters */}
+            <div className="flex gap-2">
+              {["7 Days", "30 Days", "90 Days", "1 Year"].map((t, i) => (
+                <button 
+                  key={t} 
+                  className={`px-4 py-1.5 text-[11px] font-medium rounded-full transition-colors border ${
+                    i === 1 
+                      ? "bg-[#6b4eff] text-white border-[#6b4eff]" 
+                      : "bg-white text-slate-600 border-slate-200 hover:bg-slate-50 dark:bg-[#07242e] dark:border-slate-700 dark:text-slate-300"
+                  }`}
+                >
+                  {t}
+                </button>
+              ))}
+            </div>
+
+            {/* Charts Row */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <div className="bg-white dark:bg-[#07242e] rounded-2xl p-6 border border-slate-100 dark:border-[#153747] shadow-sm">
+                <h4 className="text-sm font-bold mb-6 text-slate-900 dark:text-white">Team members over time</h4>
+                <div className="relative h-[220px] w-full">
+                  <div className="absolute inset-0 flex flex-col justify-between pointer-events-none pb-6">
+                    {[60, 45, 30, 15, 0].map((val) => (
+                      <div key={val} className="flex items-center w-full">
+                        <span className="text-[10px] text-slate-400 w-6">{val}</span>
+                        <div className="flex-1 border-t border-slate-100 dark:border-slate-800 ml-2"></div>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="absolute inset-0 ml-8 pb-6">
+                    <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="w-full h-full overflow-visible">
+                      <defs>
+                        <linearGradient id="chartGradient" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="0%" stopColor="#3b82f6" stopOpacity="0.2" />
+                          <stop offset="100%" stopColor="#3b82f6" stopOpacity="0" />
+                        </linearGradient>
+                      </defs>
+                      <path d="M0,50 L25,45 L50,40 L75,35 L100,30 L100,100 L0,100 Z" fill="url(#chartGradient)" />
+                      <path d="M0,50 L25,45 L50,40 L75,35 L100,30" fill="none" stroke="#3b82f6" strokeWidth="2" vectorEffect="non-scaling-stroke" />
+                    </svg>
+                  </div>
+
+                  <div className="absolute bottom-0 left-0 right-0 flex justify-between pl-8">
+                    {['Wk 1', 'Wk 2', 'Wk 3', 'Wk 4', 'Wk 5'].map((label) => (
+                      <span key={label} className="text-[10px] text-slate-400">{label}</span>
+                    ))}
                   </div>
                 </div>
               </div>
-            );
-          })}
-        </div>
-      </div>
-    </Panel>
-  );
-}
 
-function PerformancePanel() {
-  const [period, setPeriod] = useState<(typeof performancePeriods)[number]>("30D");
-  const percentages = { "7D": "+6.00%", "30D": "+29.92%", "90D": "+72.00%", "1Y": "+124.56%" };
-  const heights = {
-    "7D": [24, 40, 35, 54, 68, 61, 85],
-    "30D": [30, 42, 37, 58, 52, 74, 65, 92, 83, 100],
-    "90D": [22, 38, 35, 52, 48, 65, 59, 81, 76, 100],
-    "1Y": [18, 30, 34, 45, 50, 62, 70, 68, 85, 100],
-  } satisfies Record<(typeof performancePeriods)[number], number[]>;
-
-  return (
-    <Panel>
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <SectionHeading>
-          <ChartNoAxesCombined className="h-4 w-4 text-[#12a594]" aria-hidden />
-          Investment performance
-        </SectionHeading>
-        <div className="flex gap-1 rounded-full bg-[#12a594]/[0.08] p-1">
-          {performancePeriods.map((item) => (
-            <button
-              key={item}
-              type="button"
-              onClick={() => setPeriod(item)}
-              className={`rounded-full px-2.5 py-1 text-[11px] ${item === period ? "bg-[#12a594] text-white" : "text-[#5b7885] dark:text-[#84a2ad]"
-                }`}
-              aria-pressed={item === period}
-            >
-              {item}
-            </button>
-          ))}
-        </div>
-      </div>
-      <p className="mt-3 text-xl font-bold text-[#12a594]">▲ {percentages[period]}</p>
-      <div className="mt-4 flex h-[150px] items-end gap-2 rounded-xl bg-[#edf4f5] px-3 pt-3 dark:bg-[#031B23]">
-        {heights[period].map((height, index) => (
-          <span
-            key={`${period}-${index}`}
-            className="member-bar-fill flex-1 rounded-t-md bg-gradient-to-t from-[#1f5f7a] to-[#35d6c0] transition-all duration-500"
-            style={{ height: `${height}%` }}
-          />
-        ))}
-      </div>
-    </Panel>
-  );
-}
-
-
-
-export function MemberHomeDashboard() {
-  const [promotionIndex, setPromotionIndex] = useState(0);
-
-  const {
-    data: dashboardSummary,
-    isLoading: isDashboardLoading,
-  } = useDashboardSummary();
-  const walletData = dashboardSummary?.data?.[0];
-
-  const {
-    data: notificationsData,
-    isLoading: isNotificationsLoading,
-  } = useNotifications();
-  const notifications = notificationsData?.data || [];
-
-  const wallets = [
-    {
-      name: "USDT Funding Wallet",
-      amount: walletData?.DepositWallet
-        ? `$${Number(walletData.DepositWallet).toFixed(2)}`
-        : "$0.00",
-      detail: "Available Balance",
-      color: "#12a594",
-      tab: "deposit",
-    },
-    {
-      name: "Working Reward Wallet",
-      amount: (walletData?.WorkingWallet ?? walletData?.IncomeWallet)
-        ? `$${Number(walletData.WorkingWallet ?? walletData.IncomeWallet).toFixed(2)}`
-        : "$0.00",
-      detail: "Available Balance",
-      color: "#3aa3c4",
-      tab: "income",
-    },
-    {
-      name: "Trading Reward Wallet",
-      amount: walletData?.YieldWallet
-        ? `$${Number(walletData.YieldWallet).toFixed(2)}`
-        : "$0.00",
-      detail: "Available Balance",
-      color: "#1f5f7a",
-      tab: "yield",
-    },
-    {
-      name: "QUZO Coin Wallet",
-      amount: walletData?.QuzoWallet
-        ? `${Number(walletData.QuzoWallet).toFixed(4)} `
-        : "0.0000",
-      detail: "Available QUZO",
-      color: "#d9a441",
-      tab: "quzo",
-    },
-  ];
-
-  const totalWalletBalance = (walletData?.DepositWallet || 0) +
-    (walletData?.WorkingWallet ?? walletData?.IncomeWallet ?? 0) +
-    (walletData?.YieldWallet || 0) +
-    (walletData?.QuzoWallet ? Number(walletData.QuzoWallet) : 0);
-
-  useEffect(() => {
-    const timer = window.setInterval(
-      () => setPromotionIndex((current) => (current + 1) % promotions.length),
-      5000,
-    );
-    return () => window.clearInterval(timer);
-  }, []);
-
-  const currentPromotion = promotions[promotionIndex] ?? promotions[0];
-
-  return (
-    <div className="member-home space-y-4 pb-8">
-      <style jsx global>{`
-        @keyframes member-rise {
-          from {
-            opacity: 0;
-            transform: translateY(14px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-
-        @keyframes member-draw {
-          to {
-            stroke-dashoffset: 0;
-          }
-        }
-
-        @keyframes member-pulse {
-          0% {
-            filter: drop-shadow(0 0 0 rgba(25, 227, 208, 0.75));
-          }
-          100% {
-            filter: drop-shadow(0 0 8px rgba(25, 227, 208, 0));
-          }
-        }
-
-        @keyframes member-spin {
-          to {
-            transform: rotate(360deg);
-          }
-        }
-
-        @keyframes member-grow {
-          from {
-            opacity: 0.6;
-            transform: scaleY(0);
-          }
-          to {
-            opacity: 1;
-            transform: scaleY(1);
-          }
-        }
-
-        .member-home > * {
-          animation: member-rise 0.6s both;
-        }
-
-        .member-home > :nth-child(2) {
-          animation-delay: 60ms;
-        }
-
-        .member-home > :nth-child(3) {
-          animation-delay: 120ms;
-        }
-
-        .member-home > :nth-child(4) {
-          animation-delay: 180ms;
-        }
-
-        .member-home > :nth-child(5) {
-          animation-delay: 240ms;
-        }
-
-        .member-home > :nth-child(6) {
-          animation-delay: 300ms;
-        }
-
-        .member-chart-line {
-          stroke-dasharray: 1400;
-          stroke-dashoffset: 1400;
-          animation: member-draw 1.8s 180ms ease-out forwards;
-        }
-
-        .member-pulse {
-          animation: member-pulse 1.4s ease-out infinite;
-        }
-
-        .member-bar-fill {
-          transform-origin: bottom;
-          animation: member-grow 0.8s ease-out both;
-        }
-
-        .member-orbit {
-          transform-box: fill-box;
-          transform-origin: center;
-          animation: member-spin 24s linear infinite;
-        }
-
-        .member-promotion {
-          animation: member-rise 0.45s both;
-        }
-
-        @media (prefers-reduced-motion: reduce) {
-          .member-home *,
-          .member-home *::before,
-          .member-home *::after {
-            animation-duration: 0.01ms !important;
-            animation-iteration-count: 1 !important;
-            scroll-behavior: auto !important;
-            transition-duration: 0.01ms !important;
-          }
-        }
-      `}</style>
-      <div className="grid gap-4 xl:grid-cols-[1.05fr_1fr]">
-        <section className="relative grid min-h-[280px] overflow-hidden rounded-[22px] bg-gradient-to-br from-[#e9fbf4] via-[#c8f2e2] to-[#9fe5cf] p-6 shadow-[0_10px_30px_-14px_rgba(10,60,80,0.28)] dark:from-[#062b33] dark:via-[#08413f] dark:to-[#0a4a47] sm:grid-cols-[1.2fr_0.8fr] sm:items-center sm:p-7">
-          <div className="relative z-10">
-            <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-[#0b8d73] dark:text-[#7ff5e6]">
-              QUZO decentralised AI platform
-            </p>
-            <h1 className="mt-3 text-3xl font-bold leading-tight text-[#06262f] dark:text-white sm:text-[34px]">
-              Invest. Automate.
-              <span className="block">
-                Grow with <span className="text-[#10a67b] dark:text-[#3fd9a9]">AI.</span>
-              </span>
-            </h1>
-            <p className="mt-3 max-w-md text-[13px] leading-6 text-[#5b7885] dark:text-[#b9e3ea]">
-              Invest in AI-powered trading bots and earn consistent, automated profits with QUZO.
-            </p>
-            <div className="mt-5 flex flex-wrap gap-2">
-              <Link
-                href="/investment-amount"
-                className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-[#12a594] to-[#35d6c0] px-4 py-2.5 text-xs font-semibold text-white shadow-md transition hover:-translate-y-0.5"
-              >
-                Invest now <ArrowRight className="h-3.5 w-3.5" aria-hidden />
-              </Link>
-              <Link
-                href="/ai-engine"
-                className="rounded-xl border border-[#12a594]/30 bg-white/40 px-4 py-2.5 text-xs font-semibold text-[#087f73] transition hover:bg-white/70 dark:border-white/20 dark:bg-white/10 dark:text-white dark:hover:bg-white/15"
-              >
-                How it works
-              </Link>
+              <div className="bg-white dark:bg-[#07242e] rounded-2xl p-6 border border-slate-100 dark:border-[#153747] shadow-sm">
+                <h4 className="text-sm font-bold mb-6 text-slate-900 dark:text-white">Level-wise team</h4>
+                <div className="space-y-6">
+                  {LEVEL_INCOME.map((lvl, i) => (
+                    <div key={i}>
+                      <div className="flex justify-between items-center text-[12px] mb-2">
+                        <span className="text-slate-700 dark:text-slate-300">
+                          {lvl.level} <span className="text-slate-400">· {lvl.members}</span>
+                        </span>
+                        <span className="font-semibold text-slate-600 dark:text-slate-400">{lvl.value}</span>
+                      </div>
+                      <div className="h-2 rounded-full bg-slate-100 dark:bg-slate-800">
+                        <div className="h-full rounded-full bg-[#3b82f6]" style={{ width: `${lvl.percent}%` }} />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
             </div>
-          </div>
-          <div className="pointer-events-none absolute -right-4 top-1/2 hidden w-[45%] -translate-y-1/2 place-items-center sm:grid">
-            <svg viewBox="0 0 240 220" className="w-full max-w-[250px]" aria-hidden="true">
-              <defs>
-                <radialGradient id="home-quzo-orb" cx=".4" cy=".35">
-                  <stop offset="0" stopColor="#7ff0cf" />
-                  <stop offset="1" stopColor="#0a8f6a" />
-                </radialGradient>
-              </defs>
-              <circle
-                className="member-orbit"
-                cx="120"
-                cy="115"
-                r="92"
-                fill="none"
-                stroke="#12a594"
-                strokeOpacity=".35"
-                strokeDasharray="4 8"
-              />
-              <circle
-                className="member-orbit"
-                cx="120"
-                cy="115"
-                r="74"
-                fill="none"
-                stroke="#12a594"
-                strokeOpacity=".55"
-                strokeDasharray="60 20"
-              />
-              <circle cx="120" cy="115" r="54" fill="url(#home-quzo-orb)" />
-              <text x="120" y="136" textAnchor="middle" fontSize="62" fontWeight="700" fill="#fff">
-                Q
-              </text>
-              <path
-                d="m196 78 14-18 14 18m-28 12 14-18 14 18"
-                fill="none"
-                stroke="#12a594"
-                strokeWidth="5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-              <circle cx="38" cy="60" r="9" fill="#e9b949" />
-              <circle cx="32" cy="165" r="6" fill="#e9b949" />
-              <circle cx="205" cy="175" r="7" fill="#e9b949" />
-            </svg>
+
+            {/* Table: Recently joined */}
+            <div className="bg-white dark:bg-[#07242e] rounded-2xl border border-slate-100 dark:border-[#153747] shadow-sm overflow-hidden">
+              <div className="p-5 border-b border-slate-100 dark:border-slate-800">
+                <h4 className="text-sm font-bold text-slate-900 dark:text-white">Recently joined</h4>
+              </div>
+              <div className="overflow-x-auto">
+                <table className="w-full text-left text-[13px]">
+                  <thead>
+                    <tr className="text-slate-400 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/20">
+                      <th className="py-3 px-5 font-medium">Member</th>
+                      <th className="py-3 px-5 font-medium text-center w-24">Level</th>
+                      <th className="py-3 px-5 font-medium">Joined</th>
+                      <th className="py-3 px-5 font-medium">Status</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100 dark:divide-slate-800/50">
+                    {RECENT_JOINED.map((row, i) => (
+                      <tr key={i} className="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors">
+                        <td className="py-4 px-5 font-semibold text-slate-800 dark:text-slate-200">
+                          {row.name}
+                        </td>
+                        <td className="py-4 px-5 text-center text-slate-500">
+                          {row.level}
+                        </td>
+                        <td className="py-4 px-5 text-slate-500">
+                          {row.joined}
+                        </td>
+                        <td className="py-4 px-5">
+                          <div className="flex items-center gap-2">
+                            <span className={`w-1.5 h-1.5 rounded-full ${row.status === "Active" ? "bg-[#10b981]" : "bg-slate-400"}`} />
+                            <span className={`font-medium ${row.status === "Active" ? "text-slate-700 dark:text-slate-300" : "text-slate-500"}`}>
+                              {row.status}
+                            </span>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
           </div>
         </section>
-        <CoinChart />
-      </div>
 
-      <section>
-        <SectionHeading>Quick actions</SectionHeading>
-        <div className="mt-3 grid grid-cols-3 gap-2 sm:grid-cols-4 lg:grid-cols-6 2xl:grid-cols-12">
-          {homePageData.quickActions.map((action, index) => (
-            <Link
-              key={action.label}
-              href={action.href}
-              className="group flex min-h-24 flex-col items-center justify-center gap-2 rounded-2xl border border-[#d9e8ec] bg-white px-2 py-3 text-center text-[11px] font-medium text-[#5b7885] shadow-sm transition hover:-translate-y-1 hover:border-[#12a594]/50 hover:shadow-lg dark:border-[#153747] dark:bg-[#07242e] dark:text-[#b9d1d8]"
-            >
-              <span
-                className="grid h-10 w-10 place-items-center rounded-[14px] text-white shadow-md transition group-hover:scale-105"
-                style={{
-                  background: [
-                    "linear-gradient(135deg,#12a594,#35d6c0)",
-                    "linear-gradient(135deg,#1f5f7a,#3aa3c4)",
-                    "linear-gradient(135deg,#3aa3c4,#8fc9cf)",
-                  ][index % 3],
-                }}
-              >
-                {action.icon}
-              </span>
-              {action.label}
-            </Link>
-          ))}
-        </div>
-      </section>
+        {/* --- SECTION: BUSINESS OPPORTUNITIES --- */}
+        <section>
+          <div className="text-[12px] font-semibold tracking-[0.15em] text-[#35d6c0] uppercase mb-2">Business Opportunities</div>
+          <h2 className="text-xl font-bold mb-4">Grow Your Business With Quzo</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            {OPPORTUNITIES.map((opp, i) => (
+              <div key={i} className="bg-white dark:bg-[#07242e] rounded-2xl border border-[#d9e8ec] dark:border-[#153747] p-5 shadow-sm hover:-translate-y-1 transition-transform cursor-pointer group">
+                <div className="w-10 h-10 rounded-xl bg-[#3b82f6]/10 flex items-center justify-center mb-4 group-hover:bg-[#3b82f6]/20 transition-colors">
+                  <opp.icon className="w-5 h-5 text-[#3b82f6]" />
+                </div>
+                <h3 className="text-sm font-bold mb-2">{opp.title}</h3>
+                <p className="text-[11px] text-slate-500 leading-relaxed mb-4">{opp.desc}</p>
+                <div className="text-[10px] font-semibold text-[#12a594] flex items-center gap-1 group-hover:gap-2 transition-all">
+                  Explore <ArrowRight className="w-3 h-3" />
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
 
-      <Panel>
-        <div className="flex flex-wrap items-end justify-between gap-3">
-          <div>
-            <SectionHeading>
-              <Wallet className="h-4 w-4 text-[#12a594]" aria-hidden />
-              My wallets
-            </SectionHeading>
-            <p className="mt-1 text-[11px] text-[#5b7885] dark:text-[#84a2ad]">
-              Your balances across the QUZO ecosystem
-            </p>
+        {/* --- SECTION: QUICK LINKS --- */}
+        <section>
+          <div className="text-[10px] font-semibold tracking-[0.15em] text-[#35d6c0] uppercase mb-2">Quick Links</div>
+          <h2 className="text-xl font-bold mb-4">Your Business Command Center</h2>
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-8 gap-3">
+            {QUICK_LINKS.map((link, i) => (
+              <button key={i} className="flex flex-col items-center justify-center gap-2 p-3 rounded-xl bg-white dark:bg-[#07242e] border border-[#d9e8ec] dark:border-[#153747] hover:border-[#3b82f6] dark:hover:border-[#3b82f6] transition-colors group">
+                <link.icon className="w-5 h-5 text-slate-400 group-hover:text-[#3b82f6] transition-colors" />
+                <span className="text-[10px] font-medium text-slate-600 dark:text-slate-300 text-center leading-tight">{link.label}</span>
+              </button>
+            ))}
           </div>
-          <div className="text-left sm:text-right">
-            <p className="text-[10px] text-[#5b7885] dark:text-[#84a2ad]">Total balance (USD)</p>
-            <p className="mt-1 text-xl font-bold text-[#06262f] dark:text-white">
-              ${formatMoney(totalWalletBalance)}
-            </p>
-          </div>
-        </div>
-        <div className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-          {wallets.map((wallet, index) => (
-            <Link
-              key={wallet.name}
-              href={`/reports?tab=${wallet.tab}`}
-              className="group flex items-center gap-3 rounded-2xl border p-3.5 transition hover:-translate-y-0.5 hover:shadow-md"
-              style={{
-                borderColor: `${wallet.color}3d`,
-                backgroundColor: `${wallet.color}12`,
-                animationDelay: `${index * 60}ms`,
-              }}
-            >
-              <span
-                className="grid h-11 w-11 shrink-0 place-items-center rounded-full text-white shadow-md"
-                style={{ background: `linear-gradient(135deg, ${wallet.color}, #35d6c0)` }}
-              >
-                <Wallet className="h-5 w-5" aria-hidden />
-              </span>
-              <span className="min-w-0">
-                <span className="block text-[11px] text-[#5b7885] dark:text-[#84a2ad]">
-                  {wallet.name}
-                </span>
-                <span className="block truncate text-[17px] font-semibold text-[#06262f] dark:text-white">
-                  {wallet.amount}
-                </span>
-                <span className="block truncate text-[10px] text-[#5b7885] dark:text-[#84a2ad]">
-                  {wallet.detail}
-                </span>
-              </span>
-              <ArrowUpRight
-                className="ml-auto h-4 w-4 shrink-0 text-[#5b7885] transition group-hover:text-[#12a594]"
-                aria-hidden
-              />
-            </Link>
-          ))}
-        </div>
-      </Panel>
+        </section>
 
-      <div className="grid gap-4 xl:grid-cols-3">
-        <Panel>
-          <div className="flex items-center justify-between gap-2">
-            <SectionHeading>
-              <Bot className="h-4 w-4 text-[#12a594]" aria-hidden />
-              My AI bot investment
-            </SectionHeading>
-            <Pill>● Active</Pill>
-          </div>
-          <div className="mt-3 flex items-center gap-3">
-            <div className="grid h-20 w-20 shrink-0 place-items-center rounded-2xl bg-gradient-to-br from-[#3fd9a9] to-[#0a8f6a] text-3xl font-bold text-white shadow-lg">
-              Q
+        {/* --- SECTION: NOTIFICATIONS & UPDATES --- */}
+        <section>
+          <div className="text-[10px] font-semibold tracking-[0.15em] text-slate-400 uppercase mb-2">Notifications & Updates</div>
+          <div className="bg-white dark:bg-[#07242e] rounded-2xl border border-[#d9e8ec] dark:border-[#153747] p-5 sm:p-6 shadow-sm">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-lg font-bold">What&apos;s Happening</h2>
+              <div className="flex items-center gap-3">
+                <button className="flex items-center gap-1.5 text-[11px] text-slate-500 hover:text-slate-700 font-medium">
+                  <Bell className="w-3.5 h-3.5" /> Unread
+                </button>
+                <button className="text-[11px] font-semibold text-[#3b82f6]">Mark all read</button>
+                <button className="text-[11px] text-slate-400 hover:text-slate-600">View All Notifications</button>
+              </div>
             </div>
-            <div className="min-w-0 flex-1">
-              {[
-                ["Invested amount", walletData?.TradingPackage ? `$${Number(walletData.TradingPackage).toFixed(2)}` : "$0"],
-                ["Booster Status", walletData?.BoosterPackage ?? "N/A"],
-                ["Booster Left Time", (walletData?.Boostertype ?? "00:00:00") + " Hrs"],
-                ["Rank", walletData?.UserRank ?? "N/A"],
-              ].map(([label, value], index) => (
-                <div
-                  key={label}
-                  className="flex justify-between gap-2 border-b border-[#d9e8ec] py-2 text-[11px] last:border-0 dark:border-[#153747]"
-                >
-                  <span className="text-[#5b7885] dark:text-[#84a2ad]">{label}</span>
-                  <strong className={index ? "text-[#12a594]" : "text-[#06262f] dark:text-white"}>
-                    {value}
-                  </strong>
+            
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {NOTIFICATIONS.map((note, i) => (
+                <div key={i} className="flex gap-3 p-4 rounded-xl border border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-[#051c25]">
+                  <div className="w-8 h-8 rounded-full bg-white dark:bg-[#07242e] border border-slate-200 dark:border-slate-700 flex items-center justify-center shrink-0">
+                    {note.icon === "plus" && <CircleDollarSign className="w-4 h-4 text-[#12a594]" />}
+                    {note.icon === "trophy" && <ShieldCheck className="w-4 h-4 text-[#d9a441]" />}
+                    {note.icon === "bot" && <Bot className="w-4 h-4 text-[#3b82f6]" />}
+                  </div>
+                  <div>
+                    <h4 className="text-[11px] font-bold leading-tight">{note.title}</h4>
+                    <p className="text-[10px] text-slate-500 mt-1 line-clamp-2">{note.desc}</p>
+                    <span className="text-[9px] text-slate-400 mt-2 block">{note.time}</span>
+                  </div>
                 </div>
               ))}
             </div>
           </div>
-        </Panel>
+        </section>
 
-        <PerformancePanel />
+        {/* --- SECTION: AI ECONOMY (PURE TAILWIND CHART) --- */}
+        <section>
+          <div className="text-[10px] font-semibold tracking-[0.15em] text-[#35d6c0] uppercase mb-2">Global AI Market Snapshot</div>
+          <h2 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white mb-6 leading-tight">
+            THE AI ECONOMY IS ENTERING ITS TRILLION-DOLLAR ERA.
+          </h2>
 
-        <Panel>
-          <div className="flex items-center justify-between gap-2">
-            <SectionHeading>
-              <Bot className="h-4 w-4 text-[#12a594]" aria-hidden />
-              Rank progress
-            </SectionHeading>
-            <Pill>
-              {walletData?.UserRank ?? "N/A"}
-            </Pill>
-          </div>
-          <div className="mt-4 flex items-end justify-between gap-2">
-            <strong className="text-2xl text-[#06262f] dark:text-white">
-              {walletData?.RewardTotal && walletData?.RewardAmtQualify !== undefined
-                ? `${((walletData.RewardAmtQualify / walletData.RewardTotal) * 100).toFixed(1)}`
-                : "0"}%
-            </strong>
-            <span className="text-right text-[11px] text-[#5b7885] dark:text-[#84a2ad]">
-              ${formatMoney(walletData?.RewardAmtQualify ?? 0, 0)} / $
-              {formatMoney(walletData?.RewardTotal ?? 0, 0)}
-            </span>
-          </div>
-          <div className="mt-2 h-2.5 overflow-hidden rounded-full bg-[#12a594]/[0.12]">
-            <div
-              className="h-full rounded-full bg-gradient-to-r from-[#12a594] to-[#35d6c0]"
-              style={{
-                width: `${walletData?.RewardTotal && walletData?.RewardAmtQualify !== undefined
-                  ? (walletData.RewardAmtQualify / walletData.RewardTotal) * 100
-                  : 0}%`
-              }}
-            />
-          </div>
-          <div className="mt-4 grid grid-cols-3 gap-2">
-            {[
-              ["Current Salary", `$${formatMoney(walletData?.CurrentSalary ?? 0, 0)}`],
-              ["Next Rank", `${walletData?.NextRank ?? "N/A"}`],
-              ["Next Salary", `$${formatMoney(walletData?.NextSalary ?? 0, 0)}`],
-            ].map(([label, value]) => (
-              <div key={label} className="rounded-xl bg-[#edf4f5] p-2.5 dark:bg-[#031B23]">
-                <span className="block text-[9px] text-[#5b7885] dark:text-[#84a2ad]">{label}</span>
-                <strong className="mt-1 block text-xs text-[#06262f] dark:text-white">
-                  {value}
-                </strong>
+          {/* Top 4 Stat Cards */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+            {MARKET_STATS.map((s, i) => (
+              <div key={i} className="bg-white dark:bg-[#07242e] rounded-2xl p-5 border border-slate-100 dark:border-[#153747] shadow-sm relative overflow-hidden group">
+                <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-[#6b4eff] to-transparent opacity-50" />
+                <p className="text-[10px] font-bold uppercase tracking-wider text-[#6b4eff] dark:text-[#8b6cf0] mb-2">
+                  {s.type} · {s.year}
+                </p>
+                <p className="text-3xl font-bold text-slate-900 dark:text-white mb-1">{s.value}</p>
+                <p className="text-[11px] text-slate-500 leading-tight mb-3">{s.label}</p>
+                <a href="#" className="text-[10px] text-slate-400 underline underline-offset-2 hover:text-slate-600 dark:hover:text-slate-300 transition-colors">
+                  {s.source}
+                </a>
               </div>
             ))}
           </div>
-        </Panel>
-      </div>
 
-      <div className="grid gap-4 xl:grid-cols-3">
-        <Qurobot />
+          {/* Interactive Chart Card */}
+          <div className="bg-white dark:bg-[#07242e] rounded-2xl p-5 sm:p-6 border border-slate-100 dark:border-[#153747] shadow-sm">
+            <div className="flex flex-wrap gap-2 mb-8" role="group" aria-label="Chart measure">
+              {(Object.keys(MARKET_VIEWS) as (keyof typeof MARKET_VIEWS)[]).map((k) => (
+                <button
+                  key={k}
+                  type="button"
+                  onClick={() => setMarketView(k)}
+                  className={`rounded-full px-4 py-1.5 text-[11px] font-semibold transition-colors ${
+                    marketView === k 
+                      ? "bg-[#35d6c0] text-white" 
+                      : "bg-slate-100 text-slate-600 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
+                  }`}
+                >
+                  {MARKET_VIEWS[k].tab}
+                </button>
+              ))}
+            </div>
 
-        <Panel>
-          <div className="flex items-center justify-between gap-2">
-            <SectionHeading>
-              <Wallet className="h-4 w-4 text-[#12a594]" aria-hidden />
-              Recent activity
-            </SectionHeading>
-            <Pill>● Live</Pill>
-          </div>
-          <div className={`mt-2 divide-y divide-dashed divide-[#d9e8ec] dark:divide-[#153747] ${notifications.length > 10 ? 'max-h-[320px] overflow-y-auto' : ''}`}>
-            {isNotificationsLoading ? (
-              <div className="py-4 text-center text-[11px] text-[#5b7885] dark:text-[#84a2ad]">
-                Loading...
-              </div>
-            ) : notifications.length === 0 ? (
-              <div className="py-4 text-center text-[11px] text-[#5b7885] dark:text-[#84a2ad]">
-                No recent activity
-              </div>
-            ) : (
-              notifications.slice(0, 8).map((item, index) => (
-                <div key={index} className="flex items-center gap-2.5 py-2.5 first:pt-1">
-                  <span
-                    className="h-2 w-2 shrink-0 rounded-full"
-                    style={{ backgroundColor: getNotificationColor(item.AdminRemarks) }}
-                  />
-                  <span className="min-w-0 flex-1">
-                    <span className="block truncate text-[11px] font-medium text-[#06262f] dark:text-white">
-                      {item.AdminRemarks}
+            {/* Custom Tailwind Bar Chart */}
+            <div className="relative h-64 w-full flex items-end justify-around border-b border-slate-100 dark:border-slate-800 pb-2">
+              {/* Y-Axis Grid Lines */}
+              <div className="absolute inset-0 flex flex-col justify-between pointer-events-none pb-8">
+                {[1, 0.75, 0.5, 0.25, 0].map((pct, idx) => (
+                  <div key={idx} className="w-full border-t border-slate-100 dark:border-slate-800/50 relative">
+                    <span className="absolute -top-2.5 -left-2 text-[9px] text-slate-400">
+                      {marketView === 'spending' ? (pct * 4).toFixed(1) : 
+                       marketView === 'market' ? (pct * 5).toFixed(1) : 
+                       (pct * 200).toFixed(0)}
                     </span>
-                    <span className="block text-[10px] text-[#5b7885] dark:text-[#84a2ad]">
-                      {formatNotificationDate(item.NotificationDate)}
-                    </span>
-                  </span>
-                  {item.Amount && (
-                    <strong className="shrink-0 text-[11px] text-[#06262f] dark:text-white">
-                      {item.Amount}
-                    </strong>
-                  )}
-                </div>
-              ))
-            )}
-          </div>
-        </Panel>
+                  </div>
+                ))}
+              </div>
 
-        <section
-          key={currentPromotion.title}
-          className="member-promotion relative min-h-[220px] overflow-hidden rounded-[20px] bg-[radial-gradient(260px_200px_at_90%_85%,#3fd9a966,transparent),linear-gradient(135deg,#06222d,#0b5260)] p-5 text-white shadow-[0_10px_30px_-14px_rgba(10,60,80,0.28)]"
-        >
-          <div className="relative z-10">
-            <span className="rounded-full bg-white/15 px-2.5 py-1 text-[10px] font-semibold tracking-wide">
-              PROMOTION {promotionIndex + 1}/{promotions.length}
-            </span>
-            <h2 className="mt-4 text-xl font-semibold leading-tight">{currentPromotion.title}</h2>
-            <p className="mt-2 min-h-10 text-xs leading-5 text-white/80">
-              {currentPromotion.detail}
+              {/* Bars */}
+              <div className="absolute inset-0 flex justify-around items-end pl-8 pb-8 z-10">
+                {MARKET_VIEWS[marketView].data.map((item, i) => {
+                  const maxVal = Math.max(...MARKET_VIEWS[marketView].data.map(d => d.v));
+                  const heightPct = (item.v / maxVal) * 100;
+
+                  return (
+                    <div key={i} className="flex flex-col items-center group w-16 h-full justify-end">
+                      <span className="text-[11px] font-bold text-slate-700 dark:text-slate-300 mb-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                        {item.v}{MARKET_VIEWS[marketView].unit}
+                      </span>
+                      <div 
+                        className="w-10 sm:w-14 bg-[#35d6c0] rounded-t-sm transition-all duration-500 hover:bg-[#12a594]" 
+                        style={{ height: `${heightPct}%` }} 
+                      />
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* X-Axis Labels */}
+              <div className="absolute bottom-0 left-0 right-0 flex justify-around pl-8">
+                {MARKET_VIEWS[marketView].data.map((item, i) => (
+                  <div key={i} className="w-16 flex justify-center">
+                    <span className="text-[11px] font-semibold text-slate-500">{item.year}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Chart Note */}
+            <p className="mt-6 text-[10px] text-slate-500 dark:text-slate-400">
+              {MARKET_VIEWS[marketView].note} These measures use different methods and should not be compared with each other.
             </p>
-            <Link
-              href={currentPromotion.href}
-              className="mt-4 inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-[#12a594] to-[#35d6c0] px-3.5 py-2 text-xs font-semibold text-white"
-            >
-              {currentPromotion.action} <ArrowRight className="h-3.5 w-3.5" aria-hidden />
-            </Link>
-          </div>
-          <div className="absolute bottom-3 right-4 flex gap-1.5">
-            {promotions.map((promo, index) => (
-              <button
-                key={promo.title}
-                type="button"
-                aria-label={`Show promotion ${index + 1}`}
-                onClick={() => setPromotionIndex(index)}
-                className={`h-1.5 rounded-full transition-all ${promotionIndex === index ? "w-5 bg-white" : "w-1.5 bg-white/50"}`}
-              />
-            ))}
           </div>
         </section>
-      </div>
 
-
-      <div className="grid gap-4 xl:grid-cols-2">
-        <Panel>
-          <div className="flex items-center justify-between gap-2">
-            <SectionHeading>
-              <ShieldCheck className="h-4 w-4 text-[#4a7f8f]" aria-hidden />
-              Top DAO partners
-            </SectionHeading>
-            <span className="text-[10px] text-[#5b7885] dark:text-[#84a2ad]">This week</span>
-          </div>
-          <div className="mt-2">
-            {partners.map((partner, index) => (
-              <div
-                key={partner.initials}
-                className="flex items-center gap-3 border-b border-dashed border-[#d9e8ec] py-2.5 last:border-0 dark:border-[#153747]"
-              >
-                <span
-                  className="grid h-10 w-10 shrink-0 place-items-center rounded-full text-xs font-semibold text-white"
-                  style={{
-                    background: `linear-gradient(135deg, ${["#12a594", "#1f5f7a", "#4a7f8f", "#3aa3c4", "#d9a441"][index]}, #35d6c0)`,
-                  }}
-                >
-                  {partner.initials}
-                </span>
-                <span className="min-w-0 flex-1">
-                  <strong className="block text-xs text-[#06262f] dark:text-white">
-                    {partner.name}
-                  </strong>
-                  <span className="mt-1 block h-1.5 overflow-hidden rounded-full bg-[#12a594]/10">
-                    <span
-                      className="block h-full rounded-full bg-[#12a594]"
-                      style={{ width: `${100 - index * 12}%` }}
-                    />
-                  </span>
-                </span>
-                <span className="text-right">
-                  <strong className="block text-xs text-[#06262f] dark:text-white">
-                    {partner.amount}
-                  </strong>
-                  <span className="text-[10px] text-[#5b7885] dark:text-[#84a2ad]">
-                    {partner.volume}
-                  </span>
-                </span>
-              </div>
-            ))}
-          </div>
-        </Panel>
-
-        <Panel>
-          <div className="flex items-center justify-between gap-2">
-            <SectionHeading>
-              <Gift className="h-4 w-4 text-[#d9a441]" aria-hidden />
-              Reward achievers
-            </SectionHeading>
-            <span className="text-[10px] text-[#5b7885] dark:text-[#84a2ad]">Latest</span>
-          </div>
-          <div className="mt-2">
-            {achievers.map((person) => (
-              <div
-                key={person.initials}
-                className="flex items-center gap-3 border-b border-dashed border-[#d9e8ec] py-2 last:border-0 dark:border-[#153747]"
-              >
-                <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-[#12a594]/10 text-[10px] font-semibold text-[#118b7d] dark:text-[#6be2d2]">
-                  {person.initials}
-                </span>
-                <span className="min-w-0 flex-1">
-                  <strong className="block text-xs text-[#06262f] dark:text-white">
-                    {person.name}
-                  </strong>
-                  <span className="text-[10px] text-[#5b7885] dark:text-[#84a2ad]">
-                    {person.rank} · {person.time}
-                  </span>
-                </span>
-                <span className="text-xs font-semibold text-[#12a594]">{person.reward}</span>
-              </div>
-            ))}
-          </div>
-        </Panel>
       </div>
     </div>
   );
