@@ -23,6 +23,7 @@ import {
   PanelsTopLeft,
   ScrollText,
   UserRoundPlus,
+   Sparkles, 
   UsersRound,
   WalletCards,
   Wrench,
@@ -62,6 +63,7 @@ const menuIcons: Record<string, LucideIcon> = {
   "My Partners": UserRoundPlus,
   "Network Structure": GitBranch,
   "Extended Network": Network,
+  "AI Tools": Sparkles,
 };
 
 function MenuIcon({ label, className }: { label: string; className?: string }) {
