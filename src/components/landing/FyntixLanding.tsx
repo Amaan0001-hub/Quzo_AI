@@ -26,20 +26,20 @@ import {
   Zap,
 } from "lucide-react";
 import { useTheme } from "next-themes";
-import Link from "next/link";
+
 import { useEffect, useState } from "react";
-import type { ReactNode } from "react";
+
 
 import Nav from "@/components/landing/Nav";
 import {Hero} from "@/components/landing/Hero";
-import {Marquee} from "@/components/landing/Marquee";
-import {Vision} from "@/components/landing/Vision";
-import {Ecosystem} from "@/components/landing/Ecosystem";
-import {Technology} from "@/components/landing/Technology";
-import {Tokenomics} from "@/components/landing/Tokenomics";
-import {Roadmap} from "@/components/landing/Roadmap";
-import {Partner} from "@/components/landing/Partner";
-import {Footer} from "@/components/landing/Footer";
+import Footer from "@/components/landing/Footer";
+import EditorialRibbon from "./EditorialRibbon";
+import AgentMarketplace from "./AgentMarketplace";
+import WorkflowSection from "./WorkflowSection";
+import WorkforceExplorer from "./WorkforceExplorer";
+import WorkspacePreview from "./WorkspacePreview";
+import ValueCalculator from "./ValueCalculator";
+import FinalCtaSection from "./FinalCtaSection";
 
 
 
@@ -67,14 +67,14 @@ export default function FyntixLanding() {
     <main className="overflow-clip">
        <Nav/>
       <Hero/>
-      <Marquee/>
-      <Vision/>
-      <Ecosystem/>
-      <Technology/>
-      <Tokenomics/>
-      <Roadmap/>
-      <Partner/>
-      <Footer/>
+      <EditorialRibbon/>
+      <AgentMarketplace/>
+      <WorkflowSection/>
+      <WorkforceExplorer/>
+      <WorkspacePreview/>
+      <ValueCalculator/>
+      <FinalCtaSection/>
+       <Footer/>
 
     </main>
     </div>
