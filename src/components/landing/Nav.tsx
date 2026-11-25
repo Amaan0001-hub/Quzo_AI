@@ -40,8 +40,8 @@ function Logo() {
 }
 
 const LINKS = {
-  signIn: /login,
-  getStarted: /register,
+  signIn: "/login",
+  getStarted: "/register",
 };
 
 const NAV: [string, string, string][] = [
