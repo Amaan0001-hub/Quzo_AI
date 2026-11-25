@@ -1,205 +1,186 @@
-import { useEffect, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X, ArrowUpRight } from "lucide-react";
+"use client";
 
-import { Logo } from "@/components/landing/Logo";
-import { SmartLink } from "@/components/landing/SmartLink";
-import { NAV_LINKS, SITE } from "@/components/landing/site";
-import { scrollToId, getLenis } from "@/components/landing/scroll";
+import { useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
+import { ArrowUpRight, Menu, Moon, Sun, X } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
 
-const useActiveSection = (): string => {
-  const [active, setActive] = useState<string>("home");
-
-  useEffect(() => {
-    const obs = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((e) => {
-          if (e.isIntersecting) setActive(e.target.id);
-        });
-      },
-      { rootMargin: "-45% 0px -50% 0px" }
-    );
-
-    NAV_LINKS.forEach(({ id }) => {
-      const el = document.getElementById(id);
-      if (el) obs.observe(el);
-    });
-
-    return () => obs.disconnect();
-  }, []);
-
-  return active;
+/* ============================================================
+   TYPES
+   ============================================================ */
+type NavbarProps = {
+  theme?: "dark" | "light";
+  onToggleTheme?: () => void;
 };
 
-const Nav = () => {
-  const [scrolled, setScrolled] = useState<boolean>(false);
-  const [open, setOpen] = useState<boolean>(false);
-  const active = useActiveSection();
-
-  useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 24);
-    onScroll();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
-
-  useEffect(() => {
-    const lenis = getLenis();
-    if (open) lenis?.stop();
-    else lenis?.start();
-
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setOpen(false);
-    };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [open]);
-
-  const go = (id: string) => {
-    getLenis()?.start();
-    setOpen(false);
-    scrollToId(id);
-  };
-
+/* ============================================================
+   Inline Logo Component
+   ============================================================ */
+function Logo() {
   return (
-    <header
-      className={`fixed inset-x-0 top-0 z-50 transition-[background-color,border-color] duration-500 border-b ${
-        scrolled || open
-          ? "bg-[#031B23]/85 backdrop-blur-xl border-white/10"
-          : "bg-transparent border-transparent"
-      }`}
-      data-testid="site-header"
-    >
-      <nav
-        className="mx-auto flex h-[72px] max-w-[1320px] items-center justify-between px-5 md:px-10"
-        aria-label="Primary"
-      >
-        <button
-          type="button"
-          onClick={() => go("home")}
-          aria-label="QUZO home"
-          className="q-focus rounded-md"
-          data-testid="nav-logo-button"
+    <span className="flex items-center gap-2 sm:gap-[11px]">
+      <Link href="/" className="flex items-center gap-2.5 group">
+        <div className="flex flex-col leading-none">
+          <Image
+            src="/Home-Logo.png"
+            className="h-auto w-auto"
+            alt="Logo"
+            width={50}
+            height={20}
+          />
+        </div>
+      </Link>
+      {/* Yahan se hidden xs:inline-block hata diya */}
+      <span className="text-[13px] sm:text-[15px] font-bold tracking-[0.12em] text-[#f5f7ff]">
+        QUZO<span className="font-medium text-[#65E7FF]">AI</span>
+      </span>
+    </span>
+  );
+}
+
+/* ============================================================
+   Inline LINKS
+   ============================================================ */
+const SITE = "https://velvoraai.vercel.app";
+const LINKS = {
+  signIn: `${SITE}/login`,
+  getStarted: `${SITE}/register`,
+};
+
+const NAV: [string, string, string][] = [
+  ["Marketplace", "#agents", "marketplace"],
+  ["How It Works", "#how-it-works", "how-it-works"],
+  ["Network", "#workforce", "network"],
+  ["Platform", "#workspace", "platform"],
+  ["Calculator", "#calculator", "calculator"],
+];
+
+/* ============================================================
+   Main Component: Navbar
+   ============================================================ */
+export default function Navbar({ theme = "dark", onToggleTheme = () => {} }: NavbarProps) {
+  const [open, setOpen] = useState(false);
+  const nextTheme = theme === "dark" ? "light" : "dark";
+  
+  return (
+    <header className="fixed z-[100] top-0 left-0 w-full px-4 py-3 sm:px-6 sm:py-[14px]">
+      <nav className="flex w-full max-w-[1370px] h-[60px] sm:h-[66px] items-center mx-auto px-3 sm:px-4 border border-white/[0.08] rounded-full bg-[rgba(7,9,16,0.72)] shadow-[0_20px_60px_rgba(0,0,0,0.35)] backdrop-blur-[24px] backdrop-saturate-150" aria-label="Main navigation">
+        
+        {/* Brand */}
+        <Link 
+          href="/" 
+          className="flex items-center shrink-0" 
+          data-testid="nav-brand-logo" 
+          aria-label="Velvora AI home"
         >
           <Logo />
-        </button>
+        </Link>
 
-        <ul className="hidden lg:flex items-center gap-1">
-          {NAV_LINKS.map(({ id, label }) => (
-            <li key={id}>
-              <button
-                type="button"
-                onClick={() => go(id)}
-                aria-current={active === id ? "true" : undefined}
-                className={`q-focus relative rounded-full px-4 py-2 text-[13px] tracking-wide transition-colors duration-300 ${
-                  active === id
-                    ? "text-white"
-                    : "text-slate-400 hover:text-white"
-                }`}
-                data-testid={`nav-${id}-link`}
-              >
-                {label}
-                {active === id && (
-                  <motion.span
-                    layoutId="nav-dot"
-                    className="absolute left-1/2 -bottom-0.5 h-1 w-1 -translate-x-1/2 rounded-full bg-[#19D8D0]"
-                  />
-                )}
-              </button>
-            </li>
+        {/* Desktop Links (Visible on lg and above) */}
+        <div className="hidden lg:flex items-center gap-4 xl:gap-[27px] mx-auto">
+          {NAV.map(([label, href, id]) => (
+            <a 
+              key={id} 
+              href={href} 
+              className="relative whitespace-nowrap text-[#9aa8bc] text-[11px] xl:text-[12px] transition-colors duration-200 hover:text-[#f5f7ff] after:absolute after:right-0 after:-bottom-[9px] after:left-0 after:h-[1px] after:bg-[#65e7ff] after:content-[''] after:scale-x-0 after:origin-left after:transition-transform after:duration-250 hover:after:scale-x-100"
+              data-testid={`nav-link-${id}`}
+            >
+              {label}
+            </a>
           ))}
-        </ul>
-
-        <div className="hidden lg:flex items-center gap-3">
-          <SmartLink
-            href={SITE.whitepaperUrl}
-            label="The QUZO whitepaper"
-            testId="nav-whitepaper-button"
-            className="q-focus q-btn-ghost"
-          >
-            Whitepaper
-          </SmartLink>
-          <Link
-            href="/login"
-            className="q-focus q-btn-primary inline-flex items-center gap-2"
-            data-testid="nav-get-started-button"
-          >
-            Get Started <ArrowUpRight size={15} />
-          </Link>
         </div>
 
-        <button
-          type="button"
-          className="q-focus lg:hidden grid h-11 w-11 place-items-center rounded-full border border-white/15 text-white"
-          onClick={() => setOpen((o) => !o)}
-          aria-expanded={open}
-          aria-controls="mobile-menu"
-          aria-label={open ? "Close menu" : "Open menu"}
-          data-testid="nav-mobile-toggle"
-        >
-          {open ? <X size={20} /> : <Menu size={20} />}
-        </button>
+        {/* Right Side Actions */}
+        <div className="flex items-center gap-2 sm:gap-3 ml-auto lg:ml-[14px]">
+          
+          {/* Theme Toggle - Always Visible */}
+          <button 
+            className="flex w-9 h-9 sm:w-10 sm:h-10 flex-none items-center justify-center border border-white/[0.08] rounded-full bg-[#121722] text-[#f5f7ff] cursor-pointer transition-all duration-200 hover:border-[#65e7ff] hover:rotate-[5deg]" 
+            onClick={onToggleTheme} 
+            aria-label={`Switch to ${nextTheme} theme`} 
+            title={`Switch to ${nextTheme} theme`} 
+            data-testid="theme-toggle-button"
+          >
+            <motion.span 
+              key={theme} 
+              initial={{ rotate: -35, opacity: 0 }} 
+              animate={{ rotate: 0, opacity: 1 }}
+              className="flex"
+            >
+              {theme === "dark" ? <Sun size={15} /> : <Moon size={15} />}
+            </motion.span>
+          </button>
+
+          {/* Desktop Auth Buttons (Hidden on mobile) */}
+          <div className="hidden lg:flex items-center gap-3 xl:gap-[19px]">
+            <a 
+              className="text-[#9aa8bc] text-[12px] transition-colors duration-200 hover:text-[#f5f7ff]" 
+              href={LINKS.signIn} 
+              data-testid="nav-signin-button"
+            >
+              Sign In
+            </a>
+            <a 
+              className="inline-flex min-h-[36px] sm:min-h-[40px] items-center justify-center gap-2 rounded-full bg-[#e8f4f8] px-4 sm:px-[18px] text-[11px] sm:text-[12px] font-semibold text-[#070910] transition-all duration-300 hover:-translate-y-0.5 hover:bg-[#65e7ff] hover:text-[#071015] shadow-[0_8px_30px_rgba(101,231,255,0.08)] whitespace-nowrap" 
+              href={LINKS.getStarted} 
+              data-testid="nav-get-started-button"
+            >
+              Get Started <ArrowUpRight size={14} className="hidden sm:block" />
+            </a>
+          </div>
+
+          {/* Mobile Menu Toggle (Visible on mobile and tablet) */}
+          <button 
+            className="flex lg:hidden w-9 h-9 sm:w-10 sm:h-10 flex-none items-center justify-center border border-white/[0.08] rounded-full bg-[#121722] text-[#f5f7ff] cursor-pointer transition-all duration-200 hover:border-[#65e7ff]" 
+            onClick={() => setOpen(!open)} 
+            aria-expanded={open} 
+            aria-label={open ? "Close navigation" : "Open navigation"} 
+            data-testid="mobile-menu-toggle"
+          >
+            {open ? <X size={18} /> : <Menu size={18} />}
+          </button>
+        </div>
       </nav>
 
+      {/* Mobile Menu Overlay */}
       <AnimatePresence>
         {open && (
-          <motion.div
-            id="mobile-menu"
-            initial={{ opacity: 0, y: -12 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -12 }}
-            transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
-            className="lg:hidden h-[calc(100dvh-72px)] overflow-y-auto border-t border-white/10 bg-[#031B23] px-6 pb-10 pt-6"
-            data-testid="mobile-menu"
+          <motion.div 
+            className="absolute top-[72px] sm:top-[88px] left-3 right-3 sm:left-4 sm:right-4 p-5 rounded-2xl border border-white/[0.08] bg-[rgba(7,9,16,0.95)] backdrop-blur-xl shadow-[0_20px_60px_rgba(0,0,0,0.35)] flex flex-col gap-4" 
+            initial={{ opacity: 0, y: -12 }} 
+            animate={{ opacity: 1, y: 0 }} 
+            exit={{ opacity: 0, y: -12 }} 
+            data-testid="mobile-navigation-menu"
           >
-            <ul className="flex flex-col">
-              {NAV_LINKS.map(({ id, label }, i) => (
-                <motion.li
-                  key={id}
-                  initial={{ opacity: 0, x: -16 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.05 * i }}
-                >
-                  <button
-                    type="button"
-                    onClick={() => go(id)}
-                    className="q-focus flex w-full items-baseline gap-4 border-b border-white/10 py-4 text-left"
-                    data-testid={`mobile-nav-${id}-link`}
-                  >
-                    <span className="font-mono text-xs text-[#19D8D0]">
-                      0{i + 1}
-                    </span>
-                    <span className="font-display text-3xl text-white">
-                      {label}
-                    </span>
-                  </button>
-                </motion.li>
-              ))}
-            </ul>
-
-            <div className="mt-8 flex flex-col gap-3">
-              <SmartLink
-                href={SITE.whitepaperUrl}
-                label="The QUZO whitepaper"
-                testId="mobile-whitepaper-button"
-                className="q-focus q-btn-ghost justify-center"
+            {NAV.map(([label, href, id]) => (
+              <a 
+                key={id} 
+                href={href} 
+                onClick={() => setOpen(false)} 
+                className="text-[#9aa8bc] text-[14px] font-medium hover:text-[#f5f7ff] transition-colors" 
+                data-testid={`mobile-nav-link-${id}`}
               >
-                Whitepaper
-              </SmartLink>
-              <Link
-                href="/login"
-                className="q-focus q-btn-primary justify-center inline-flex items-center gap-2"
-                data-testid="mobile-get-started-button"
-              >
-                Get Started <ArrowUpRight size={15} />
-              </Link>
-            </div>
+                {label}
+              </a>
+            ))}
+            <a 
+              href={LINKS.signIn} 
+              className="text-[#9aa8bc] text-[14px] font-medium hover:text-[#f5f7ff] transition-colors" 
+              data-testid="mobile-nav-signin"
+            >
+              Sign In
+            </a>
+            <a 
+              className="inline-flex min-h-[46px] items-center justify-center gap-2.5 rounded-full bg-[#e8f4f8] px-5 text-[13px] font-semibold text-[#070910] hover:bg-[#65e7ff] transition-all duration-300 mt-2" 
+              href={LINKS.getStarted} 
+              data-testid="mobile-nav-get-started"
+            >
+              Get Started <ArrowUpRight size={16} />
+            </a>
           </motion.div>
         )}
       </AnimatePresence>
     </header>
   );
-};
-
-export default Nav;
+}
