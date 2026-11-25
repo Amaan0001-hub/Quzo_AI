@@ -1,974 +1,548 @@
 "use client";
-import React, { useState, useEffect, useCallback } from 'react';
-import { Loader2 } from "lucide-react";
-import { toast } from 'sonner';
-import { useQueryClient } from '@tanstack/react-query';
-import { Sora } from 'next/font/google';
-import { QUERY_KEYS } from '@/lib/constants';
 
-const sora = Sora({ subsets: ['latin'], weight: ['400', '500', '600', '700'] });
+import { useEffect, useState, useRef } from "react";
+import { useRouter, usePathname } from "next/navigation";
+import { motion } from "framer-motion";
+import {
+  UserX,
+  FileText,
+  Gift,
+  CheckCircle,
+  Sparkles,
+  Cpu,
+  Shield,
+  Clock3,
+} from "lucide-react";
+import { RiRobotLine, RiEyeLine } from "react-icons/ri";
+import { sortOptions } from "@/lib/constants";
+import { getPageName } from "@/lib/utils";
+import LeaseModal from "@/app/components/LeaseModal";
 
-/* ------------------------------------------------------------------ */
-/*  Types                                                              */
-/* ------------------------------------------------------------------ */
-interface PlanFeature {
-  text: string;
+interface Agent {
+  id: number;
+  productId: string;
+  categoryId: string;
+  categoryName: string;
+  subCategoryId: string;
+  subCategoryName: string | null;
+  subCategoryTypeId: string;
+  subCategoryTypeName: string;
+  productName: string;
+  subName: string;
+  description: string;
+  rating: number;
+  AICredite: number;
+  createdDate: string;
+  updatedDate: string | null;
+  status: string;
+  active: boolean;
+  imageUrl: string | null;
+  Specification: string;
+  Commingsoon: number;
+  price?: number;
+  toatalmonth?: number;
+  totalReturn?: number;
+  weeklyReturn?: number;
+  task?: string;
+  unit?: string;
 }
 
-interface Plan {
-  id: string;
-  title: string;
-  subtitle: string;
-  icon: string;
-  investmentRange: string;
-  features: PlanFeature[];
-  min: number;
-  d: string;
-  rate: string;
-  max: number | null;
-  investorLimit: string;
-  leadersLimit: string;
-  colors: { a: string; b: string };
-  isPopular?: boolean;
-  BoosterPackage: number;
-  minAmount: number;
-  maxAmount: number;
-  pop: string;
-  totalincome: string;
-  capmulti: string;
+interface SortOption {
+  readonly value: string;
+  readonly label: string;
 }
 
-interface ActivatePlanModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  plan: Plan | null;
-  userId?: string;
-}
+export default function InvestmentAmountPage() {
+  const pathname = usePathname();
+  const router = useRouter();
+  const pageName = getPageName(pathname);
 
-/* ------------------------------------------------------------------ */
-/*  Tailwind class presets                                             */
-/* ------------------------------------------------------------------ */
-const THEME_VARS = [
-  "[--card:#fff] dark:[--card:#07242e]",
-  "[--ink:#06262f] dark:[--ink:#e6f7f9]",
-  "[--mut:#5b7885] dark:[--mut:#84a2ad]",
-  "[--line:#d9e8ec] dark:[--line:#153747]",
-  "[--sh:0_10px_30px_-14px_rgba(10,60,80,.28)] dark:[--sh:0_10px_30px_-14px_#000]",
-  "[--p:#12a594] [--p2:#35d6c0]",
-].join(" ");
-
-const CARD_BASE =
-  "relative overflow-hidden rounded-[18px] border border-[color:var(--line)] bg-[color:var(--card)] [box-shadow:var(--sh)] " +
-  "transition-[transform,border-color,background,box-shadow] duration-[250ms] animate-[qzrise_.6s_both] [animation-delay:calc(var(--i,0)*45ms)] " +
-  "hover:-translate-y-[3px] hover:border-[color:var(--c,var(--p))]";
-
-const CARD =
-  CARD_BASE +
-  " p-4 after:content-[''] after:absolute after:-right-[30px] after:-top-[30px] after:h-[110px] after:w-[110px] after:rounded-full " +
-  "after:bg-[color:var(--c,var(--p))] after:opacity-10 after:transition-all after:duration-[400ms] hover:after:scale-150 hover:after:opacity-[.16]";
-
-const CARD_INC =
-  CARD_BASE +
-  " p-0 hover:[box-shadow:0_18px_34px_-14px_var(--c)] " +
-  "before:content-[''] before:absolute before:inset-x-0 before:top-0 before:z-[2] before:h-1 before:[background:linear-gradient(90deg,var(--c),var(--p2))] " +
-  "after:content-[''] after:absolute after:-right-[50px] after:-top-[60px] after:h-[170px] after:w-[170px] after:rounded-full " +
-  "after:bg-[color:var(--c)] after:opacity-20 after:blur-[34px] after:transition-all after:duration-[400ms] hover:after:scale-[1.2] hover:after:opacity-[.34]";
-
-const CARD_PKG =
-  CARD_BASE + " p-0 hover:[box-shadow:0_20px_36px_-16px_var(--a)]";
-
-const GRID = "mt-[14px] grid gap-[14px]";
-const G2 = `${GRID} grid-cols-1 md:grid-cols-[repeat(auto-fit,minmax(340px,1fr))]`;
-const G3 = `${GRID} grid-cols-1 sm:grid-cols-[repeat(auto-fit,minmax(260px,1fr))]`;
-const G4 = `${GRID} grid-cols-2 sm:grid-cols-[repeat(auto-fit,minmax(210px,1fr))]`;
-
-const H2 =
-  "mt-[26px] flex items-center gap-2 text-[15px] font-semibold tracking-[.01em] text-[color:var(--ink)] " +
-  "before:content-[''] before:h-4 before:w-1 before:rounded before:[background:linear-gradient(var(--p),var(--p2))]";
-
-const LAB = "flex items-center gap-2 text-[12.5px] font-medium text-[color:var(--mut)]";
-const IB =
-  "grid h-[30px] w-[30px] place-items-center rounded-[10px] text-[color:var(--c,var(--p))] [background:color-mix(in_srgb,var(--c,var(--p))_15%,transparent)]";
-const VAL = "mt-[10px] mb-0.5 text-[24px] font-semibold tabular-nums";
-const RW = "flex items-center justify-between gap-[10px]";
-const BAR = "mt-[10px] h-2 overflow-hidden rounded-[9px] [background:color-mix(in_srgb,var(--c,var(--p))_14%,transparent)]";
-const BAR_I =
-  "block h-full rounded-[9px] [background:linear-gradient(90deg,var(--c,var(--p)),var(--p2))] [background-size:200%_100%] animate-[qzsh_3s_linear_infinite]";
-const KV_WRAP = "grid grid-cols-3 gap-[6px] sm:gap-[10px]";
-const KV_CELL = "rounded-xl p-[8px] sm:p-[10px] [background:color-mix(in_srgb,var(--p)_7%,transparent)]";
-const KV_SMALL = "block text-[10px] sm:text-[11.5px] text-[color:var(--mut)]";
-const KV_B = "text-[14px] sm:text-[17px]";
-const LV_WRAP = "mt-[10px] flex flex-wrap gap-1";
-const LV_I =
-  "h-[15px] w-[15px] rounded-[5px] animate-[qzpop_.4s_both] [animation-delay:calc(var(--k)*40ms)] [background:linear-gradient(135deg,var(--p),var(--p2))]";
-const GO =
-  "cursor-pointer rounded-xl px-4 py-[10px] font-semibold text-white transition duration-200 [background:linear-gradient(90deg,var(--p),var(--p2))] hover:-translate-y-px hover:brightness-[1.08]";
-const PILL =
-  "whitespace-nowrap rounded-full px-[10px] py-1 text-[11.5px] font-semibold text-[color:var(--c)] [background:color-mix(in_srgb,var(--c)_15%,transparent)]";
-const BIG_IB =
-  "relative grid h-11 w-11 place-items-center rounded-[14px] text-white [background:linear-gradient(135deg,var(--c),color-mix(in_srgb,var(--c)_55%,#fff))] [box-shadow:0_8px_18px_-6px_var(--c)] " +
-  "after:content-[''] after:absolute after:-inset-[5px] after:rounded-[17px] after:border-2 after:border-[color:var(--c)] after:opacity-0 after:animate-[qzpl2_3s_infinite]";
-const QMARK =
-  "grid place-items-center font-bold text-white [background:linear-gradient(135deg,var(--p),var(--p2))] animate-[qzbob_4s_ease-in-out_infinite] [box-shadow:0_6px_18px_-4px_var(--p)]";
-const LIVE = "inline-flex items-center gap-1.5 text-[12px] text-[#7ff5e6]";
-const LIVE_I = "h-2 w-2 rounded-full bg-[#19e3d0] animate-[qzpl_1.4s_infinite]";
-
-const PKG_TOP = [
-  "relative overflow-hidden px-[18px] pt-[18px] pb-5 text-white [background:linear-gradient(135deg,var(--a),var(--b))]",
-  "before:content-[''] before:absolute before:-right-[70px] before:-top-[100px] before:h-[230px] before:w-[230px] before:rounded-full before:bg-white before:opacity-[.14] before:animate-[qzbob_6s_ease-in-out_infinite]",
-].join(" ");
-
-const HERO = [
-  "relative overflow-hidden rounded-[22px] px-[22px] py-5 text-[#e8fbff] animate-[qzrise_.6s_both] [box-shadow:var(--sh)]",
-  "[background:radial-gradient(700px_260px_at_90%_-30%,#1f5f7a66,transparent_60%),radial-gradient(600px_260px_at_0_130%,#19e3d044,transparent_60%),#06222d]",
-  "after:content-[''] after:absolute after:inset-0 after:[transform:translateX(-100%)] after:animate-[qzswp_6s_infinite]",
-  "after:[background:linear-gradient(105deg,transparent_40%,#ffffff12_50%,transparent_60%)]",
-].join(" ");
-
-const ORB = [
-  "relative z-[1] grid h-[118px] w-[118px] place-items-center",
-  "before:content-[''] before:absolute before:inset-0 before:rounded-[36px] before:border-2 before:border-[#19e3d0] before:animate-[qzpl2_3s_infinite]",
-  "after:content-[''] after:absolute after:inset-0 after:rounded-[36px] after:border-2 after:border-[#19e3d0] after:animate-[qzpl2_3s_infinite] after:[animation-delay:1.5s]",
-].join(" ");
-
-/* ------------------------------------------------------------------ */
-/*  Design helpers                                                     */
-/* ------------------------------------------------------------------ */
-const P: Record<string, string> = {
-  pkg: 'M12 3l8 4.5v9L12 21l-8-4.5v-9zM12 12l8-4.5M12 12v9M12 12L4 7.5',
-  ai: 'M9 3v3M15 3v3M9 18v3M15 18v3M3 9h3M3 15h3M18 9h3M18 15h3M7 6h10v12H7zM10 10h4v4h-4z',
-  users: 'M9 11a3 3 0 100-6 3 3 0 000 6zM3 20c0-3 3-5 6-5s6 2 6 5M17 11a2.5 2.5 0 100-5M18 15c2 .4 3 2 3 5',
-  coin: 'M12 3a9 9 0 100 18 9 9 0 000-18zM9.5 9.5h4a1.5 1.5 0 010 3h-3a1.5 1.5 0 000 3h4M12 7v2M12 15v2',
-  bolt: 'M13 3L5 14h6l-1 7 8-11h-6z',
-  tree: 'M12 4v6M5 20v-4h14v4M12 10v6M7 16v-3h10v3',
-  shield: 'M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z',
-  trend: 'M3 17l6-6 4 4 8-8M15 7h6v6',
-  gift: 'M4 11h16v9H4zM3 8h18v3H3zM12 8v12M12 8c-3 0-4-4-1-4s1 4 1 4zM12 8c3 0 4-4 1-4s-1 4-1 4z',
-};
-
-const Ic = ({ n, size = "h-[18px] w-[18px]" }: { n: string; size?: string }) => (
-  <svg
-    className={`block flex-none fill-none stroke-current [stroke-width:1.8] [stroke-linecap:round] [stroke-linejoin:round] ${size}`}
-    viewBox="0 0 24 24"
-  >
-    <path d={P[n]} />
-  </svg>
-);
-
-const fmt = (v: number, d = 2) =>
-  v.toLocaleString('en-US', { minimumFractionDigits: d, maximumFractionDigits: d });
-
-/* ------------------------------------------------------------------ */
-/*  Static design data                                                 */
-/* ------------------------------------------------------------------ */
-interface Offer {
-  t: string; ic: string; c: string; b: string; s: string; d: string; x?: string; f: [string, string][];
-}
-const OFF: Offer[] = [
-  { t: 'Daily Booster Program', ic: 'bolt', c: '#d9a441', b: 'LIVE', s: '+0.3% / +0.5%', d: 'Add direct referrals within 24 hours to boost daily rewards. Your directs’ total investment must be equal to or greater than your own.', x: 'cd', f: [['3 directs', '+0.3%'], ['5 directs', '+0.5%']] },
-  { t: 'Level Income Unlock', ic: 'tree', c: '#1f5f7a', b: 'UNLOCK', s: '20 levels · 30%', d: 'Self-investment of $50 or more plus up to 5 direct referrals opens all 20 levels.', x: 'lv', f: [['Self-invest', '$50+'], ['Directs', '5']] },
-  { t: 'Direct Referral Income', ic: 'users', c: '#12a594', b: 'EARN', s: '8% total', d: 'Commission is shared across three levels of your referral line.', x: 'ref', f: [['Level 1', '5%'], ['Level 2', '2%'], ['Level 3', '1%']] },
-  { t: 'DAO Partner', ic: 'shield', c: '#4a7f8f', b: 'LIMITED', s: '5% shared pool', d: 'Generate $3,000 direct business within 15 days to qualify. Equal shares, paid every Friday.', x: 'dao', f: [['Seats', '280'], ['Payout', 'Friday']] },
-  { t: 'Salary Rewards', ic: 'coin', c: '#1fa88a', b: '36 MONTHS', s: 'Up to 10%', d: 'Rank-based monthly salary for 36 months. Keep 5% fresh business next month to stay eligible.', f: [['Nova', '1%'], ['Global Apex', '10%']] },
-  { t: 'Rank Rewards', ic: 'gift', c: '#8fc9cf', b: 'NEW', s: 'Up to $15,000', d: 'One-time rewards linked to total business across your entire downline.', f: [['Nova', '$100'], ['Global Apex', '$15,000']] },
-];
-
-const RK: [string, number, number][] = [
-  ['Nova', 5000, 100], ['Pioneer', 15000, 250], ['Trader', 30000, 500], ['Navigator', 50000, 1000], ['Elite', 75000, 2000],
-  ['Strategist', 110000, 3000], ['Architect', 170000, 5000], ['Vanguard', 250000, 7500], ['Sovereign', 350000, 10000], ['Global Apex', 500000, 15000],
-];
-const RC = ['#8fc9cf', '#6fc0c4', '#4fb8a0', '#12a594', '#2a8fb0', '#1f6f8f', '#1f5f7a', '#17495c', '#0f3d4d', '#d9a441'];
-
-/* ------------------------------------------------------------------ */
-/*  Design components                                                  */
-/* ------------------------------------------------------------------ */
-function Cd() {
-  const [s, setS] = useState(5 * 3600 + 42 * 60 + 10);
-  useEffect(() => {
-    const t = setInterval(() => setS((x) => (x > 0 ? x - 1 : 0)), 1000);
-    return () => clearInterval(t);
-  }, []);
-  const f = (n: number) => String(n).padStart(2, '0');
-  return (
-    <span className="font-semibold tabular-nums text-[color:var(--c)]">
-      {f((s / 3600) | 0)}:{f(((s / 60) % 60) | 0)}:{f(s % 60)}
-    </span>
-  );
-}
-
-function OfferCard({ o, i }: { o: Offer; i: number }) {
-  return (
-    <div className={CARD_INC} style={{ '--c': o.c, '--i': i } as React.CSSProperties}>
-      <div className="relative z-[1] px-4 pt-[18px] pb-0">
-        <div className={RW}>
-          <span className={BIG_IB}><Ic n={o.ic} size="h-[22px] w-[22px]" /></span>
-          <span className={PILL}>{o.b}</span>
-        </div>
-        <div className={`${LAB} mt-3`}>{o.t}</div>
-        <div className={`${VAL} !mt-1 !text-[22px]`}>{o.s}</div>
-        <div className="mt-2 text-[12.5px] leading-[1.55] text-[color:var(--mut)]">{o.d}</div>
-        {o.x === 'cd' && (
-          <div className="mt-2 text-[12.5px] leading-[1.55] text-[color:var(--mut)]">
-            Window closes in <Cd />
-          </div>
-        )}
-        {o.x === 'lv' && (
-          <div className={LV_WRAP}>
-            {Array.from({ length: 20 }, (_, j) => (
-              <i key={j} className={LV_I} style={{ '--k': j } as React.CSSProperties}></i>
-            ))}
-          </div>
-        )}
-        {o.x === 'ref' && (
-          <div className="mt-3 flex h-2 gap-[3px]">
-            <i className="rounded-md" style={{ flex: 5, background: '#12a594' }}></i>
-            <i className="rounded-md" style={{ flex: 2, background: '#3aa3c4' }}></i>
-            <i className="rounded-md" style={{ flex: 1, background: '#1f5f7a' }}></i>
-          </div>
-        )}
-        {o.x === 'dao' && (
-          <>
-            <div className={BAR}><i className={BAR_I} style={{ width: '76%' }}></i></div>
-            <div className="mt-[7px] flex justify-between text-[11.5px] text-[color:var(--mut)]">
-              <span>Seats filled (sample)</span><span>212 / 280</span>
-            </div>
-          </>
-        )}
-      </div>
-      <div className="relative z-[1] mt-[14px] flex justify-between gap-1.5 border-t border-dashed border-[color:var(--line)] px-4 pt-[10px] pb-[14px] text-[11px] text-[color:var(--mut)]">
-        {o.f.map(([a, b]) => (
-          <span key={a}>
-            {a}
-            <b className="mt-px block text-[12.5px] text-[color:var(--ink)]">{b}</b>
-          </span>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-function PlanCard({ plan, i, onActivate }: { plan: Plan; i: number; onActivate: () => void }) {
-  const hi = plan.max || 10000;
-  const [amt, setAmt] = useState<number>(plan.min);
-  // 1. Starter plan ke liye max 999, aur Pro plan ke liye 10000 (ya 50000) tak slider
-  const isStarter = plan.title.includes("Cros-Dex");
-  const sliderMax = isStarter ? 999 : 50000; // Pro plan ke liye slider 50,000 tak jayega
-
-  // const [amt, setAmt] = useState<number>(plan.min);
-
-  // Dynamic Total Income Calculation
-  const capMulti = parseFloat(plan.capmulti.replace('×', '')) || 1;
-  const dynamicIncome = amt * capMulti;
-  return (
-    <div
-      className={CARD_PKG}
-      style={{ '--a': plan.colors.a, '--b': plan.colors.b, '--i': i } as React.CSSProperties}
-    >
-      <div className={PKG_TOP}>
-        <div className={`${RW} relative`}>
-          <span className="grid h-[46px] w-[46px] place-items-center rounded-[14px] bg-[#ffffff2e]">
-            <Ic n="pkg" size="h-6 w-6" />
-          </span>
-          <span className="rounded-full bg-[#ffffff33] px-[11px] py-1 text-[11.5px] font-semibold text-center">
-            {plan.pop}
-          </span>
-        </div>
-        <div className="relative mt-3 text-[20px] font-semibold">{plan.title}</div>
-        <div className="relative text-[12.5px] opacity-[.85]">{plan.subtitle}</div>
-        <div className="relative mt-[14px]">
-          <small className="block text-[12px] opacity-[.85]">{plan.d}</small>
-          <b className="text-[34px] font-bold">{plan.rate}</b>
-        </div>
-      </div>
-
-      <div className="px-[18px] pt-4 pb-[18px]">
-        <div className={KV_WRAP}>
-          <div className={KV_CELL}><small className={KV_SMALL}>Minimum</small><b className={KV_B}>${fmt(plan.min, 0)}</b></div>
-          <div className={KV_CELL}><small className={KV_SMALL}>Maximum</small><b className={KV_B}>{plan.investorLimit}</b></div>
-          <div className={KV_CELL}><small className={KV_SMALL}>Income cap</small><b className={KV_B}>{plan.leadersLimit}</b></div>
-        </div>
-
-
-        <div className={`${LAB} mt-4`}>Investment amount (USDT)</div>
-        <div className="mt-3 flex gap-2">
-          <input
-            type="number"
-            className="min-w-0 flex-1 rounded-xl border border-[color:var(--line)] bg-transparent px-3 py-[10px] text-inherit outline-none"
-            value={amt}
-            // onChange={(e) => setAmt(+e.target.value || 0)}
-            onChange={(e) => {
-              const val = +e.target.value;
-              // Starter plan me 999 se zyada type nahi kar sakte
-              const maxAllowed = isStarter ? 999 : Infinity;
-              setAmt(val > maxAllowed ? maxAllowed : val);
-            }}
-          />
-        </div>
-        <input
-          className="mt-3 w-full [accent-color:var(--a)]"
-          type="range"
-          min={plan.min}
-          // max={hi}
-          // step={plan.min >= 100 ? 100 : 10}
-          // value={Math.min(Math.max(amt, plan.min), hi)}
-          // onChange={(e) => setAmt(+e.target.value)}
-          // 2. Slider ka max yahan set hoga
-          max={sliderMax}
-          // Agar Pro plan hai toh step 100, warna 10
-          step={isStarter ? 10 : 100}
-          value={Math.min(Math.max(amt, plan.min), sliderMax)}
-          onChange={(e) => setAmt(+e.target.value)}
-        />
-
-        {/* <div className="my-[14px] flex flex-col sm:flex-row sm:justify-between rounded-xl p-3 text-[12px] text-[color:var(--mut)] [background:color-mix(in_srgb,var(--a)_9%,transparent)] gap-2 sm:gap-0">
-          <span>Total income cap<b className="block text-[17px] text-[color:var(--ink)]">{plan.totalincome}</b></span>
-          <span className="sm:text-right">Cap multiple<b className="block text-[17px] text-[color:var(--ink)]">{plan.capmulti}</b></span>
-        </div> */}
-        <div className="my-[14px] flex flex-col sm:flex-row sm:justify-between rounded-xl p-3 text-[12px] text-[color:var(--mut)] [background:color-mix(in_srgb,var(--a)_9%,transparent)] gap-2 sm:gap-0">
-          <span>
-            Total income cap
-            <b className="block text-[17px] text-[color:var(--ink)]">
-              {/* 3. Dynamic Income yahan lagaya */}
-              ${dynamicIncome.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-            </b>
-          </span>
-          <span className="sm:text-right">
-            Cap multiple
-            <b className="block text-[17px] text-[color:var(--ink)]">
-              {plan.capmulti}
-            </b>
-          </span>
-        </div>
-        <button className={`${GO} w-full`} onClick={onActivate}>
-          Activate package
-        </button>
-      </div>
-    </div>
-  );
-}
-
-/* ------------------------------------------------------------------ */
-/*  Activate modal                                                     */
-/* ------------------------------------------------------------------ */
-const ActivatePlanModal: React.FC<ActivatePlanModalProps> = ({
-  isOpen,
-  onClose,
-  plan,
-  userId = "",
-}) => {
-  const queryClient = useQueryClient();
-  const [amount, setAmount] = useState("");
-  const [quantity, setQuantity] = useState("");
-  const [amountError, setAmountError] = useState("");
-  const [quantityError, setQuantityError] = useState("");
-  const [walletBalance, setWalletBalance] = useState(0);
-  const [fundWalletBalance, setFundWalletBalance] = useState(0);
-  const [isLoadingWallet, setIsLoadingWallet] = useState(false);
-  const [isActivating, setIsActivating] = useState(false);
-  const [activationError, setActivationError] = useState("");
-  const [userIdInput, setUserIdInput] = useState(userId);
-  const [userName, setUserName] = useState("");
-  const [userNameError, setUserNameError] = useState("");
-  const [isLoadingUserName, setIsLoadingUserName] = useState(false);
+  const [openDialog, setOpenDialog] = useState<boolean>(false);
+  const [selectedAgent, setSelectedAgent] = useState<Agent | null>(null);
+  const [searchTerm, setSearchTerm] = useState<string>("");
+  const [sortBy, setSortBy] = useState<string>("all");
+  const [showDropdown, setShowDropdown] = useState<boolean>(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+  const [productId, setProductId] = useState<string>("");
+  const [month, setMonth] = useState<string>("");
+  const [allProductData, setAllProductData] = useState<Agent[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
-    if (isOpen) {
-      const authLogin = localStorage.getItem('authLogin');
-      setUserIdInput(authLogin || userId);
-      setUserName("");
-      setUserNameError("");
-      fetchWalletDetails();
-    }
-  }, [isOpen, userId]);
-
-  const fetchUserName = useCallback(async () => {
-    setIsLoadingUserName(true);
-    setUserName("");
-    setUserNameError("");
-    try {
-      const response = await fetch(`/api/FundManager?authLogin=${userIdInput}`);
-      const data = await response.json();
-
-      if (response.ok && data.statusCode === 200 && data.data?.Name) {
-        setUserName(data.data.Name);
-      } else {
-        setUserNameError(
-          typeof data.message === "string" ? data.message : "User ID not found.",
-        );
-      }
-    } catch (error) {
-      console.error('Failed to fetch user name:', error);
-      setUserNameError("Could not verify this User ID. Please try again.");
-    } finally {
-      setIsLoadingUserName(false);
-    }
-  }, [userIdInput]);
-
-  useEffect(() => {
-    const timeoutId = setTimeout(() => {
-      if (userIdInput && userIdInput.length > 0) {
-        fetchUserName();
-      } else {
-        setUserName("");
-      }
-    }, 500);
-
-    return () => clearTimeout(timeoutId);
-  }, [userIdInput, fetchUserName]);
-
-  const fetchWalletDetails = async () => {
-    setIsLoadingWallet(true);
-    try {
-      const response = await fetch('/api/FundManager');
-      const data = await response.json();
-
-      if (data.statusCode === 200 && data.data) {
-        setWalletBalance(data.data.DepositWallet || 0);
-        setFundWalletBalance(data.data.FundWallet || 0);
-      } else {
-        setWalletBalance(0);
-        setFundWalletBalance(0);
-      }
-    } catch (error) {
-      console.error('Failed to fetch wallet details:', error);
-      setWalletBalance(0);
-      setFundWalletBalance(0);
-    } finally {
-      setIsLoadingWallet(false);
-    }
-  };
-
-  const handleActivate = async () => {
-    if (!plan) return;
-
-    setIsActivating(true);
-    setActivationError("");
-
-    try {
-      const response = await fetch('/api/FundManager', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          productId: plan.id,
-          rkprice: Number(amount) || 0,
-          byAuthlogin: userIdInput,
-          RechargeType: plan.BoosterPackage,
-        }),
-      });
-
-      const data = await response.json();
-
-      if (data.statusCode === 200) {
-        toast.success(data.message || "Plan activated successfully!");
-        queryClient.invalidateQueries({ queryKey: QUERY_KEYS.dashboard.summary });
-        onClose();
-      } else {
-        setActivationError(data.message || "Failed to activate plan");
-        toast.error(data.message || "Failed to activate plan");
-      }
-    } catch (error) {
-      console.error('Failed to activate plan:', error);
-      setActivationError("An error occurred while activating the plan");
-      toast.error("An error occurred while activating the plan");
-    } finally {
-      setIsActivating(false);
-    }
-  };
-
-  if (!isOpen || !plan) return null;
-
-  const isQuantityPlan = plan.title === "Legacy Reborn 2.0";
-
-  const handleQuantityChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const qty = e.target.value;
-    setQuantity(qty);
-
-    const numQty = Number(qty);
-    if (qty === "" || numQty <= 0) {
-      setQuantityError("Please enter a valid quantity");
-      setAmount("");
-    } else {
-      const calculatedAmount = numQty * 660;
-      setAmount(calculatedAmount.toString());
-
-      if (calculatedAmount > walletBalance) {
-        setQuantityError("Insufficient balance");
-      } else {
-        setQuantityError("");
-      }
-    }
-  };
-
-  // const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-  //   const value = e.target.value;
-  //   setAmount(value);
-
-  //   if (value === "") {
-  //     setAmountError("");
-  //     return;
-  //   }
-
-  //   const numValue = Number(value);
-
-  //   if (plan.title === "Liquidity Provider") {
-  //     if (numValue < 10) {
-  //       setAmountError("Minimum investment is $10");
-  //     } else if (numValue > walletBalance) {
-  //       setAmountError("Insufficient balance");
-  //     } else {
-  //       setAmountError("");
-  //     }
-  //   } else if (plan.title === "Smart Bonds") {
-  //     if (numValue < 100) {
-  //       setAmountError("Minimum investment is $50");
-  //     } else if (numValue > walletBalance) {
-  //       setAmountError("Insufficient balance");
-  //     } else {
-  //       setAmountError("");
-  //     }
-  //   } else {
-  //     if (numValue < 100) {
-  //       setAmountError("Minimum investment is $100");
-  //     } else if (numValue > walletBalance) {
-  //       setAmountError("Insufficient balance");
-  //     } else {
-  //       setAmountError("");
-  //     }
-  //   }
-  // };
-  const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    setAmount(value);
-
-    if (value === "" || value === ".") {
-      setAmountError("");
-      return;
-    }
-
-    const numValue = Number(value);
-
-    // Dynamic validation using plan data
-    const minLimit = plan.minAmount || 0;
-    const maxLimit = plan.maxAmount || Infinity;
-
-    if (numValue < minLimit) {
-      setAmountError(`Minimum investment is $${minLimit}`);
-    } else if (numValue > maxLimit) {
-      setAmountError(`Maximum investment is $${maxLimit}`);
-    } else if (numValue > walletBalance) {
-      setAmountError("Insufficient balance");
-    } else {
-      setAmountError("");
-    }
-  };
-  const getModalTheme = () => {
-    if (plan.title === "Normal") {
-      return { btn: "bg-blue-500 hover:bg-blue-600 text-white", text: "text-blue-600", iconBg: "bg-blue-100" };
-    }
-    if (plan.title === "Legacy Reborn") {
-      return { btn: "bg-amber-500 hover:bg-amber-600 text-white", text: "text-amber-600", iconBg: "bg-amber-100" };
-    }
-    return { btn: "bg-purple-500 hover:bg-purple-600 text-white", text: "text-purple-600", iconBg: "bg-purple-100" };
-  };
-
-  const modalTheme = getModalTheme();
-
-  const isSubmitDisabled =
-    !amount ||
-    !userIdInput ||
-    !!amountError ||
-    (isQuantityPlan && (!!quantityError || !quantity)) ||
-    isActivating;
-
-  return (
-    <>
-      <style jsx global>{`
-        .custom-scrollbar::-webkit-scrollbar {
-          width: 6px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-track {
-          background: transparent;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb {
-          background: #cbd5e1;
-          border-radius: 3px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-          background: #94a3b8;
-        }
-        .dark .custom-scrollbar::-webkit-scrollbar-thumb {
-          background: #334155;
-        }
-        .dark .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-          background: #475569;
-        }
-      `}</style>
-      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 overflow-y-auto">
-        <div className="relative w-full max-w-[480px] bg-white dark:bg-[#11111a] rounded-3xl shadow-2xl p-5 sm:p-8 animate-in fade-in zoom-in-95 duration-200 border border-gray-100 dark:border-white/10">
-
-          {/* Header */}
-          <div className="flex justify-between items-start mb-6">
-            <div>
-              <p className="text-blue-500 text-xs font-bold tracking-widest uppercase mb-1">
-                Subscribe Now
-              </p>
-              <h2 className="text-2xl sm:text-3xl font-extrabold text-gray-900 dark:text-white tracking-tight">
-                Activate <span className={modalTheme.text}>{plan.title}</span>
-              </h2>
-            </div>
-            <button
-              onClick={onClose}
-              className="p-2 bg-gray-50 dark:bg-white/5 hover:bg-gray-100 dark:hover:bg-white/10 rounded-full transition-colors border border-gray-100 dark:border-white/10"
-            >
-              <span className="text-gray-500 dark:text-gray-400 font-bold text-lg leading-none">&times;</span>
-            </button>
-          </div>
-
-          {/* Wallet Info Box */}
-          <div className="bg-[#f0fdf4] dark:bg-green-900/20 border border-green-100 dark:border-green-500/30 rounded-2xl p-5 mb-6">
-            {plan?.title === "Liquidity Provider" ? (
-              <div className="flex justify-between items-center">
-                <div>
-                  <p className="text-gray-600 dark:text-gray-400 text-[10px] font-bold tracking-widest uppercase mb-1">USDT Wallet</p>
-                  <p className="text-green-600 dark:text-green-400 text-2xl font-bold">
-                    {isLoadingWallet ? <Loader2 className="h-6 w-6 animate-spin text-[#F5C451]" aria-label="Loading" /> : `$${walletBalance}`}
-                  </p>
-                </div>
-              </div>
-            ) : (
-              <>
-                <p className="text-gray-600 dark:text-gray-400 text-[10px] font-bold tracking-widest uppercase mb-1">Fund Wallet</p>
-                <p className="text-green-600 dark:text-green-400 text-2xl font-bold">
-                  {isLoadingWallet ? <Loader2 className="h-6 w-6 animate-spin text-[#F5C451]" aria-label="Loading" /> : `$${walletBalance}`}
-                </p>
-              </>
-            )}
-          </div>
-
-          {/* Form */}
-          <div className="space-y-5">
-            <div>
-              <label className="block text-gray-800 dark:text-gray-200 text-sm font-bold mb-2">
-                USER ID <span className="text-red-500">*</span>
-              </label>
-              <div className="relative">
-                <input
-                  type="text"
-                  value={userIdInput}
-                  placeholder="Enter UserID"
-                  onChange={(e) => {
-                    setUserIdInput(e.target.value);
-                    setUserName("");
-                    setUserNameError("");
-                  }}
-                  aria-invalid={!!userNameError}
-                  aria-describedby={userNameError ? "user-id-error" : undefined}
-                  className="w-full bg-[#f4f6fc] dark:bg-white/5 text-gray-800 dark:text-white text-lg placeholder-gray-400 font-medium px-4 py-3.5 pr-12 rounded-xl border outline-none transition-all"
-                />
-                {isLoadingUserName && (
-                  <Loader2
-                    className="absolute right-4 top-1/2 h-5 w-5 -translate-y-1/2 animate-spin text-[#F5C451]"
-                    aria-label="Loading user name"
-                  />
-                )}
-              </div>
-              {userName && (
-                <span className="text-green-600 dark:text-green-400 text-sm font-medium mt-2 block">
-                  {userName}
-                </span>
-              )}
-              {userNameError && !isLoadingUserName && (
-                <p id="user-id-error" className="mt-2 text-xs font-medium text-red-500" role="alert">
-                  {userNameError}
-                </p>
-              )}
-            </div>
-
-            {isQuantityPlan ? (
-              <div>
-                <label className="block text-gray-800 dark:text-gray-200 text-sm font-bold mb-2">
-                  QUANTITY <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="number"
-                  placeholder="Enter quantity"
-                  value={quantity}
-                  onChange={handleQuantityChange}
-                  className={`w-full bg-[#f4f6fc] dark:bg-white/5 text-gray-800 dark:text-white text-lg placeholder-gray-400 font-medium px-4 py-3.5 rounded-xl border outline-none transition-all ${quantityError
-                    ? "border-red-400 dark:border-red-500"
-                    : "border-transparent focus:border-blue-300 dark:focus:border-blue-500"
-                    }`}
-                />
-                {quantityError ? (
-                  <p className="text-red-500 text-xs font-medium mt-2">⚠️ {quantityError}</p>
-                ) : (
-                  <p className="text-gray-500 dark:text-gray-400 text-xs font-medium mt-2 flex items-center gap-1">
-                    💡 1 Quantity = $660
-                  </p>
-                )}
-              </div>
-            ) : (
-              <div>
-                <label className="block text-gray-800 dark:text-gray-200 text-sm font-bold mb-2">SELECTED PLAN</label>
-                <div className="w-full bg-[#f8f9fc] dark:bg-white/5 border border-gray-100 dark:border-white/10 text-gray-600 dark:text-gray-300 text-lg font-medium px-4 py-3.5 rounded-xl flex items-center gap-3">
-                  <span className={`text-xl p-1.5 rounded-md ${modalTheme.iconBg}`}>{plan.icon}</span>
-                  <span className={modalTheme.text}>{plan.title}</span>
-                </div>
-              </div>
-            )}
-
-            <div>
-              <label className="block text-gray-800 dark:text-gray-200 text-sm font-bold mb-2">
-                INVESTMENT AMOUNT (USD) <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="number"
-                placeholder="Enter amount"
-                value={amount}
-                onChange={handleAmountChange}
-                readOnly={isQuantityPlan}
-                className={`w-full bg-[#f4f6fc] dark:bg-white/5 text-gray-800 dark:text-white text-lg placeholder-gray-400 font-medium px-4 py-3.5 rounded-xl border outline-none transition-all ${isQuantityPlan ? "cursor-not-allowed" : ""
-                  } ${amountError
-                    ? "border-red-400 dark:border-red-500"
-                    : "border-transparent focus:border-blue-300 dark:focus:border-blue-500"
-                  }`}
-              />
-              {amountError ? (
-                <p className="text-red-500 text-xs font-medium mt-2">⚠️ {amountError}</p>
-              ) : (
-                <p className="text-gray-500 dark:text-gray-400 text-xs font-medium mt-2 flex items-center gap-1">
-                  💡 Investment range: <span className="text-gray-900 dark:text-white font-bold">{plan.investmentRange}</span>
-                </p>
-              )}
-            </div>
-          </div>
-
-          {/* Button */}
-          <button
-            onClick={handleActivate}
-            disabled={isSubmitDisabled || isActivating}
-            className={`w-full mt-8 py-4 rounded-xl flex items-center justify-center gap-2 text-sm font-extrabold tracking-widest uppercase transition-all duration-300 ${modalTheme.btn} ${isSubmitDisabled || isActivating ? "opacity-50 cursor-not-allowed" : ""
-              }`}
-          >
-            <span className="text-xl">{isActivating ? "⏳" : "🚀"}</span>
-            {isActivating ? "Activating..." : `Activate ${plan.title}`}
-          </button>
-
-          {activationError && (
-            <p className="text-red-500 text-xs font-medium mt-3 text-center">⚠️ {activationError}</p>
-          )}
-
-        </div>
-      </div>
-    </>
-  );
-};
-
-/* ------------------------------------------------------------------ */
-/*  Page                                                               */
-/* ------------------------------------------------------------------ */
-export default function PricingPage() {
-  const [selectedPlan, setSelectedPlan] = useState<Plan | null>(null);
-  const [plans, setPlans] = useState<Plan[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [showBanner, setShowBanner] = useState(true);
-
-  useEffect(() => {
-    const fetchPlans = async () => {
+    const fetchProducts = async () => {
       try {
-        const response = await fetch('/api/investment-plans?Type=1', {
-          method: 'GET',
-        });
-
+        const response = await fetch("/api/investment-plans");
         const data = await response.json();
 
         if (data.statusCode === 200 && data.data) {
-          const hardcodedPlans: Plan[] = [
-            {
-              id: "",
-              title: "",
-              subtitle: "Multi-DEX arbitrage execution",
-              icon: "🚀",
-              investmentRange: "$50+",
-              d: "Proposed yield reward rate",
-              rate: "up to 12–16%",
-              isPopular: true,
-              pop: "Starter",
-              features: [
-                { text: "Accessible entry starting at just $10" },
-                { text: "Yields 0.33% daily revenue sharing (10% monthly)" },
-                { text: "Investor Limit 2.X" },
-                { text: "Leaders Limit 4X" },
-              ],
-              min: 50,
-              max: null,
-              investorLimit: "$999",
-              leadersLimit: "2X",
-              colors: { a: '#12a594', b: '#3aa3c4' },
-              BoosterPackage: 1,
-              capmulti: "2X",
-              totalincome: "$112.50",
-              minAmount: 50,       // <-- ADD THIS
-              maxAmount: 999,
-            },
-            {
-              id: "",
-              title: "",
-              subtitle: "Advanced MEV strategy for larger entries",
-              pop: "Pro",
-              icon: "📊",
-              investmentRange: "$1000+",
-              d: "Proposed yield reward rate",
-              rate: "up to 15–20%",
-              features: [
-                { text: "Accessible entry starting at just $100" },
-                { text: "Investor Limit 1X" },
-                { text: "Leaders Limit 1X" },
-              ],
-              min: 1000,
-              max: null,
-              investorLimit: "No limit",
-              leadersLimit: "2.5X",
-              colors: { a: '#1f5f7a', b: '#3aa3c4' },
-              BoosterPackage: 2,
-              capmulti: "2.5X",
-              totalincome: "$3,000.00",
-              minAmount: 1000,       
-              maxAmount: Infinity, 
-            },
-          ];
-
-          const mappedPlans = hardcodedPlans.map((plan, index) => {
-            const apiItem = data.data[index];
-            if (apiItem) {
-              return {
-                ...plan,
-                id: apiItem.productId,
-                title: apiItem.name,
-                BoosterPackage: apiItem.BoosterPackage,
-              };
-            }
-            return plan;
-          });
-
-          setPlans(mappedPlans);
+          setAllProductData(data.data as Agent[]);
         }
       } catch (error) {
-        console.error('Failed to fetch plans:', error);
+        console.error("Failed to fetch products:", error);
       } finally {
-        setIsLoading(false);
+        setLoading(false);
       }
     };
 
-    fetchPlans();
+    fetchProducts();
   }, []);
 
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
+        setShowDropdown(false);
+      }
+    };
+
+    if (showDropdown) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [showDropdown]);
+
+  const handleCloseDialog = () => {
+    setOpenDialog(false);
+    setSelectedAgent(null);
+  };
+
+  const getStatusColorClass = (status: string) => {
+    switch (status) {
+      case "Available":
+        return "bg-green-500 text-white border border-green-500";
+      case "Coming Soon":
+        return `
+        bg-white/95
+        text-orange-600
+        border border-orange-200
+        shadow-lg
+        dark:bg-zinc-900/95
+        dark:border-orange-500/30
+        dark:text-orange-300
+      `;
+      default:
+        return `
+        bg-red-50
+        text-red-600
+        border border-red-200
+        dark:bg-red-950/40
+        dark:border-red-800
+        dark:text-red-300
+      `;
+    }
+  };
+
+  const filteredAgents: Agent[] = (allProductData || [])
+    .filter((agent) =>
+      agent.productName?.toLowerCase().includes(searchTerm.toLowerCase())
+    )
+    .sort((a, b) => (a.price || 0) - (b.price || 0));
+
+  const sortedAgents = (): Agent[] => {
+    let agents = [...filteredAgents];
+    if (sortBy === "personalagents") {
+      agents = agents.filter(
+        (agent) => (agent.price ?? 0) >= 10 && (agent.price ?? 0) <= 490
+      );
+    } else if (sortBy === "businessagents") {
+      agents = agents.filter(
+        (agent) => (agent.price ?? 0) >= 500 && (agent.price ?? 0) <= 4950
+      );
+    } else if (sortBy === "industrialagents") {
+      agents = agents.filter(
+        (agent) => (agent.price ?? 0) >= 5000 && (agent.price ?? 0) <= 20000
+      );
+    }
+    return agents;
+  };
+
+  const handleLeaseClick = (e: React.MouseEvent, agent: Agent) => {
+    e.stopPropagation();
+    e.preventDefault();
+    setProductId(agent.productId);
+    setMonth((agent.toatalmonth || 0).toString());
+    if (agent.status === "Available") {
+      setSelectedAgent(agent);
+      setOpenDialog(true);
+    }
+  };
+
+  const handleCardClick = (agent: Agent) => {
+    router.push(`/agent-detail?id=${agent.productId}`);
+  };
+
   return (
-    <div
-      className={`${sora.className} ${THEME_VARS} min-h-screen bg-[#edf4f5] p-4 sm:p-6 text-[14px] leading-[normal] text-[color:var(--ink)] transition-colors duration-[400ms] dark:bg-[#031B23] overflow-x-hidden`}
-    >
-      <style jsx global>{`
-        @keyframes qzbob{50%{transform:translateY(-3px) rotate(-4deg)}}
-        @keyframes qzpl{0%{box-shadow:0 0 0 0 #19e3d0aa}100%{box-shadow:0 0 0 10px #19e3d000}}
-        @keyframes qzpl2{from{transform:scale(.5);opacity:1}to{transform:scale(1.6);opacity:0}}
-        @keyframes qzrise{from{opacity:0;transform:translateY(14px)}}
-        @keyframes qzsh{to{background-position:-200% 0}}
-        @keyframes qzswp{60%,100%{transform:translateX(100%)}}
-        @keyframes qzgrow{from{transform:scaleY(.2);opacity:0}}
-        @keyframes qzpop{from{transform:scale(0)}}
-        @media(prefers-reduced-motion:reduce){
-          [data-qz],[data-qz] *,[data-qz] *::before,[data-qz] *::after{animation:none!important;transition:none!important}
-        }
-      `}</style>
+    <>
+      <div className="p-4 mx-auto transition-colors duration-300 bg-gradient-to-b from-slate-50 to-white dark:from-gray-950 dark:to-gray-900 sm:px-6 lg:px-8">
+        <div>
+          <div>
+            <h1 className="mb-2 text-3xl font-bold text-gray-900 transition-colors duration-300 dark:text-gray-100">
+              {pageName}
+            </h1>
+            <p className="text-gray-600 transition-colors duration-300 dark:text-gray-400">
+              Browse and acquire AI agents for your business needs
+            </p>
+          </div>
 
-      <div data-qz className="mx-auto">
-      
-
-        {/* Hero */}
-        <div className={HERO}>
-          <div className="relative z-[1] flex flex-col md:flex-row items-start md:items-center gap-6 md:gap-[26px]">
-            <div className="relative z-[1] min-w-[240px] flex-1">
-              <span className={LIVE}><i className={LIVE_I}></i>New season</span>
-              <div className="mt-2 mb-1.5 text-[24px] sm:text-[28px] font-semibold leading-tight">Explore the QUZO ecosystem</div>
-              <div className="flex flex-wrap gap-x-5 gap-y-2 text-[12px] text-[#b9e3ea]">
-                AI Intelligence · Crypto &amp; Forex Trading · DeFi · Rewards
-              </div>
-             
+          {/* Search and Filter Section */}
+          <div className="flex flex-col items-center justify-between gap-3 mt-4 mb-6 sm:flex-row sm:mt-0">
+            <div className="relative w-full sm:w-80">
+              <span className="absolute inset-y-0 flex items-center pointer-events-none left-4">
+                <svg
+                  className="w-5 h-5 text-gray-400 dark:text-gray-500"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M21 21l-4.35-4.35m0 0A7.5 7.5 0 104.5 4.5a7.5 7.5 0 0012.15 12.15z"
+                  />
+                </svg>
+              </span>
+              <input
+                className="pl-12 pr-4 py-3 w-full rounded-2xl border-2 border-slate-200 dark:border-slate-700 focus:border-[#6446d7] focus:ring-4 focus:ring-[#6446d7]/20 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 shadow-lg hover:shadow-xl transition-all duration-200 outline-none"
+                placeholder="Search agents..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
             </div>
-            <div className={ORB}>
-              <span className={`${QMARK} h-[92px] w-[92px] rounded-[28px] text-[46px]`}>Q</span>
+
+            <div className="relative w-full sm:w-auto sm:ml-2" ref={dropdownRef}>
+              <button
+                className="w-full sm:w-[300px] px-4 py-3 rounded-2xl border-2 border-slate-200 dark:border-slate-700 focus:border-[#6446d7] focus:ring-4 focus:ring-[#6446d7]/20 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm text-gray-900 dark:text-gray-100 shadow-lg hover:shadow-xl transition-all duration-200 outline-none flex items-center justify-between"
+                onClick={() => setShowDropdown((prev) => !prev)}
+              >
+                <span>
+                  {sortBy === "all"
+                    ? "All Agents"
+                    : sortOptions.find(
+                        (option) => option.value === sortBy
+                      )?.label}
+                </span>
+                <svg
+                  className="w-4 h-4 ml-2 text-gray-400"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M19 9l-7 7-7-7"
+                  />
+                </svg>
+              </button>
+
+              {showDropdown && (
+                <div className="absolute z-20 mt-2 w-full sm:w-[300px] bg-white/95 dark:bg-gray-900/95 backdrop-blur-sm border-2 border-slate-200 dark:border-slate-700 rounded-2xl shadow-2xl overflow-hidden">
+                  <div className="p-2 space-y-1">
+                    <label className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-[#397FF5]/10 cursor-pointer transition-all duration-150">
+                      <input
+                        type="radio"
+                        name="sortBy"
+                        value="all"
+                        checked={sortBy === "all"}
+                        onChange={(e) => {
+                          setSortBy(e.target.value);
+                          setShowDropdown(false);
+                        }}
+                        className="form-radio h-4 w-4 text-[#6446d7] accent-[#6446d7]"
+                      />
+                      <span className="text-gray-800 dark:text-gray-200 font-medium">
+                        All Agents
+                      </span>
+                    </label>
+
+                    {sortOptions.map((option: SortOption) => (
+                      <label
+                        key={option.value}
+                        className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-[#397FF5]/10 cursor-pointer transition-all duration-150"
+                      >
+                        <input
+                          type="radio"
+                          name="sortBy"
+                          value={option.value}
+                          checked={sortBy === option.value}
+                          onChange={(e) => {
+                            setSortBy(e.target.value);
+                            setShowDropdown(false);
+                          }}
+                          className="form-radio h-4 w-4 text-[#6446d7] accent-[#6446d7]"
+                        />
+                        <span className="text-gray-800 dark:text-gray-200 font-medium">
+                          {option.label}
+                        </span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>
 
-        {/* Packages (live data + modal) */}
-        <h2 className={H2} id="qz-packages">AI strategy packages</h2>
-        <div className={G2}>
-          {isLoading ? (
-            <div className="col-span-full flex justify-center py-16">
-              <Loader2 className="h-10 w-10 animate-spin text-[#F5C451]" aria-label="Loading" />
+        {/* Cards Grid */}
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-3 md:gap-8">
+          {!loading && sortedAgents().length === 0 ? (
+            <div className="col-span-full flex items-center justify-center h-[60vh]">
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95, y: 30 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                transition={{ duration: 0.5, ease: "easeOut" }}
+                className="flex flex-col items-center p-12 text-center bg-white/90 dark:bg-gray-900/90 backdrop-blur-sm border-2 border-slate-200 dark:border-slate-700 shadow-2xl rounded-3xl max-w-md"
+              >
+                <div className="p-4 mb-4 bg-gradient-to-br from-slate-100 to-slate-200 dark:from-gray-800 dark:to-gray-700 rounded-full">
+                  <UserX className="w-16 h-16 text-gray-800 dark:text-gray-200" />
+                </div>
+                <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100">
+                  No Agents Found
+                </h2>
+                <p className="mt-2 text-gray-800 dark:text-gray-200 text-xs font-bold">
+                  Try adjusting your filters or search criteria.
+                </p>
+              </motion.div>
             </div>
           ) : (
-            plans.map((plan, i) => (
-              <PlanCard
-                key={plan.id || i}
-                plan={plan}
-                i={i}
-                onActivate={() => setSelectedPlan(plan)}
-              />
+            sortedAgents().map((agent, index) => (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.4, delay: index * 0.08 }}
+                key={agent.productId}
+                onClick={() => handleCardClick(agent)}
+                className="cursor-pointer group"
+              >
+                <div className="relative overflow-hidden bg-white dark:bg-gray-900 rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 border border-slate-200/50 dark:border-slate-700/50">
+                  {/* Card Header with Image */}
+                  <div className="relative h-56 sm:h-64 overflow-hidden bg-gradient-to-br from-slate-100 to-slate-200 dark:from-gray-800 dark:to-gray-700">
+                    {agent.imageUrl ? (
+                      <img
+                        src={agent.imageUrl}
+                        alt={agent.productName}
+                        className="object-cover object-top w-full h-full transition-transform duration-700 group-hover:scale-110"
+                      />
+                    ) : (
+                      <div className="flex items-center justify-center w-full h-full">
+                        <Cpu className="w-24 h-24 text-gray-400 dark:text-gray-600" />
+                      </div>
+                    )}
+
+                    {/* Gradient Overlay */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+
+                    {/* Status Badge */}
+                    <div
+                      className={`absolute top-4 right-4 flex items-center gap-1.5 rounded-full px-4 py-2 text-xs font-semibold shadow-md backdrop-blur-sm ${getStatusColorClass(
+                        agent.status
+                      )}`}
+                    >
+                      {agent.status !== "Available" && (
+                        <Clock3 className="h-3.5 w-3.5" />
+                      )}
+                      {agent.status}
+                    </div>
+
+                    {/* Subscribe Badge */}
+                    <div className="absolute top-4 left-4 flex items-center gap-1.5 px-3 py-2 bg-[#397FF5] rounded-xl text-white text-sm font-medium shadow-lg">
+                      <Sparkles className="w-4 h-4" />
+                      Subscribe Agent
+                    </div>
+
+                    {/* Agent Info on Image */}
+                    <div className="absolute bottom-4 left-4 right-4">
+                      <div className="flex items-end justify-between">
+                        <div className="space-y-1">
+                          <h2 className="text-2xl font-bold text-white drop-shadow-lg line-clamp-1">
+                            {agent.productName}
+                          </h2>
+                          <p className="text-white/80 text-sm font-medium flex items-center gap-1.5">
+                            <span className="w-1.5 h-1.5 rounded-full bg-[#397FF5]"></span>
+                            {agent.categoryName}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Card Body */}
+                  <div className="p-6">
+                    {/* Sub Name with Icon */}
+                    <div className="flex items-center gap-2 mb-3">
+                      <Cpu className="w-4 h-4 text-gray-600 dark:text-gray-400" />
+                      <h3 className="text-black dark:text-white font-bold text-sm">
+                        Agent Capabilities
+                      </h3>
+                    </div>
+
+                    <p className="text-gray-800 dark:text-gray-200 text-xs">
+                      {agent.subName}
+                    </p>
+
+                    {/* Capabilities Section */}
+                    <div className="mb-5">
+                      <div className="grid grid-cols-2 gap-2">
+                        {agent.Specification && (
+                          <div className="col-span-2">
+                            <div
+                              className="text-xs text-gray-700 dark:text-gray-300"
+                              dangerouslySetInnerHTML={{
+                                __html: agent.Specification,
+                              }}
+                            />
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* License & Includes Grid */}
+                    <div className="grid grid-cols-1 gap-3 mb-5">
+                      {agent.status !== "Available" && (
+                        <div className="w-full rounded-xl border border-orange-200 bg-orange-50/80 px-3 py-2 dark:border-orange-900 dark:bg-orange-950/30">
+                          <div className="flex items-center gap-3">
+                            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-orange-100 dark:bg-orange-900/40">
+                              <Shield className="h-4 w-4 text-orange-600 dark:text-orange-400" />
+                            </div>
+                            <div>
+                              <h3 className="text-sm font-serif font-medium text-orange-700 dark:text-orange-300">
+                                Acquire License will open once this agent is
+                                launched.
+                              </h3>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* License Details */}
+                      <div className="p-3 bg-gradient-to-br from-blue-50/60 to-blue-50/60 dark:from-blue-950/30 dark:to-blue-950/30 rounded-2xl border border-blue-200/50 dark:border-blue-800/30">
+                        <div className="flex items-center gap-1.5 mb-2">
+                          <FileText
+                            size={14}
+                            className="text-blue-600 dark:text-blue-400"
+                          />
+                          <h4 className="font-bold text-gray-800 dark:text-gray-200 text-[12px]">
+                            License Details
+                          </h4>
+                        </div>
+                        <div className="space-y-1.5 text-xs">
+                          <div className="flex justify-between flex-wrap">
+                            <span className="text-gray-600 dark:text-white text-xs">
+                              Category:
+                            </span>
+                            <span className="font text-gray-800 dark:text-gray-200 text-xs">
+                              {agent.categoryName}
+                            </span>
+                          </div>
+                          <div className="flex justify-between flex-wrap">
+                            <span className="text-gray-600 dark:text-gray-200 text-xs">
+                              License Type:
+                            </span>
+                            <span className="font text-gray-800 dark:text-gray-200 text-xs">
+                              Commercial
+                            </span>
+                          </div>
+                          <div className="flex justify-between flex-wrap">
+                            <span className="text-gray-600 dark:text-gray-200 text-xs">
+                              Status:
+                            </span>
+                            <span
+                              className={`font-bold ${
+                                agent.status === "Available"
+                                  ? "text-green-600 dark:text-green-400"
+                                  : "text-red-600 dark:text-red-400"
+                              }`}
+                            >
+                              {agent.status}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* What You Receive */}
+                      <div className="p-3 bg-gradient-to-br from-blue-50/60 to-pink-50/60 dark:from-blue-950/30 dark:to-pink-950/30 rounded-2xl border border-blue-200/50 dark:border-blue-800/30">
+                        <div className="flex items-center gap-1.5 mb-2">
+                          <Gift
+                            size={14}
+                            className="text-blue-600 dark:text-blue-400"
+                          />
+                          <h4 className="font-bold text-gray-800 dark:text-gray-200 text-[12px]">
+                            What You Receive
+                          </h4>
+                        </div>
+                        <div className="space-y-1">
+                          {[
+                            "Agent License",
+                            "Marketplace Access",
+                            "Deployment Rights",
+                            "Compute Credit Eligibility",
+                            "Future Upgrades",
+                          ].map((item) => (
+                            <div
+                              key={item}
+                              className="flex items-center gap-1.5"
+                            >
+                              <CheckCircle
+                                size={12}
+                                className="text-blue-500 dark:text-blue-400 shrink-0"
+                              />
+                              <span className="text-gray-600 dark:text-white text-xs">
+                                {item}
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Action Buttons */}
+                    <div className="grid grid-cols-2 gap-3">
+                      {agent.status === "Available" && (
+                        <>
+                          <button
+                            className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-semibold text-white bg-gradient-to-r from-blue-600 to-blue-500 shadow-md shadow-blue-500/25 hover:brightness-110 hover:shadow-lg hover:shadow-blue-500/40 hover:-translate-y-0.5 transition-all duration-300 whitespace-nowrap text-[12px]"
+                            onClick={(e) => handleLeaseClick(e, agent)}
+                          >
+                            <RiRobotLine className="mr-2" />
+                            Acquire License
+                          </button>
+                          <button
+                            className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-semibold whitespace-nowrap bg-black/5 backdrop-blur-sm border border-black/100 text-gray-900 hover:bg-black/10 hover:-translate-y-0.5 dark:bg-white/10 dark:border-white/20 dark:text-white dark:hover:bg-white/20 transition-all duration-300 text-[12px]"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleCardClick(agent);
+                            }}
+                          >
+                            <RiEyeLine className="mr-2" />
+                            View Details
+                          </button>
+                        </>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
             ))
           )}
         </div>
 
-        <div className={G4}>
-          {([
-            ['ai', 'AI-powered trading strategies'],
-            ['pkg', 'Multi-DEX execution'],
-            ['shield', 'Risk-managed and secure'],
-            ['trend', 'Optimised yield potential'],
-          ] as [string, string][]).map(([ic, t], i) => (
-            <div className={`${CARD} !p-[14px]`} key={t} style={{ '--i': i } as React.CSSProperties}>
-              <div className={`${LAB} items-start sm:items-center`}><span className={IB}><Ic n={ic} /></span><span className="leading-tight text-[11px] sm:text-[12.5px]">{t}</span></div>
-            </div>
-          ))}
-        </div>
-
-        {/* Offers */}
-        <h2 className={H2}>New offers and promotions</h2>
-        <div className={G3}>
-          {OFF.map((o, i) => (
-            <OfferCard key={o.t} o={o} i={i} />
-          ))}
-        </div>
-
-        {/* Rank ladder */}
-        <h2 className={H2}>Rank rewards ladder</h2>
-        <div className="mt-1.5 flex items-end gap-[10px] overflow-x-auto px-1 pt-4 pb-2 custom-scrollbar">
-          {RK.map(([n, b, r], k) => (
-            <div
-              key={n}
-              className="flex flex-[1_0_100px] sm:flex-[1_0_118px] flex-col justify-end gap-0.5 rounded-t-[16px] rounded-b-[12px] p-3 text-white animate-[qzgrow_.8s_both] [animation-delay:calc(var(--k)*70ms)] [transform-origin:bottom] [box-shadow:0_12px_22px_-12px_var(--c)] [background:linear-gradient(180deg,var(--c),color-mix(in_srgb,var(--c)_55%,#000))]"
-              style={{ '--c': RC[k], '--k': k, minHeight: 90 + k * 17 } as React.CSSProperties}
-            >
-              <span className="text-[12px] font-semibold">{n}</span>
-              <small className="text-[10px] sm:text-[11px] opacity-[.85]">Business ${fmt(b, 0)}</small>
-              <b className="text-[15px] sm:text-[17px]">${fmt(r, 0)}</b>
-            </div>
-          ))}
-        </div>
-
-        <div className="mt-[26px] text-center text-[12px] text-[color:var(--mut)]">
-          Proposed terms. Daily rewards are not guaranteed. All AI strategy yield income is paid exclusively in USDT.
-        </div>
+        {/* Dialog — only passing props that LeaseModal actually accepts */}
+        {openDialog && selectedAgent && (
+          <LeaseModal
+            agent={selectedAgent}
+            onClose={handleCloseDialog}
+            productId={productId}
+            month={month}
+          />
+        )}
       </div>
-
-      <ActivatePlanModal
-        isOpen={!!selectedPlan}
-        onClose={() => setSelectedPlan(null)}
-        plan={selectedPlan}
-      />
-    </div>
+    </>
   );
 }

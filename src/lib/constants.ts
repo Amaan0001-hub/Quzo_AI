@@ -41,3 +41,9 @@ export const QUERY_KEYS = {
 } as const;
 
 export const DEFAULT_PAGE_SIZE = 20;
+
+export const sortOptions = [
+  { label: "Personal Agents ($10 - $490)", value: "personalagents" },
+  { label: "Business Agents ($500 - $4,950)", value: "businessagents" },
+  { label: "Industrial Agents ($5,000 - $20,000)", value: "industrialagents" },
+] as const;
