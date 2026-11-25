@@ -29,7 +29,7 @@ export async function GET(request: NextRequest) {
     }
 
     const backend = createBackendClient(token);
-    const { data } = await backend.get("/FundManager/getAllInvestmentProduct", {
+    const { data } = await backend.get("/Product/getAllInvestmentProduct", {
       params: Type ? { Type: parseInt(Type, 10) } : undefined,
     });
 
