@@ -33,6 +33,7 @@ export const primaryNav: NavItem[] = [
     dropdownItems: [
       { label: "AI Engine", href: "/ai-engine" },
       { label: "AI Assistant", href: "/ai-assistant" },
+      { label: "AI Tools", href: "/ai-tools" },
     ],
   },
   {
