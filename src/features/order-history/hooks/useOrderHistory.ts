@@ -15,3 +15,10 @@ export function useBoosterOrderHistory() {
     queryFn: () => orderHistoryService.getBoosterOrderHistory(),
   });
 }
+
+export function useAgentLicenseHistory() {
+  return useQuery({
+    queryKey: [...QUERY_KEYS.orderHistory.all, "agentLicenseHistory"],
+    queryFn: () => orderHistoryService.getAgentLicenseHistory(),
+  });
+}
