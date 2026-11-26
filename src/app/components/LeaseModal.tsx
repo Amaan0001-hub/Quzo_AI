@@ -134,7 +134,7 @@ const PLANS: Record<PlanKey, Plan> = {
   personal: {
     key: "personal",
     name: "Personal",
-    multiplier: 6,
+    multiplier: 2.5,
     revenueShare: "6%-7%",
     range: { min: 10, max: 490, step: 10 },
     badge: "Starter",
@@ -162,7 +162,7 @@ const PLANS: Record<PlanKey, Plan> = {
   business: {
     key: "business",
     name: "Business",
-    multiplier: 8,
+    multiplier: 2.5,
     revenueShare: "7%–8%",
     range: { min: 500, max: 1490, step: 50 },
     badge: "Popular",
@@ -191,9 +191,9 @@ const PLANS: Record<PlanKey, Plan> = {
   industrial: {
     key: "industrial",
     name: "Industrial",
-    multiplier: 10,
+    multiplier: 2.5,
     revenueShare: "9%–10%",
-    range: { min: 5000, max: 20000, step: 100 },
+    range: { min: 1500, max: 25000, step: 100 },
     badge: "Enterprise",
     Icon: RiBuilding4Line,
     tw: {
@@ -369,7 +369,7 @@ export default function LeaseModal({
   const plan = PLANS[selectedPlan];
   const { min, max, step } = plan.range;
   const clamped = Math.min(Math.max(investment, min), max);
-  const credits = clamped * plan.multiplier;
+  const credits = clamped * 100;
   const pct = ((clamped - min) / (max - min)) * 100;
 
   const canAcquireLicense = Boolean(searchedUrid);
@@ -782,7 +782,8 @@ export default function LeaseModal({
                 </span>{" "}
                 and marked for deployment under the{" "}
                 <Link
-                  href={routeMap["/community"] || "/community"}
+                  // href={routeMap["/community"] || "/community"}
+                  href="#"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="font-semibold text-cyan-700 underline underline-offset-2 transition-colors hover:text-cyan-900 dark:text-[#65e7ff] dark:hover:text-white"
