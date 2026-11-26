@@ -28,16 +28,7 @@ export const primaryNav: NavItem[] = [
     label: "My Assets",
     href: "/fund-director",
   },
-  {
-    label: "Tools",
-    href: "/ai-engine",
-    isDropdown: true,
-    dropdownItems: [
-      { label: "AI Engine", href: "/ai-engine" },
-      { label: "AI Assistant", href: "/ai-assistant" },
-      { label: "AI Tools", href: "/ai-tools" },
-    ],
-  },
+
   {
     label: "Analytics",
     href: "/analytics",
@@ -65,6 +56,16 @@ export const primaryNav: NavItem[] = [
       { label: "Income Report", href: "/income-reports" },
       { label: "Wallet Manager", href: "/reports" },
       { label: "Rank", href: "/rank" },
+    ],
+  },
+  {
+    label: "Tools",
+    href: "/ai-engine",
+    isDropdown: true,
+    dropdownItems: [
+      { label: "AI Engine", href: "/ai-engine" },
+      { label: "AI Assistant", href: "/ai-assistant" },
+      { label: "AI Tools", href: "/ai-tools" },
     ],
   },
 ];

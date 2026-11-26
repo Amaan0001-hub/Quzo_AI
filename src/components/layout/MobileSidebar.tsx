@@ -24,7 +24,7 @@ import {
   Rocket,
   ScrollText,
   UserRoundPlus,
-   Sparkles, 
+  Sparkles,
   UsersRound,
   WalletCards,
   Wrench,
@@ -87,6 +87,29 @@ function isNavItemActive(pathname: string, item: (typeof primaryNav)[number]) {
     : isNavPathActive(pathname, item.href);
 }
 
+/*
+  THEME (same as home page)
+  base   : #050a18 / #0a1224 navy
+  accent : #65e7ff
+  active : #65e7ff glass + glowing left bar
+  borders: white/10
+*/
+const itemBase =
+  "group relative flex items-center gap-3 rounded-2xl border px-4 py-3 font-medium transition-all duration-300";
+const itemActive =
+  "border-cyan-500/40 bg-gradient-to-r from-[#65e7ff]/30 via-[#65e7ff]/15 to-transparent text-slate-900 shadow-[0_8px_24px_-12px_rgba(6,182,212,0.5)] dark:border-[#65e7ff]/40 dark:from-[#65e7ff]/20 dark:via-[#65e7ff]/10 dark:text-white dark:shadow-[0_0_28px_-8px_rgba(101,231,255,0.55)]";
+const itemIdle =
+  "border-transparent text-slate-600 dark:text-slate-300 hover:border-slate-200 dark:hover:border-white/10 hover:bg-slate-100 dark:hover:bg-white/[0.05] hover:text-slate-900 dark:hover:text-white";
+
+function ActiveBar() {
+  return (
+    <span
+      aria-hidden="true"
+      className="absolute left-0 top-1/2 h-6 w-[3px] -translate-y-1/2 rounded-r-full bg-cyan-500 shadow-[0_0_12px_rgba(6,182,212,0.6)] dark:bg-[#65e7ff] dark:shadow-[0_0_12px_rgba(101,231,255,0.9)]"
+    />
+  );
+}
+
 export function MobileSidebar() {
   const pathname = usePathname();
   const router = useRouter();
@@ -121,21 +144,21 @@ export function MobileSidebar() {
       {isMobileOpen && (
         <button
           type="button"
-          className="fixed inset-x-0 bottom-0 top-16 z-30 bg-black/50 lg:hidden"
+          className="fixed inset-x-0 bottom-0 top-16 z-30 bg-slate-900/40 backdrop-blur-sm dark:bg-[#050a18]/70 lg:hidden"
           onClick={() => setMobileOpen(false)}
           aria-label="Close navigation menu"
         />
       )}
       <aside
         id="primary-navigation"
-        className={`fixed left-0 top-16 z-40 flex h-[calc(100vh-4rem)] w-64 shrink-0 flex-col overflow-y-auto border-r border-gray-200 bg-white transition-[transform,visibility] dark:border-[#1E293B] dark:bg-[#0B1021] lg:sticky lg:top-16 lg:z-auto lg:block ${
+        className={`fixed left-0 top-16 z-40 flex h-[calc(100vh-4rem)] w-64 shrink-0 flex-col overflow-y-auto border-r border-slate-200 dark:border-white/10 bg-white dark:bg-[linear-gradient(180deg,#0a1224_0%,#050a18_55%,#050a18_100%)] transition-[transform,visibility] [scrollbar-color:rgba(101,231,255,0.25)_transparent] [scrollbar-width:thin] lg:sticky lg:top-16 lg:z-auto lg:block ${
           isMobileOpen
             ? "visible translate-x-0"
             : "invisible -translate-x-full lg:visible lg:translate-x-0"
         }`}
         aria-label="Primary navigation"
       >
-        <nav className="flex-1 space-y-1 p-4">
+        <nav className="flex-1 space-y-1.5 p-4">
           {primaryNav.map((item) => {
             const isActive = isNavItemActive(pathname, item);
             const isDropdownOpen = openDropdown === item.label;
@@ -146,29 +169,35 @@ export function MobileSidebar() {
                   <button
                     type="button"
                     onClick={() => setOpenDropdown(isDropdownOpen ? null : item.label)}
-                    className={`flex w-full items-center justify-between gap-3 rounded-2xl px-4 py-3 text-left text-sm font-medium transition-all ${
-                      isActive
-                        ? "bg-gradient-to-r from-[#12a594] to-[#32d3bd] text-white shadow-[0_12px_24px_rgba(18,165,148,0.25)]"
-                        : "text-slate-700 hover:bg-[#12a594]/5 dark:text-slate-200 dark:hover:bg-[#7ff0cf]/[0.06]"
+                    className={`${itemBase} w-full justify-between text-left text-sm ${
+                      isActive ? itemActive : itemIdle
                     }`}
                     aria-expanded={isDropdownOpen}
                   >
+                    {isActive && <ActiveBar />}
                     <span className="flex items-center gap-3">
                       {item.img ? (
                         <img src={item.img} alt="" className="h-5 w-5" />
                       ) : (
-                        <MenuIcon label={item.label} className="h-5 w-5 shrink-0" />
+                        <MenuIcon
+                          label={item.label}
+                          className={`h-5 w-5 shrink-0 transition-colors ${
+                            isActive
+                              ? "text-cyan-700 dark:text-[#65e7ff]"
+                              : "text-slate-500 dark:text-slate-400 group-hover:text-cyan-700 dark:group-hover:text-[#65e7ff]"
+                          }`}
+                        />
                       )}
                       {item.label}
                     </span>
                     <ChevronDown
-                      className={`h-4 w-4 transition-transform ${
-                        isDropdownOpen ? "rotate-180" : ""
-                      }`}
+                      className={`h-4 w-4 transition-transform duration-300 ${
+                        isActive ? "text-cyan-700 dark:text-[#65e7ff]" : "text-slate-500"
+                      } ${isDropdownOpen ? "rotate-180" : ""}`}
                     />
                   </button>
                   {isDropdownOpen && (
-                    <div className="ml-4 mt-2 space-y-1">
+                    <div className="ml-6 mt-2 space-y-1 border-l border-[#65e7ff]/20 pl-3">
                       {item.dropdownItems.map((dropdownItem) => {
                         const isDropdownItemActive = isNavPathActive(pathname, dropdownItem.href);
 
@@ -178,13 +207,20 @@ export function MobileSidebar() {
                             href={dropdownItem.href}
                             onClick={(event) => handleNavigation(event, dropdownItem.href)}
                             aria-current={isDropdownItemActive ? "page" : undefined}
-                            className={`flex items-center gap-3 rounded-xl px-4 py-2 text-sm transition-all ${
+                            className={`group flex items-center gap-3 rounded-xl border px-3 py-2 text-sm transition-all duration-300 ${
                               isDropdownItemActive
-                                ? "bg-gradient-to-r from-[#12a594] to-[#32d3bd] font-semibold text-white shadow-[0_8px_18px_rgba(18,165,148,0.2)]"
-                                : "text-slate-600 hover:bg-[#12a594]/5 dark:text-slate-300 dark:hover:bg-[#7ff0cf]/[0.06]"
+                                ? "border-cyan-500/30 bg-cyan-50 font-semibold text-cyan-800 shadow-sm dark:border-[#65e7ff]/30 dark:bg-[#65e7ff]/10 dark:text-[#65e7ff] dark:shadow-[0_0_20px_-8px_rgba(101,231,255,0.6)]"
+                                : "border-transparent text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-white/[0.05] hover:text-slate-900 dark:hover:text-white"
                             }`}
                           >
-                            <MenuIcon label={dropdownItem.label} className="h-4 w-4 shrink-0" />
+                            <MenuIcon
+                              label={dropdownItem.label}
+                              className={`h-4 w-4 shrink-0 transition-colors ${
+                                isDropdownItemActive
+                                  ? "text-cyan-700 dark:text-[#65e7ff]"
+                                  : "text-slate-500 group-hover:text-cyan-700 dark:group-hover:text-[#65e7ff]"
+                              }`}
+                            />
                             {dropdownItem.label}
                           </Link>
                         );
@@ -201,45 +237,47 @@ export function MobileSidebar() {
                 href={item.href}
                 onClick={(event) => handleNavigation(event, item.href)}
                 aria-current={isActive ? "page" : undefined}
-                className={`flex items-center gap-3 rounded-2xl px-4 py-3 text-base font-medium transition-all ${
-                  isActive
-                    ? "bg-gradient-to-r from-[#12a594] to-[#32d3bd] text-white shadow-[0_12px_24px_rgba(18,165,148,0.25)]"
-                    : "text-slate-700 hover:bg-[#12a594]/5 dark:text-slate-200 dark:hover:bg-[#7ff0cf]/[0.06]"
-                }`}
+                className={`${itemBase} text-base ${isActive ? itemActive : itemIdle}`}
               >
+                {isActive && <ActiveBar />}
                 {item.img ? (
                   <img src={item.img} alt="" className="h-5 w-5" />
                 ) : (
-                  <MenuIcon label={item.label} className="h-5 w-5 shrink-0" />
+                  <MenuIcon
+                    label={item.label}
+                    className={`h-5 w-5 shrink-0 transition-colors ${
+                      isActive ? "text-cyan-700 dark:text-[#65e7ff]" : "text-slate-500 dark:text-slate-400 group-hover:text-cyan-700 dark:group-hover:text-[#65e7ff]"
+                    }`}
+                  />
                 )}
                 {item.label}
               </Link>
             );
           })}
         </nav>
-        <div className="mt-auto border-t border-gray-200 p-4 dark:border-[#1E293B]">
+        <div className="mt-auto border-t border-slate-200 dark:border-white/10 p-4">
           <button
             type="button"
             onClick={() => {
               setMobileOpen(false);
               logout.mutate();
             }}
-            className="flex w-full items-center gap-3 rounded-2xl px-4 py-3 text-base font-medium text-rose-600 transition-colors hover:bg-rose-500/10 dark:text-rose-400"
+            className="flex w-full items-center gap-3 rounded-2xl border border-rose-400/20 bg-rose-500/[0.06] px-4 py-3 text-base font-medium text-rose-600 dark:text-rose-300 transition-all duration-300 hover:border-rose-400/40 hover:bg-rose-500/15 hover:text-rose-700 dark:hover:text-rose-200"
           >
             <LogOut className="h-5 w-5 shrink-0" aria-hidden="true" />
             Logout
           </button>
         </div>
       </aside>
-      {loadingInvestmentFund && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-[#050505]/75 px-4 backdrop-blur-sm">
-          <div className="flex h-28 w-28 items-center justify-center rounded-full border border-[#7ff0cf]/20 bg-[#0B1021] shadow-2xl shadow-[#12a594]/10">
-            <div className="flex h-14 w-14 items-center justify-center rounded-full border border-[#7ff0cf]/20 bg-[#7ff0cf]/10">
-              <Loader2 className="h-7 w-7 animate-spin text-[#7ff0cf]" aria-hidden />
+      {/* {loadingInvestmentFund && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/40 px-4 backdrop-blur-sm dark:bg-[#050a18]/80">
+          <div className="flex h-28 w-28 items-center justify-center rounded-full border border-[#65e7ff]/25 bg-white shadow-xl dark:bg-[#0a1224] dark:shadow-[0_0_60px_-10px_rgba(101,231,255,0.5)]">
+            <div className="flex h-14 w-14 items-center justify-center rounded-full border border-[#65e7ff]/30 bg-[#65e7ff]/10">
+              <Loader2 className="h-7 w-7 animate-spin text-cyan-700 dark:text-[#65e7ff]" aria-hidden />
             </div>
           </div>
         </div>
-      )}
+      )} */}
     </>
   );
 }

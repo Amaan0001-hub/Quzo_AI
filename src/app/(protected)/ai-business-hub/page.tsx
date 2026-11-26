@@ -53,8 +53,8 @@ function Ring({ pct, size = 100, color = "#3b8bff", sub = "" }: { pct: number; s
   return (
     <div className="ring-wrap" style={{ position: 'relative', width: size, height: size }}>
       <svg width={size} height={size} style={{ transform: 'rotate(-90deg)' }}>
-        <circle cx={size/2} cy={size/2} r={radius} stroke="rgba(255,255,255,0.1)" strokeWidth="8" fill="none" />
-        <circle cx={size/2} cy={size/2} r={radius} stroke={color} strokeWidth="8" fill="none" strokeDasharray={circumference} strokeDashoffset={offset} strokeLinecap="round" />
+        <circle cx={size / 2} cy={size / 2} r={radius} stroke="rgba(255,255,255,0.1)" strokeWidth="8" fill="none" />
+        <circle cx={size / 2} cy={size / 2} r={radius} stroke={color} strokeWidth="8" fill="none" strokeDasharray={circumference} strokeDashoffset={offset} strokeLinecap="round" />
       </svg>
       <div className="ring-txt" style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
         <span style={{ fontSize: 18, fontWeight: 'bold' }}>{pct.toFixed(0)}%</span>
@@ -76,8 +76,8 @@ function Donut({ size = 100, stroke = 12, parts = [], center }: { size?: number;
           const segment = (
             <circle
               key={i}
-              cx={size/2}
-              cy={size/2}
+              cx={size / 2}
+              cy={size / 2}
               r={radius}
               stroke={part.color}
               strokeWidth={stroke}
@@ -159,9 +159,8 @@ function MetricRow({
 }) {
   return (
     <div
-      className={`grid grid-cols-[1fr_auto] items-center gap-x-4 gap-y-2 border-b border-[#e3eeec] dark:border-[#1E293B] px-4 py-3 md:grid-cols-[2fr_1.2fr_3fr_1.2fr] ${
-        highlight ? "bg-[#eef6f9] dark:bg-[#0B1021]" : "bg-white dark:bg-[#0B1021]"
-      }`}
+      className={`grid grid-cols-[1fr_auto] items-center gap-x-4 gap-y-2 border-b border-[#e3eeec] dark:border-[#1E293B] px-4 py-3 md:grid-cols-[2fr_1.2fr_3fr_1.2fr] ${highlight ? "bg-[#eef6f9] dark:bg-[#0B1021]" : "bg-white dark:bg-[#0B1021]"
+        }`}
       style={{ borderLeft: `4px solid ${accent}` }}
     >
       <div className="flex items-center gap-3">
@@ -326,6 +325,14 @@ export default function AIBUSINESSHUB() {
   const rewardIncome = getNumber(affiliate?.RewardIncome);
   const salaryIncome = getNumber(affiliate?.SalaryIncome);
   const daoIncome = getNumber(affiliate?.DaoIncome);
+  // Income data from API
+  const AgentAccessRewards = getNumber(affiliate?.AgentAccessRewards);
+  const AgenticFleetLeadershipRewards = getNumber(affiliate?.AgenticFleetLeadershipRewards);
+  const DirectActivationRewards = getNumber(affiliate?.DirectActivationRewards);
+  const BoosterProfitProtocol = getNumber(affiliate?.BoosterProfitProtocol);
+  const UnityRevenueClubs = getNumber(affiliate?.UnityRevenueClubs);
+  const ReferralRoyaltyRewards = getNumber(affiliate?.ReferralRoyaltyRewards);
+  const PerformanceRewrads = getNumber(affiliate?.PerformanceRewrads);
 
   // Package API values
   const totalTradingPackage = getNumber(affiliate?.TotalEarning);
@@ -388,23 +395,23 @@ export default function AIBUSINESSHUB() {
   }
 
   const kpis = [
-    { label: "Direct Partner Rewards", value: directIncome, prefix: "$", dec: 2, tone: "green", icon: "arrowUp", series: [12, 15, 18, 22, 25, 28, 30] },
-    { label: "AI Strategy Rewards", value: dailyProfitIncome, prefix: "$", dec: 2, tone: "blue", icon: "chart", series: [10, 12, 14, 16, 18, 20, 22] },
-    { label: "Booster Income", value: boosterProfitAPI, prefix: "$", dec: 2, tone: "violet", icon: "award", series: [8, 10, 12, 15, 18, 20, 25] },
-    { label: "DAO Income", value: daoIncome, prefix: "$", dec: 2, tone: "amber", icon: "rocket", series: [15, 18, 22, 25, 28, 32, 35] },
-    { label: "Network Rewards", value: levelIncomeAPI, prefix: "$", dec: 2, tone: "violet", icon: "group", series: [10, 12, 14, 16, 18, 20, 22] },
-    { label: "Achievement Rewards", value: rewardIncome, prefix: "$", dec: 2, tone: "blue", icon: "share", series: [12, 14, 16, 18, 20, 22, 24] },
-    { label: "Salary Income", value: salaryIncome, prefix: "$", dec: 2, tone: "green", icon: "refresh", series: [15, 18, 21, 24, 27, 30, 33] },
+    { label: "Direct Activation Rewards", value: DirectActivationRewards, prefix: "$", dec: 2, tone: "blue", icon: "chart", series: [10, 12, 14, 16, 18, 20, 22] },
+    { label: "Agent Access Rewards", value: AgentAccessRewards, prefix: "$", dec: 2, tone: "green", icon: "arrowUp", series: [12, 15, 18, 22, 25, 28, 30] },
+    { label: "Booster Profit Protocol", value: BoosterProfitProtocol, prefix: "$", dec: 2, tone: "violet", icon: "award", series: [8, 10, 12, 15, 18, 20, 25] },
+    { label: "Referral Royalty Rewards", value: ReferralRoyaltyRewards, prefix: "$", dec: 2, tone: "amber", icon: "rocket", series: [15, 18, 22, 25, 28, 32, 35] },
+    { label: "Fleet Leadership Rewards", value: AgenticFleetLeadershipRewards, prefix: "$", dec: 2, tone: "violet", icon: "group", series: [10, 12, 14, 16, 18, 20, 22] },
+    { label: "Performance Rewrads", value: PerformanceRewrads, prefix: "$", dec: 2, tone: "blue", icon: "share", series: [12, 14, 16, 18, 20, 22, 24] },
+    { label: "Unity Revenue Clubs", value: UnityRevenueClubs, prefix: "$", dec: 2, tone: "green", icon: "refresh", series: [15, 18, 21, 24, 27, 30, 33] },
   ];
 
   const incomeHistory = [
-    { name: "Direct Referral Income", amount: directIncome, icon: "arrowUp" },
-    { name: "Daily Profit Income", amount: dailyProfitIncome, icon: "chart" },
-    { name: "Level Income", amount: levelIncomeAPI, icon: "group" },
-    { name: "Booster Income", amount: boosterProfitAPI, icon: "award" },
-    { name: "DAO Income", amount: daoIncome, icon: "rocket" },
-    { name: "Rewards Income", amount: rewardIncome, icon: "share" },
-    { name: "Salary Income", amount: salaryIncome, icon: "refresh" },
+    { name: "Agent Access Rewards", amount: AgentAccessRewards, icon: "arrowUp" },
+    { name: "Direct Activation Rewards", amount: DirectActivationRewards, icon: "chart" },
+    { name: "Booster Profit Protocol", amount: BoosterProfitProtocol, icon: "group" },
+    { name: "Referral Royalty Rewards", amount: ReferralRoyaltyRewards, icon: "award" },
+    { name: "Fleet Leadership Rewards", amount: AgenticFleetLeadershipRewards, icon: "rocket" },
+    { name: "Performance Rewrads", amount: PerformanceRewrads, icon: "share" },
+    { name: "Unity Revenue Clubs", amount: UnityRevenueClubs, icon: "refresh" },
   ];
 
   const incomeTotal = incomeHistory.reduce((a, i) => a + i.amount, 0);
@@ -424,7 +431,7 @@ export default function AIBUSINESSHUB() {
 
   return (
     <>
-      <div className="hub-bg p-4 sm:p-6 lg:p-8">
+      <div className=" p-4 sm:p-6 lg:p-8">
 
         {/* Business Overview */}
         <section className="mb-8">
@@ -622,7 +629,7 @@ export default function AIBUSINESSHUB() {
                 from="#a8b860"
                 to="#34cdb8"
               />
-           
+
               <MetricRow
                 icon={<TrendingUp size={18} />}
                 label="Team Business"
@@ -633,7 +640,7 @@ export default function AIBUSINESSHUB() {
                 from="#a8b860"
                 to="#34cdb8"
               />
-                 <MetricRow
+              <MetricRow
                 icon={<Zap size={18} />}
                 label="Level Open"
                 value={<CountUp value={levelOpen} prefix="" dec={0} />}
