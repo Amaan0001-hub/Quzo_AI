@@ -7,6 +7,7 @@ import {
   ArrowRight,
   ArrowUpRight,
   Bot,
+  Cpu,
   type LucideIcon,
   ChartNoAxesCombined,
   Coins,
@@ -29,13 +30,55 @@ import {
   Sparkles,
   Globe,
 } from "lucide-react";
-import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+import {
+  Bar,
+  BarChart,
+  CartesianGrid,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from "recharts";
+import { useDashboardSummary } from "@/features/dashboard/hooks/useDashboardSummary";
 
 /* ============================================================
-   DUMMY DATA & CONSTANTS
+   TYPES
    ============================================================ */
 
-// Global AI Market Data
+/**
+ * Shape returned by GET /user-details (matches the real API response).
+ * Only the fields this dashboard consumes are listed; extra fields are
+ * safely ignored thanks to the index signature.
+ */
+interface WalletData {
+  FullName?: string;
+  AuthLogin?: string;
+  AIAgentLicense?: number;
+  PurchaseCredit?: number;
+  DeployedCredit?: number;
+  UserRank?: string;
+  CurrentSalary?: number;
+  RewardAmtQualify?: number;
+  RewardTotal?: number;
+  NextRank?: string;
+  NextSalary?: number;
+  TeamBusiness?: number;
+  TotalTeam?: number;
+  ActiveTeam?: number;
+  BoosterPackage?: string;
+  Boostertype?: string;
+  DepositWallet?: number;
+  IncomeWallet?: number;
+  YieldWallet?: number;
+  QuzoWallet?: number;
+  TradingPackage?: number; // may not exist in API — treated as optional
+  [key: string]: unknown;
+}
+
+/* ============================================================
+   CONSTANTS
+   ============================================================ */
+
 const MARKET_VIEWS = {
   spending: {
     tab: "AI spending",
@@ -98,6 +141,9 @@ const MARKET_STATS = [
     source: "WEF Future of Jobs 2025",
   },
 ];
+
+const PENDING = "To be updated";
+
 function parseMarketValue(v: string) {
   const prefix = v.startsWith("$") ? "$" : "";
   const suffix = v.includes("T") ? "T" : v.includes("M") ? "M" : "";
@@ -105,7 +151,7 @@ function parseMarketValue(v: string) {
   return { num, prefix, suffix };
 }
 
-/* ---------- INCOME: ---------- */
+/* ---------- INCOME (kept for reference, unused after refactor) ---------- */
 const INCOME_SERIES = [
   ["yield", "Yield", "var(--c1)"],
   ["performance", "Performance", "var(--c2)"],
@@ -179,7 +225,6 @@ const INCOME_RANGE_TABS: [IncomeRangeKey, string][] = [
   ["1Y", "1 Year"],
 ];
 
-// Recharts shared config 
 const TIP = {
   contentStyle: {
     background: "var(--card)",
@@ -209,13 +254,6 @@ const LEVEL_INCOME = [
   { level: "Level 1", members: "14 members", value: "$48,200", percent: 100 },
   { level: "Level 2", members: "21 members", value: "$32,100", percent: 75 },
   { level: "Level 3", members: "13 members", value: "$16,100", percent: 40 },
-];
-
-const AFFILIATE_STATS = [
-  { label: "Direct Referrals", value: "14" },
-  { label: "Total Team Members", value: "48" },
-  { label: "Active Members", value: "36" },
-  { label: "Team Business Volume", value: "$96,400" },
 ];
 
 const RECENT_JOINED = [
@@ -280,7 +318,33 @@ const NOTIFICATIONS = [
   },
 ];
 
-/* ---------- Inline Reveal + Counter ---------- */
+/* ============================================================
+   HELPERS
+   ============================================================ */
+
+function formatMoney(n: number, decimals = 2): string {
+  return Number(n).toLocaleString("en-US", {
+    minimumFractionDigits: decimals,
+    maximumFractionDigits: decimals,
+  });
+}
+
+function SectionHeading({ children }: { children: ReactNode }) {
+  return (
+    <h3 className="flex items-center gap-2 text-sm font-bold text-[#06262f] dark:text-white">
+      {children}
+    </h3>
+  );
+}
+
+function Pill({ children }: { children: ReactNode }) {
+  return (
+    <span className="inline-flex items-center rounded-full border border-[#12a594]/30 bg-[#12a594]/10 px-3 py-1 text-[10px] font-bold text-[#12a594] dark:text-[#35d6c0]">
+      {children}
+    </span>
+  );
+}
+
 function Reveal({
   children,
   delay = 0,
@@ -350,8 +414,9 @@ function Counter({
 }
 
 /* ============================================================
-   SUB-COMPONENT: Income Range Tabs
+   SUB-COMPONENTS
    ============================================================ */
+
 function IncomeRangeTabs({
   value,
   onChange,
@@ -380,9 +445,6 @@ function IncomeRangeTabs({
   );
 }
 
-/* ============================================================
-   SECTION: Income Overview 
-   ============================================================ */
 function IncomeOverviewSection() {
   const [range, setRange] = useState<IncomeRangeKey>("30D");
   const reduced = useReducedMotion();
@@ -404,7 +466,6 @@ function IncomeOverviewSection() {
       </div>
 
       <div className="flex flex-col gap-6">
-        {/* Header & Time Filters */}
         <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
           <h2 className="text-2xl font-bold text-slate-900 dark:text-white">
             Your Income Overview
@@ -412,7 +473,6 @@ function IncomeOverviewSection() {
           <IncomeRangeTabs value={range} onChange={setRange} />
         </div>
 
-        {/* Main Chart Card — Recharts stacked bars */}
         <div className="rounded-3xl border border-slate-100 bg-white p-6 shadow-sm dark:border-[#153747] dark:bg-[#07242e]">
           <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
             <div>
@@ -467,7 +527,6 @@ function IncomeOverviewSection() {
             </ResponsiveContainer>
           </div>
 
-          {/* Custom legend: Affiliate · Performance · */}
           <div className="mt-3 flex justify-center gap-6">
             {[...INCOME_SERIES].reverse().map(([key, name, color]) => (
               <div
@@ -481,7 +540,6 @@ function IncomeOverviewSection() {
           </div>
         </div>
 
-        {/* Bottom Row: Income by source + Recent transactions */}
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
           <div className="rounded-3xl border border-slate-100 bg-white p-6 shadow-sm dark:border-[#153747] dark:bg-[#07242e]">
             <h3 className="mb-6 text-sm font-bold text-slate-900 dark:text-white">
@@ -552,31 +610,312 @@ function IncomeOverviewSection() {
   );
 }
 
+/* ---------------------------------------------------------------
+   LicenseCredits — now API-driven via walletData
+   --------------------------------------------------------------- */
+function LicenseCredits({ walletData }: { walletData: WalletData }) {
+  const licenseValue = Number(walletData.AIAgentLicense ?? 0);
+  const creditsPurchased = Number(walletData.PurchaseCredit ?? 0);
+  const creditsUtilized = Number(walletData.DeployedCredit ?? 0);
+  const serviceRevenue = Number(walletData.IncomeWallet ?? 0);
+  const vendorRevenue = Number(walletData.TeamBusiness ?? 0);
+
+  const steps: [string, string, number | null, boolean, number, LucideIcon][] = [
+    ["AI License Value", "Your agent license", licenseValue, true, 0, BadgeCheck],
+    [
+      "Total Credits Purchased",
+      "AI compute credits",
+      creditsPurchased,
+      false,
+      0,
+      Coins,
+    ],
+    [
+      "Total Credits Utilized",
+      "Consumed or deployed",
+      creditsUtilized,
+      false,
+      0,
+      Cpu,
+    ],
+    [
+      "Total Revenue Generated",
+      "Revenue, not net profit",
+      serviceRevenue + vendorRevenue,
+      true,
+      2,
+      TrendingUp,
+    ],
+  ];
+
+  const used =
+    creditsPurchased === 0
+      ? null
+      : Math.min(100, Math.round((creditsUtilized / creditsPurchased) * 100));
+
+  return (
+    <div className="relative overflow-hidden rounded-[1.5rem] border border-white/10 bg-[#070b18] p-5 text-white sm:p-6">
+      <div className="absolute -left-24 -top-24 h-64 w-64 rounded-full bg-cyan-500/20 blur-3xl" />
+      <div className="absolute -bottom-24 -right-16 h-72 w-72 rounded-full bg-violet-600/30 blur-3xl" />
+      <div className="relative">
+        <h3 className="text-lg font-bold">AI License &amp; Credits</h3>
+        <p className="mb-5 text-xs text-slate-400">
+          License → Credits → Utilization → Revenue
+        </p>
+
+        <ol className="grid grid-cols-[repeat(auto-fit,minmax(min(100%,210px),1fr))] gap-3">
+          {steps.map(([label, sub, value, isMoney, decimals, Icon], i) => (
+            <li
+              key={label}
+              className="relative rounded-2xl border border-white/10 bg-white/[0.05] p-4 backdrop-blur transition hover:-translate-y-1 hover:border-cyan-300/60"
+            >
+              <div className="mb-4 flex items-center justify-between">
+                <span className="rounded-xl bg-gradient-to-br from-cyan-500 to-violet-600 p-2.5 shadow-[0_0_24px_-4px_#22d3ee]">
+                  <Icon className="h-5 w-5" />
+                </span>
+                {i < steps.length - 1 ? (
+                  <ArrowRight className="h-4 w-4 text-cyan-300" />
+                ) : (
+                  <span className="h-2 w-2 rounded-full bg-emerald-400" />
+                )}
+              </div>
+              <p className="text-xs text-slate-300">{label}</p>
+              <p className="my-1 flex min-h-[2.25rem] items-center text-3xl font-bold">
+                {value === null ? (
+                  <span className="text-base font-semibold text-slate-400">
+                    {PENDING}
+                  </span>
+                ) : (
+                  <Counter
+                    value={value}
+                    prefix={isMoney ? "$" : ""}
+                    decimals={decimals}
+                  />
+                )}
+              </p>
+              <p className="text-[11px] text-slate-500">{sub}</p>
+            </li>
+          ))}
+        </ol>
+
+        <div className="mt-5 flex flex-wrap items-center gap-3">
+          <div className="min-w-0 flex-[1_1_240px]">
+            <div className="mb-2 flex justify-between text-xs text-slate-300">
+              <span>Credit utilization</span>
+              <span>{used === null ? PENDING : `${used}%`}</span>
+            </div>
+            <div className="h-2 overflow-hidden rounded-full bg-white/10">
+              <div
+                className="h-full rounded-full bg-gradient-to-r from-cyan-400 to-violet-500 transition-all duration-1000"
+                style={{ width: `${used ?? 0}%` }}
+              />
+            </div>
+          </div>
+          <Link
+  href="/investment-amount"
+  className="rounded-xl bg-gradient-to-r from-[#12a594] to-[#35d6c0] px-4 py-2.5 text-sm font-semibold text-white shadow-[0_4px_14px_rgba(18,165,148,0.3)] transition-opacity hover:opacity-90"
+>
+  Buy License
+</Link>
+<Link
+  href="/deploy-agents"
+  className="rounded-xl border border-white/20 bg-white/5 px-4 py-2.5 text-sm font-semibold transition-colors hover:bg-white/10"
+>
+  Deploy Credits
+</Link>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ---------------------------------------------------------------
+   RevenueProfit — now API-driven
+   --------------------------------------------------------------- */
+function RevenueProfit({ walletData }: { walletData: WalletData }) {
+  const serviceRevenue = Number(walletData.IncomeWallet ?? 0);
+  const vendorRevenue = Number(walletData.TeamBusiness ?? 0);
+  const total = serviceRevenue + vendorRevenue;
+
+  return (
+    <div className="rounded-3xl border border-slate-100 bg-white p-5 shadow-sm dark:border-[#153747] dark:bg-[#07242e] sm:p-6">
+      <h3 className="text-lg font-bold text-slate-900 dark:text-white">
+        Revenue &amp; Profit Overview
+      </h3>
+      <div className="mt-4 grid grid-cols-1 gap-6 md:grid-cols-2">
+        <div>
+          <p className="text-4xl font-extrabold text-emerald-600 dark:text-emerald-400 sm:text-5xl">
+            <Counter value={total} prefix="$" decimals={2} />
+          </p>
+          <p className="mt-1 text-sm text-slate-500">Total Revenue Generated</p>
+          <div
+            className="mt-5 flex h-3 overflow-hidden rounded-full bg-slate-100 dark:bg-slate-800"
+            aria-hidden="true"
+          >
+            <span
+              className="h-full bg-[#3b82f6] transition-all duration-1000"
+              style={{
+                width: `${
+                  total > 0 ? Math.round((serviceRevenue / total) * 100) : 0
+                }%`,
+              }}
+            />
+            <span
+              className="h-full bg-[#6366f1] transition-all duration-1000"
+              style={{
+                width: `${
+                  total > 0 ? Math.round((vendorRevenue / total) * 100) : 0
+                }%`,
+              }}
+            />
+          </div>
+          <ul className="mt-4 space-y-3">
+            <li className="flex items-center justify-between gap-3 text-sm">
+              <span className="flex items-center gap-2">
+                <span className="h-2.5 w-2.5 shrink-0 rounded-full bg-[#3b82f6]" />
+                AI Service Revenue
+              </span>
+              <span className="font-bold text-slate-900 dark:text-white">
+                ${formatMoney(serviceRevenue)}
+              </span>
+            </li>
+            <li className="flex items-center justify-between gap-3 text-sm">
+              <span className="flex items-center gap-2">
+                <span className="h-2.5 w-2.5 shrink-0 rounded-full bg-[#6366f1]" />
+                Vendor Deployment Revenue
+              </span>
+              <span className="font-bold text-slate-900 dark:text-white">
+                ${formatMoney(vendorRevenue)}
+              </span>
+            </li>
+          </ul>
+        </div>
+        <div className="grid content-center gap-3">
+          <div className="flex flex-wrap items-center justify-between gap-2 rounded-2xl border border-slate-100 bg-slate-50 p-5 dark:border-slate-800 dark:bg-[#051c25]">
+            <span className="text-sm font-medium text-slate-700 dark:text-slate-300">
+              Net Profit
+            </span>
+            <span className="text-xl font-bold text-slate-400">{PENDING}</span>
+          </div>
+          <div className="flex flex-wrap items-center justify-between gap-2 rounded-2xl border border-slate-100 bg-slate-50 p-5 dark:border-slate-800 dark:bg-[#051c25]">
+            <span className="text-sm font-medium text-slate-700 dark:text-slate-300">
+              Pending Payout
+            </span>
+            <span className="text-xl font-bold text-slate-400">{PENDING}</span>
+          </div>
+          <button className="inline-flex items-center gap-2 text-sm font-semibold text-[#3b82f6] hover:underline">
+            View revenue reports <ArrowRight className="h-4 w-4" />
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function Panel({ children, className = "" }: { children: ReactNode; className?: string }) {
+  return (
+    <div
+      className={`rounded-3xl border border-slate-100 bg-white p-5 shadow-sm dark:border-[#153747] dark:bg-[#07242e] ${className}`}
+    >
+      {children}
+    </div>
+  );
+}
+
+function CoinChart({ children }: { children?: ReactNode }) {
+  const price = "1 USDT";
+
+  const utilities = [
+    { icon: Coins, name: "Trading", text: "Trade QUZO on supported exchanges" },
+    { icon: Bot, name: "AI Services", text: "Access AI-powered trading tools" },
+    { icon: Gift, name: "Rewards", text: "Earn QUZO through activities" },
+    { icon: ChartNoAxesCombined, name: "Analytics", text: "Track performance metrics" },
+  ];
+
+  return (
+    <div className="space-y-4">
+      <Panel className="overflow-hidden p-0">
+        <div className="grid overflow-hidden rounded-[28px] border border-[#d9e8ec] bg-[#f8fbfc] dark:border-[#153747] dark:bg-[#031B23] lg:grid-cols-[1fr_2fr]">
+          <div className="relative flex flex-col justify-between gap-10 bg-white p-8 dark:bg-[#052832] md:p-10">
+            <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-[#5b7885] dark:text-slate-400">
+              Token utility
+            </p>
+            <div className="flex justify-center">
+              <div className="relative h-32 w-32">
+                <div className="absolute inset-0 rounded-full bg-gradient-to-br from-[#10a67b] to-[#35d6c0] shadow-2xl" />
+                <div className="absolute inset-2 flex items-center justify-center rounded-full bg-gradient-to-br from-[#0a6b4f] to-[#19a885]">
+                  <img
+                    src="/logos/quzo-logo-light.png"
+                    alt="QUZO"
+                    className="h-16 w-16 object-contain"
+                  />
+                </div>
+              </div>
+            </div>
+            <div className="text-center">
+              <p className="text-xl font-bold text-[#06262f] dark:text-white">{price}</p>
+              <p className="mt-1 text-xs text-[#5b7885] dark:text-slate-300">
+                QUZO Coin Pre Allocation Price 1 USDT
+              </p>
+            </div>
+          </div>
+          <div className="grid gap-px bg-[#d9e8ec] dark:bg-white/10 sm:grid-cols-2 lg:grid-cols-2">
+            {utilities.map((item, index) => {
+              const Icon = item.icon;
+              return (
+                <div key={item.name} className="min-h-[150px] bg-white p-5 dark:bg-[#031B23]">
+                  <div className="flex gap-4">
+                    <span className="shrink-0 pt-0.5 font-mono text-[10px] text-[#5b7885] dark:text-slate-400">
+                      0{index + 1}
+                    </span>
+                    <div className="min-w-0 flex-1">
+                      <Icon
+                        size={18}
+                        className="text-[#12a594] dark:text-[#19D8D0]"
+                        aria-hidden="true"
+                      />
+                      <h3 className="font-display mt-3 text-sm font-semibold text-[#06262f] dark:text-white">
+                        {item.name}
+                      </h3>
+                      <p className="mt-2 text-xs leading-relaxed text-[#5b7885] dark:text-slate-300">
+                        {item.text}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </Panel>
+
+      {children}
+    </div>
+  );
+}
+
 /* ============================================================
-   MAIN COMPONENT
+   MAIN COMPONENT — uses real API walletData
    ============================================================ */
 export function MemberHomeDashboard() {
   const [mounted, setMounted] = useState(false);
   const [copied, setCopied] = useState(false);
   const copyLink = () => {
-    navigator.clipboard.writeText(`${window.location.origin}/register?ref=DEMO1234`);
+    navigator.clipboard.writeText(
+      `${window.location.origin}/register?ref=DEMO1234`
+    );
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
-  const cards: [string, number, boolean, string, LucideIcon][] = [
-    ["Total Income", 8420.75, true, "/reports", CircleDollarSign],
-    ["Yield Wallet", 1240.5, true, "/wallet", Wallet],
-    ["Performance Wallet", 386.2, true, "/wallet", Gauge],
-    ["Deposit Wallet", 5000, true, "/wallet", ArrowDownToLine],
-    ["Active Licenses", 3, false, "/agents", BadgeCheck],
-    ["Total Team", 48, false, "/team", Users],
-  ];
-  const availableCredits = 31200;
-  const totalCredits = 50000;
-  const credits = Math.round((availableCredits / totalCredits) * 100);
 
-  // State for Global AI Market Chart Tabs
-  const [marketView, setMarketView] = useState<keyof typeof MARKET_VIEWS>("spending");
+  const { data: dashboardSummary, isLoading: isDashboardLoading } =
+    useDashboardSummary();
+
+  // Real API data — no more hardcoded object
+  const walletData: WalletData = (dashboardSummary?.data?.[0] ?? {}) as WalletData;
+
+  const [marketView, setMarketView] =
+    useState<keyof typeof MARKET_VIEWS>("spending");
 
   useEffect(() => {
     setMounted(true);
@@ -584,15 +923,25 @@ export function MemberHomeDashboard() {
 
   if (!mounted) return null;
 
+  const rewardPct =
+    walletData.RewardTotal && walletData.RewardAmtQualify !== undefined
+      ? (walletData.RewardAmtQualify / walletData.RewardTotal) * 100
+      : 0;
+
+  // Derived values (used in stats cards below)
+  const totalTeam = Number(walletData.TotalTeam ?? 0);
+  const activeTeam = Number(walletData.ActiveTeam ?? 0);
+  const teamBusiness = Number(walletData.TeamBusiness ?? 0);
+  const depositWallet = Number(walletData.DepositWallet ?? 0);
+  const incomeWallet = Number(walletData.IncomeWallet ?? 0);
+  const yieldWallet = Number(walletData.YieldWallet ?? 0);
+
   return (
     <div className="min-h-screen w-full bg-[#f4f7f9] font-sans text-[#06262f] selection:bg-[#12a594]/30 dark:bg-[#03161f] dark:text-[#e6f7f9]">
-      {/* ================= HERO SECTION (COMPACT) ================= */}
+      {/* HERO */}
       <div className="relative w-full overflow-hidden rounded-b-[2rem] bg-[#03161f] px-4 pb-12 pt-6 sm:px-6 md:px-8 lg:px-12">
-        {/* Background Glow Effects */}
         <div className="pointer-events-none absolute right-0 top-1/2 h-[600px] w-[600px] -translate-y-1/2 translate-x-1/4 rounded-full bg-[#12a594]/10 blur-[100px]" />
         <div className="pointer-events-none absolute right-1/4 top-0 h-[300px] w-[300px] rounded-full bg-[#35d6c0]/10 blur-[80px]" />
-
-        {/* Subtle Grid Pattern */}
         <div
           className="pointer-events-none absolute inset-0 opacity-20"
           style={{
@@ -603,29 +952,21 @@ export function MemberHomeDashboard() {
         />
 
         <div className="relative z-10 mx-auto grid max-w-[1300px] grid-cols-1 items-center gap-8 lg:grid-cols-[1.1fr_0.9fr]">
-          {/* ================= LEFT CONTENT ================= */}
           <div className="relative z-20 flex flex-col items-start pt-4 lg:pt-0">
-            {/* Top Badge */}
             <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-[#12a594]/30 bg-[#12a594]/10 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.15em] text-[#35d6c0] backdrop-blur-md">
               <span className="h-1.5 w-1.5 rounded-full bg-[#35d6c0] shadow-[0_0_10px_#35d6c0]" />
               YOUR AI BUSINESS PANEL
             </div>
-
-            {/* Heading */}
             <h1 className="mb-3 text-3xl font-extrabold leading-[1.1] tracking-tight text-white sm:text-4xl lg:text-[3.2rem]">
               THE FUTURE IS NO LONGER COMING. <br />
               <span className="bg-gradient-to-r from-[#12a594] to-[#35d6c0] bg-clip-text text-transparent">
                 {"IT'S HERE."}
               </span>
             </h1>
-
-            {/* Subtitle */}
             <p className="mb-6 max-w-[480px] text-[13px] leading-relaxed text-slate-400 sm:text-[14px]">
-              Discover the next generation of AI agents, autonomous robotics, intelligent automation
-              and global business opportunities.
+              Discover the next generation of AI agents, autonomous robotics,
+              intelligent automation and global business opportunities.
             </p>
-
-            {/* Buttons */}
             <div className="relative z-20 flex flex-wrap items-center gap-3">
               <button className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-[#12a594] to-[#35d6c0] px-5 py-2.5 text-[13px] font-semibold text-white shadow-[0_0_20px_rgba(18,165,148,0.3)] transition-all hover:opacity-90">
                 <Bot className="h-4 w-4" /> Explore AI Marketplace{" "}
@@ -634,58 +975,17 @@ export function MemberHomeDashboard() {
               <button className="flex items-center gap-2 rounded-xl border border-[#12a594]/30 bg-white/5 px-5 py-2.5 text-[13px] font-semibold text-white backdrop-blur-sm transition-all hover:bg-white/10">
                 <Globe className="h-4 w-4 text-[#35d6c0]" /> Discover Opportunities
               </button>
-              <button className="mt-2 flex items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-5 py-2.5 text-[13px] font-semibold text-white backdrop-blur-sm transition-all hover:bg-white/10 sm:mt-0">
-                <Sparkles className="h-4 w-4 text-[#12a594]" /> Deploy Agents
-              </button>
+             <Link
+  href="/deploy-agents"
+  className="mt-2 flex items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-5 py-2.5 text-[13px] font-semibold text-white backdrop-blur-sm transition-all hover:bg-white/10 sm:mt-0"
+>
+  <Sparkles className="h-4 w-4 text-[#12a594]" /> Deploy Agents
+</Link>
             </div>
           </div>
 
-          {/* ================= RIGHT ILLUSTRATION ================= */}
           <div className="relative z-10 flex h-[300px] items-center justify-center lg:h-[380px]">
-            {/* Central Glow */}
             <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(18,165,148,0.15)_0%,transparent_60%)]" />
-
-            {/* Floating Glassmorphism Cards */}
-            <div className="absolute left-[0%] top-[5%] z-20 flex items-center gap-2.5 rounded-xl border border-[#12a594]/20 bg-[#03161f]/80 p-2.5 pr-4 shadow-lg backdrop-blur-xl lg:-left-[5%]">
-              <div className="flex h-8 w-8 items-center justify-center rounded-full border border-[#12a594]/30 bg-[#0a2a33]">
-                <Bot className="h-4 w-4 text-[#35d6c0]" />
-              </div>
-              <div>
-                <div className="text-[11px] font-bold text-white">AI Agents</div>
-                <div className="text-[9px] text-[#84a2ad]">Digital workforce</div>
-              </div>
-            </div>
-
-            <div className="absolute right-[0%] top-[0%] z-20 flex items-center gap-2.5 rounded-xl border border-[#12a594]/20 bg-[#03161f]/80 p-2.5 pr-4 shadow-lg backdrop-blur-xl lg:-right-[5%]">
-              <div className="flex h-8 w-8 items-center justify-center rounded-full border border-[#12a594]/30 bg-[#0a2a33]">
-                <Globe className="h-4 w-4 text-[#35d6c0]" />
-              </div>
-              <div>
-                <div className="text-[11px] font-bold text-white">Global Network</div>
-                <div className="text-[9px] text-[#84a2ad]">Connected intelligence</div>
-              </div>
-            </div>
-
-            <div className="absolute bottom-[15%] right-[0%] z-20 flex items-center gap-2.5 rounded-xl border border-[#12a594]/20 bg-[#03161f]/80 p-2.5 pr-4 shadow-lg backdrop-blur-xl lg:-right-[2%]">
-              <div className="flex h-8 w-8 items-center justify-center rounded-full border border-[#12a594]/30 bg-[#0a2a33]">
-                <LayoutGrid className="h-4 w-4 text-[#35d6c0]" />
-              </div>
-              <div>
-                <div className="text-[11px] font-bold text-white">Smart Factories</div>
-                <div className="text-[9px] text-[#84a2ad]">Robotic production</div>
-              </div>
-            </div>
-
-            <div className="absolute bottom-[5%] left-[0%] z-20 flex items-center gap-2.5 rounded-xl border border-[#12a594]/20 bg-[#03161f]/80 p-2.5 pr-4 shadow-lg backdrop-blur-xl lg:left-[2%]">
-              <div className="flex h-8 w-8 items-center justify-center rounded-full border border-[#12a594]/30 bg-[#0a2a33]">
-                <Globe className="h-4 w-4 text-[#35d6c0]" />
-              </div>
-              <div>
-                <div className="text-[11px] font-bold text-white">Autonomous Mobility</div>
-                <div className="text-[9px] text-[#84a2ad]">Robo taxi and drones</div>
-              </div>
-            </div>
-
             <Image
               src="/quzo-hero-robot.webp"
               alt="QUZO AI Robot"
@@ -698,143 +998,175 @@ export function MemberHomeDashboard() {
         </div>
       </div>
 
-      {/* ================= OVERLAPPING STATS CARDS ================= */}
-      <div className="w-full bg-[#f4f7f9] pb-8 dark:bg-[#03161f]">
-        <div className="relative z-20 mx-auto -mt-10 max-w-[1300px] px-4 sm:px-6 md:px-8 lg:px-12">
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
-            {/* Card 1: Total Income */}
-            <Reveal delay={0}>
-              <div className="flex items-center justify-between rounded-2xl border border-slate-100 bg-white p-5 shadow-sm dark:border-[#153747] dark:bg-[#07242e]">
-                <div>
-                  <p className="mb-1 text-[13px] font-medium text-slate-500 dark:text-slate-400">
-                    Total Income
-                  </p>
-                  <h3 className="text-2xl font-bold text-slate-900 dark:text-white">
-                    <Counter value={8420.75} prefix="$" decimals={2} />
-                  </h3>
-                </div>
-                <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-[#12a594]/10">
-                  <CircleDollarSign className="h-6 w-6 text-[#12a594]" />
-                </div>
-              </div>
-            </Reveal>
-
-            {/* Card 2: Yield Wallet */}
-            <Reveal delay={0.05}>
-              <div className="flex items-center justify-between rounded-2xl border border-slate-100 bg-white p-5 shadow-sm dark:border-[#153747] dark:bg-[#07242e]">
-                <div>
-                  <p className="mb-1 text-[13px] font-medium text-slate-500 dark:text-slate-400">
-                    Yield Wallet
-                  </p>
-                  <h3 className="text-2xl font-bold text-slate-900 dark:text-white">
-                    <Counter value={1240.5} prefix="$" decimals={2} />
-                  </h3>
-                </div>
-                <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-[#12a594]/10">
-                  <Wallet className="h-6 w-6 text-[#12a594]" />
-                </div>
-              </div>
-            </Reveal>
-
-            {/* Card 3: Performance Wallet */}
-            <Reveal delay={0.1}>
-              <div className="flex items-center justify-between rounded-2xl border border-slate-100 bg-white p-5 shadow-sm dark:border-[#153747] dark:bg-[#07242e]">
-                <div>
-                  <p className="mb-1 text-[13px] font-medium text-slate-500 dark:text-slate-400">
-                    Performance Wallet
-                  </p>
-                  <h3 className="text-2xl font-bold text-slate-900 dark:text-white">
-                    <Counter value={386.2} prefix="$" decimals={2} />
-                  </h3>
-                </div>
-                <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-[#12a594]/10">
-                  <TrendingUp className="h-6 w-6 text-[#12a594]" />
-                </div>
-              </div>
-            </Reveal>
-
-            {/* Card 4: Deposit Wallet */}
-            <Reveal delay={0.15}>
-              <div className="flex items-center justify-between rounded-2xl border border-slate-100 bg-white p-5 shadow-sm dark:border-[#153747] dark:bg-[#07242e]">
-                <div>
-                  <p className="mb-1 text-[13px] font-medium text-slate-500 dark:text-slate-400">
-                    Deposit Wallet
-                  </p>
-                  <h3 className="text-2xl font-bold text-slate-900 dark:text-white">
-                    <Counter value={5000} prefix="$" decimals={2} />
-                  </h3>
-                </div>
-                <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-[#12a594]/10">
-                  <ArrowDownToLine className="h-6 w-6 text-[#12a594]" />
-                </div>
-              </div>
-            </Reveal>
-
-            {/* Card 5: Active Licenses */}
-            <Reveal delay={0.2}>
-              <div className="flex items-center justify-between rounded-2xl border border-slate-100 bg-white p-5 shadow-sm dark:border-[#153747] dark:bg-[#07242e]">
-                <div>
-                  <p className="mb-1 text-[13px] font-medium text-slate-500 dark:text-slate-400">
-                    Active Licenses
-                  </p>
-                  <h3 className="text-2xl font-bold text-slate-900 dark:text-white">
-                    <Counter value={3} />
-                  </h3>
-                </div>
-                <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-[#12a594]/10">
-                  <ShieldCheck className="h-6 w-6 text-[#12a594]" />
-                </div>
-              </div>
-            </Reveal>
-
-            {/* Card 6: Total Team */}
-            <Reveal delay={0.25}>
-              <div className="flex items-center justify-between rounded-2xl border border-slate-100 bg-white p-5 shadow-sm dark:border-[#153747] dark:bg-[#07242e]">
-                <div>
-                  <p className="mb-1 text-[13px] font-medium text-slate-500 dark:text-slate-400">
-                    Total Team
-                  </p>
-                  <h3 className="text-2xl font-bold text-slate-900 dark:text-white">
-                    <Counter value={48} />
-                  </h3>
-                </div>
-                <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-[#12a594]/10">
-                  <Users className="h-6 w-6 text-[#12a594]" />
-                </div>
-              </div>
-            </Reveal>
+      {/* MAIN CONTENT */}
+      <div className="mx-auto max-w-[1200px] space-y-6 px-4 py-8 sm:px-6 md:px-8 lg:px-12">
+        {/* Overview */}
+        <section>
+          <div className="mb-2 text-[10px] font-semibold uppercase tracking-[0.15em] text-[#35d6c0]">
+            My AI economy
           </div>
+          <h2 className="mb-6 text-2xl font-bold text-slate-900 dark:text-white">
+            Your Licenses, Credits &amp; Revenue
+          </h2>
+          <div className="space-y-4">
+            <Reveal>
+              <LicenseCredits walletData={walletData} />
+            </Reveal>
+            <Reveal delay={0.1}>
+              <RevenueProfit walletData={walletData} />
+            </Reveal>
 
-          {/* Bottom Bar: AI Credits Progress & Actions */}
-          <div className="mt-4 flex flex-col items-center gap-6 rounded-2xl border border-slate-100 bg-white p-5 shadow-sm dark:border-[#153747] dark:bg-[#07242e] xl:flex-row">
-            <div className="w-full flex-1">
-              <div className="mb-3 flex justify-between text-[13px] font-medium text-slate-600 dark:text-slate-300">
-                <span>AI credits available</span>
-                <span className="text-slate-400">31,200 of 50,000</span>
-              </div>
-              <div className="h-2.5 w-full overflow-hidden rounded-full bg-slate-100 dark:bg-slate-800">
-                <div className="h-full w-[62%] rounded-full bg-gradient-to-r from-[#12a594] to-[#35d6c0]" />
-              </div>
+            {/* 4 Cards — now dynamic */}
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-4">
+              {(
+                [
+                  ["Yield Wallet", `$${formatMoney(yieldWallet)}`, Wallet],
+                  ["Performance Wallet", `$${formatMoney(incomeWallet)}`, Gauge],
+                  ["Deposit Wallet", `$${formatMoney(depositWallet)}`, ArrowDownToLine],
+                  ["Total Team", `${totalTeam}`, Users],
+                ] as [string, string, LucideIcon][]
+              ).map(([label, val, Icon], i) => (
+                <div
+                  key={i}
+                  className="flex items-start justify-between gap-2 rounded-2xl border border-slate-100 bg-white p-5 shadow-sm dark:border-[#153747] dark:bg-[#07242e]"
+                >
+                  <div>
+                    <p className="text-xs font-medium text-slate-500 dark:text-slate-400">
+                      {label}
+                    </p>
+                    <p className="mt-2 flex min-h-[2rem] items-center text-2xl font-bold text-slate-900 dark:text-white">
+                      {val}
+                    </p>
+                  </div>
+                  <div className="shrink-0 rounded-xl bg-slate-50 p-2.5 text-[#3b82f6] dark:bg-slate-800">
+                    <Icon className="h-5 w-5" />
+                  </div>
+                </div>
+              ))}
             </div>
 
-            <div className="flex w-full shrink-0 items-center gap-3 xl:w-auto">
-              <button className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#12a594] to-[#35d6c0] px-6 py-2.5 text-[13px] font-semibold text-white shadow-[0_4px_14px_rgba(18,165,148,0.3)] transition-opacity hover:opacity-90 xl:flex-none">
+            <div className="flex flex-wrap gap-3 pt-2">
+              <button className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-[#12a594] to-[#35d6c0] px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-opacity hover:opacity-90">
                 <Plus className="h-4 w-4" /> Add Funds
               </button>
-              <button className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-slate-100 px-6 py-2.5 text-[13px] font-semibold text-slate-700 transition-colors hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700 xl:flex-none">
+              <button className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-5 py-2.5 text-sm font-semibold text-slate-700 shadow-sm transition-colors hover:bg-slate-50 dark:border-slate-700 dark:bg-[#07242e] dark:text-slate-300 dark:hover:bg-slate-800">
                 <ArrowDownToLine className="h-4 w-4" /> Withdraw
               </button>
             </div>
           </div>
-        </div>
-      </div>
+        </section>
 
-      {/* ================= MAIN CONTENT GRID ================= */}
-      <div className="mx-auto max-w-[1200px] space-y-6 px-4 py-8 sm:px-6 md:px-8 lg:px-12">
-        {/* --- SECTION: INCOME STATISTICS  --- */}
-        <IncomeOverviewSection />
+        {/* CoinChart + panels */}
+        <CoinChart>
+          <div className="grid gap-4 xl:grid-cols-2">
+            {/* My AI bot investment */}
+            <Panel>
+              <div className="flex items-center justify-between gap-2">
+                <SectionHeading>
+                  <Bot className="h-4 w-4 text-[#12a594]" aria-hidden />
+                  My AI bot investment
+                </SectionHeading>
+                <Pill>● Active</Pill>
+              </div>
+              <div className="mt-3 flex items-center gap-3">
+                <div className="grid h-20 w-20 shrink-0 place-items-center rounded-2xl bg-gradient-to-br from-[#3fd9a9] to-[#0a8f6a] text-3xl font-bold text-white shadow-lg">
+                  Q
+                </div>
+                <div className="min-w-0 flex-1">
+                  {[
+                    [
+                      "Licensed amount",
+                      `$${formatMoney(Number(walletData.AIAgentLicense ?? 0))}`,
+                    ],
+                    ["Booster Status", walletData.BoosterPackage ?? "N/A"],
+                    [
+                      "Booster Left Time",
+                      walletData.Boostertype
+                        ? `${walletData.Boostertype} Hrs`
+                        : "00:00:00 Hrs",
+                    ],
+                    ["Rank", walletData.UserRank ?? "N/A"],
+                  ].map(([label, value], index) => (
+                    <div
+                      key={label}
+                      className="flex justify-between gap-2 border-b border-[#d9e8ec] py-2 text-[11px] last:border-0 dark:border-[#153747]"
+                    >
+                      <span className="text-[#5b7885] dark:text-[#84a2ad]">
+                        {label}
+                      </span>
+                      <strong
+                        className={
+                          index
+                            ? "text-[#12a594]"
+                            : "text-[#06262f] dark:text-white"
+                        }
+                      >
+                        {value}
+                      </strong>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </Panel>
 
-        {/* --- SECTION: AFFILIATE TEAM GROWTH --- */}
+            {/* Rank progress — dynamic */}
+            <Panel>
+              <div className="flex items-center justify-between gap-2">
+                <SectionHeading>
+                  <Bot className="h-4 w-4 text-[#12a594]" aria-hidden />
+                  Rank progress
+                </SectionHeading>
+                <Pill>{walletData.UserRank ?? "N/A"}</Pill>
+              </div>
+              <div className="mt-4 flex items-end justify-between gap-2">
+                <strong className="text-2xl text-[#06262f] dark:text-white">
+                  {walletData.RewardTotal !== undefined &&
+                  walletData.RewardAmtQualify !== undefined
+                    ? rewardPct.toFixed(1)
+                    : "0"}
+                  %
+                </strong>
+                <span className="text-right text-[11px] text-[#5b7885] dark:text-[#84a2ad]">
+                  ${formatMoney(walletData.RewardAmtQualify ?? 0, 0)} / $
+                  {formatMoney(walletData.RewardTotal ?? 0, 0)}
+                </span>
+              </div>
+              <div className="mt-2 h-2.5 overflow-hidden rounded-full bg-[#12a594]/[0.12]">
+                <div
+                  className="h-full rounded-full bg-gradient-to-r from-[#12a594] to-[#35d6c0]"
+                  style={{ width: `${rewardPct}%` }}
+                />
+              </div>
+              <div className="mt-4 grid grid-cols-3 gap-2">
+                {[
+                  [
+                    "Current Salary",
+                    `$${formatMoney(walletData.CurrentSalary ?? 0, 0)}`,
+                  ],
+                  ["Next Rank", `${walletData.NextRank ?? "N/A"}`],
+                  [
+                    "Next Salary",
+                    `$${formatMoney(walletData.NextSalary ?? 0, 0)}`,
+                  ],
+                ].map(([label, value]) => (
+                  <div
+                    key={label}
+                    className="rounded-xl bg-[#edf4f5] p-2.5 dark:bg-[#031B23]"
+                  >
+                    <span className="block text-[9px] text-[#5b7885] dark:text-[#84a2ad]">
+                      {label}
+                    </span>
+                    <strong className="mt-1 block text-xs text-[#06262f] dark:text-white">
+                      {value}
+                    </strong>
+                  </div>
+                ))}
+              </div>
+            </Panel>
+          </div>
+        </CoinChart>
+
+        {/* Affiliate — now dynamic */}
         <section>
           <div className="mb-2 text-[10px] font-semibold uppercase tracking-[0.15em] text-[#35d6c0]">
             Affiliate
@@ -844,12 +1176,16 @@ export function MemberHomeDashboard() {
           </h2>
 
           <div className="flex flex-col gap-6">
-            {/* Referral Link Bar */}
+            {/* Referral link */}
             <div className="flex flex-col items-start justify-between gap-4 rounded-2xl border border-slate-100 bg-white p-4 shadow-sm dark:border-[#153747] dark:bg-[#07242e] md:flex-row md:items-center">
               <div>
-                <p className="mb-1 text-[11px] text-slate-500">Your referral link</p>
+                <p className="mb-1 text-[11px] text-slate-500">
+                  Your referral link
+                </p>
                 <p className="text-sm font-bold text-slate-900 dark:text-white">
-                http://localhost:3001/register?ref=DEMO1234
+                  {walletData.AuthLogin
+                    ? `${typeof window !== "undefined" ? window.location.origin : ""}/register?ref=${walletData.AuthLogin}`
+                    : "http://localhost:3001/register?ref=DEMO1234"}
                 </p>
               </div>
               <div className="flex w-full items-center gap-2 md:w-auto">
@@ -857,40 +1193,7 @@ export function MemberHomeDashboard() {
                   onClick={copyLink}
                   className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-[#35d6c0] px-4 py-2 text-[12px] font-semibold text-white transition-colors hover:bg-[#12a594] md:flex-none"
                 >
-                  {copied ? (
-                    <>
-                      <svg
-                        width="14"
-                        height="14"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2.5"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      >
-                        <polyline points="20 6 9 17 4 12" />
-                      </svg>
-                      Copied!
-                    </>
-                  ) : (
-                    <>
-                      <svg
-                        width="14"
-                        height="14"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      >
-                        <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
-                        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
-                      </svg>
-                      Copy link
-                    </>
-                  )}
+                  {copied ? "Copied!" : "Copy link"}
                 </button>
                 <button className="flex-1 rounded-xl bg-slate-100 px-4 py-2 text-[12px] font-semibold text-slate-700 transition-colors hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700 md:flex-none">
                   Affiliate dashboard
@@ -898,24 +1201,29 @@ export function MemberHomeDashboard() {
               </div>
             </div>
 
-            {/* Stats Cards */}
+            {/* Stats — dynamic */}
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-              {AFFILIATE_STATS.map((stat, i) => {
-                const isMoney = stat.value.includes("$");
-                const num = Number(stat.value.replace(/[^0-9.]/g, ""));
-                return (
-                  <Reveal key={i} delay={i * 0.05}>
-                    <div className="rounded-2xl border border-slate-100 bg-white p-5 shadow-sm dark:border-[#153747] dark:bg-[#07242e]">
-                      <p className="mb-1 text-[11px] text-slate-500">{stat.label}</p>
-                      <h3 className="text-2xl font-bold text-slate-900 dark:text-white">
-                        <Counter value={num} prefix={isMoney ? "$" : ""} />
-                      </h3>
-                    </div>
-                  </Reveal>
-                );
-              })}
+              {[
+                { label: "Direct Referrals", value: totalTeam }, // best proxy since API doesn't split
+                { label: "Total Team Members", value: totalTeam },
+                { label: "Active Members", value: activeTeam },
+                { label: "Team Business Volume", value: teamBusiness, money: true },
+              ].map((stat, i) => (
+                <Reveal key={i} delay={i * 0.05}>
+                  <div className="rounded-2xl border border-slate-100 bg-white p-5 shadow-sm dark:border-[#153747] dark:bg-[#07242e]">
+                    <p className="mb-1 text-[11px] text-slate-500">{stat.label}</p>
+                    <h3 className="text-2xl font-bold text-slate-900 dark:text-white">
+                      <Counter
+                        value={Number(stat.value)}
+                        prefix={stat.money ? "$" : ""}
+                      />
+                    </h3>
+                  </div>
+                </Reveal>
+              ))}
             </div>
-            {/* Time Filters */}
+
+            {/* Time filters */}
             <div className="flex gap-2">
               {["7 Days", "30 Days", "90 Days", "1 Year"].map((t, i) => (
                 <button
@@ -931,7 +1239,7 @@ export function MemberHomeDashboard() {
               ))}
             </div>
 
-            {/* Charts Row */}
+            {/* Charts */}
             <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
               <div className="rounded-2xl border border-slate-100 bg-white p-6 shadow-sm dark:border-[#153747] dark:bg-[#07242e]">
                 <h4 className="mb-6 text-sm font-bold text-slate-900 dark:text-white">
@@ -941,12 +1249,13 @@ export function MemberHomeDashboard() {
                   <div className="pointer-events-none absolute inset-0 flex flex-col justify-between pb-6">
                     {[60, 45, 30, 15, 0].map((val) => (
                       <div key={val} className="flex w-full items-center">
-                        <span className="w-6 text-[10px] text-slate-400">{val}</span>
+                        <span className="w-6 text-[10px] text-slate-400">
+                          {val}
+                        </span>
                         <div className="ml-2 flex-1 border-t border-slate-100 dark:border-slate-800"></div>
                       </div>
                     ))}
                   </div>
-
                   <div className="absolute inset-0 ml-8 pb-6">
                     <svg
                       viewBox="0 0 100 100"
@@ -954,9 +1263,23 @@ export function MemberHomeDashboard() {
                       className="h-full w-full overflow-visible"
                     >
                       <defs>
-                        <linearGradient id="chartGradient" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="0%" stopColor="#3b82f6" stopOpacity="0.2" />
-                          <stop offset="100%" stopColor="#3b82f6" stopOpacity="0" />
+                        <linearGradient
+                          id="chartGradient"
+                          x1="0"
+                          y1="0"
+                          x2="0"
+                          y2="1"
+                        >
+                          <stop
+                            offset="0%"
+                            stopColor="#3b82f6"
+                            stopOpacity="0.2"
+                          />
+                          <stop
+                            offset="100%"
+                            stopColor="#3b82f6"
+                            stopOpacity="0"
+                          />
                         </linearGradient>
                       </defs>
                       <path
@@ -972,7 +1295,6 @@ export function MemberHomeDashboard() {
                       />
                     </svg>
                   </div>
-
                   <div className="absolute bottom-0 left-0 right-0 flex justify-between pl-8">
                     {["Wk 1", "Wk 2", "Wk 3", "Wk 4", "Wk 5"].map((label) => (
                       <span key={label} className="text-[10px] text-slate-400">
@@ -992,10 +1314,14 @@ export function MemberHomeDashboard() {
                     <div key={i}>
                       <div className="mb-2 flex items-center justify-between text-[12px]">
                         <span className="text-slate-700 dark:text-slate-300">
-                          {lvl.level} <span className="text-slate-400">· {lvl.members}</span>
+                          {lvl.level}{" "}
+                          <span className="text-slate-400">· {lvl.members}</span>
                         </span>
                         <span className="font-semibold text-slate-600 dark:text-slate-400">
-                          $<Counter value={Number(lvl.value.replace(/[^0-9.]/g, ""))} />
+                          $
+                          <Counter
+                            value={Number(lvl.value.replace(/[^0-9.]/g, ""))}
+                          />
                         </span>
                       </div>
                       <div className="h-2 rounded-full bg-slate-100 dark:bg-slate-800">
@@ -1010,7 +1336,7 @@ export function MemberHomeDashboard() {
               </div>
             </div>
 
-            {/* Table: Recently joined */}
+            {/* Recently joined */}
             <div className="overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-sm dark:border-[#153747] dark:bg-[#07242e]">
               <div className="border-b border-slate-100 p-5 dark:border-slate-800">
                 <h4 className="text-sm font-bold text-slate-900 dark:text-white">
@@ -1022,7 +1348,9 @@ export function MemberHomeDashboard() {
                   <thead>
                     <tr className="border-b border-slate-100 bg-slate-50/50 text-slate-400 dark:border-slate-800 dark:bg-slate-800/20">
                       <th className="px-5 py-3 font-medium">Member</th>
-                      <th className="w-24 px-5 py-3 text-center font-medium">Level</th>
+                      <th className="w-24 px-5 py-3 text-center font-medium">
+                        Level
+                      </th>
                       <th className="px-5 py-3 font-medium">Joined</th>
                       <th className="px-5 py-3 font-medium">Status</th>
                     </tr>
@@ -1036,13 +1364,19 @@ export function MemberHomeDashboard() {
                         <td className="px-5 py-4 font-semibold text-slate-800 dark:text-slate-200">
                           {row.name}
                         </td>
-                        <td className="px-5 py-4 text-center text-slate-500">{row.level}</td>
-                        <td className="px-5 py-4 text-slate-500">{row.joined}</td>
+                        <td className="px-5 py-4 text-center text-slate-500">
+                          {row.level}
+                        </td>
+                        <td className="px-5 py-4 text-slate-500">
+                          {row.joined}
+                        </td>
                         <td className="px-5 py-4">
                           <div className="flex items-center gap-2">
                             <span
                               className={`h-1.5 w-1.5 rounded-full ${
-                                row.status === "Active" ? "bg-[#10b981]" : "bg-slate-400"
+                                row.status === "Active"
+                                  ? "bg-[#10b981]"
+                                  : "bg-slate-400"
                               }`}
                             />
                             <span
@@ -1065,7 +1399,7 @@ export function MemberHomeDashboard() {
           </div>
         </section>
 
-        {/* --- SECTION: BUSINESS OPPORTUNITIES --- */}
+        {/* OPPORTUNITIES */}
         <section>
           <div className="mb-2 text-[12px] font-semibold uppercase tracking-[0.15em] text-[#35d6c0]">
             Business Opportunities
@@ -1081,7 +1415,9 @@ export function MemberHomeDashboard() {
                   <opp.icon className="h-5 w-5 text-[#3b82f6]" />
                 </div>
                 <h3 className="mb-2 text-sm font-bold">{opp.title}</h3>
-                <p className="mb-4 text-[11px] leading-relaxed text-slate-500">{opp.desc}</p>
+                <p className="mb-4 text-[11px] leading-relaxed text-slate-500">
+                  {opp.desc}
+                </p>
                 <div className="flex items-center gap-1 text-[10px] font-semibold text-[#12a594] transition-all group-hover:gap-2">
                   Explore <ArrowRight className="h-3 w-3" />
                 </div>
@@ -1090,7 +1426,7 @@ export function MemberHomeDashboard() {
           </div>
         </section>
 
-        {/* --- SECTION: QUICK LINKS --- */}
+        {/* QUICK LINKS */}
         <section>
           <div className="mb-2 text-[10px] font-semibold uppercase tracking-[0.15em] text-[#35d6c0]">
             Quick Links
@@ -1111,7 +1447,7 @@ export function MemberHomeDashboard() {
           </div>
         </section>
 
-        {/* --- SECTION: NOTIFICATIONS & UPDATES --- */}
+        {/* NOTIFICATIONS */}
         <section>
           <div className="mb-2 text-[10px] font-semibold uppercase tracking-[0.15em] text-slate-400">
             Notifications & Updates
@@ -1123,7 +1459,9 @@ export function MemberHomeDashboard() {
                 <button className="flex items-center gap-1.5 text-[11px] font-medium text-slate-500 hover:text-slate-700">
                   <Bell className="h-3.5 w-3.5" /> Unread
                 </button>
-                <button className="text-[11px] font-semibold text-[#3b82f6]">Mark all read</button>
+                <button className="text-[11px] font-semibold text-[#3b82f6]">
+                  Mark all read
+                </button>
                 <button className="text-[11px] text-slate-400 hover:text-slate-600">
                   View All Notifications
                 </button>
@@ -1140,13 +1478,23 @@ export function MemberHomeDashboard() {
                     {note.icon === "plus" && (
                       <CircleDollarSign className="h-4 w-4 text-[#12a594]" />
                     )}
-                    {note.icon === "trophy" && <ShieldCheck className="h-4 w-4 text-[#d9a441]" />}
-                    {note.icon === "bot" && <Bot className="h-4 w-4 text-[#3b82f6]" />}
+                    {note.icon === "trophy" && (
+                      <ShieldCheck className="h-4 w-4 text-[#d9a441]" />
+                    )}
+                    {note.icon === "bot" && (
+                      <Bot className="h-4 w-4 text-[#3b82f6]" />
+                    )}
                   </div>
                   <div>
-                    <h4 className="text-[11px] font-bold leading-tight">{note.title}</h4>
-                    <p className="mt-1 line-clamp-2 text-[10px] text-slate-500">{note.desc}</p>
-                    <span className="mt-2 block text-[9px] text-slate-400">{note.time}</span>
+                    <h4 className="text-[11px] font-bold leading-tight">
+                      {note.title}
+                    </h4>
+                    <p className="mt-1 line-clamp-2 text-[10px] text-slate-500">
+                      {note.desc}
+                    </p>
+                    <span className="mt-2 block text-[9px] text-slate-400">
+                      {note.time}
+                    </span>
                   </div>
                 </div>
               ))}
@@ -1154,7 +1502,7 @@ export function MemberHomeDashboard() {
           </div>
         </section>
 
-        {/* --- SECTION: AI ECONOMY (PURE TAILWIND CHART) --- */}
+        {/* AI ECONOMY */}
         <section>
           <div className="mb-2 text-[10px] font-semibold uppercase tracking-[0.15em] text-[#35d6c0]">
             Global AI Market Snapshot
@@ -1163,7 +1511,6 @@ export function MemberHomeDashboard() {
             THE AI ECONOMY IS ENTERING ITS TRILLION-DOLLAR ERA.
           </h2>
 
-          {/* Top 4 Stat Cards */}
           <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {MARKET_STATS.map((s, i) => {
               const { num, prefix, suffix } = parseMarketValue(s.value);
@@ -1177,7 +1524,9 @@ export function MemberHomeDashboard() {
                     <p className="mb-1 text-3xl font-bold text-slate-900 dark:text-white">
                       <Counter value={num} prefix={prefix} suffix={suffix} />
                     </p>
-                    <p className="mb-3 text-[11px] leading-tight text-slate-500">{s.label}</p>
+                    <p className="mb-3 text-[11px] leading-tight text-slate-500">
+                      {s.label}
+                    </p>
                     <a
                       href="#"
                       className="text-[10px] text-slate-400 underline underline-offset-2 transition-colors hover:text-slate-600 dark:hover:text-slate-300"
@@ -1190,28 +1539,31 @@ export function MemberHomeDashboard() {
             })}
           </div>
 
-          {/* Interactive Chart Card */}
           <div className="rounded-2xl border border-slate-100 bg-white p-5 shadow-sm dark:border-[#153747] dark:bg-[#07242e] sm:p-6">
-            <div className="mb-8 flex flex-wrap gap-2" role="group" aria-label="Chart measure">
-              {(Object.keys(MARKET_VIEWS) as (keyof typeof MARKET_VIEWS)[]).map((k) => (
-                <button
-                  key={k}
-                  type="button"
-                  onClick={() => setMarketView(k)}
-                  className={`rounded-full px-4 py-1.5 text-[11px] font-semibold transition-colors ${
-                    marketView === k
-                      ? "bg-[#35d6c0] text-white"
-                      : "bg-slate-100 text-slate-600 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
-                  }`}
-                >
-                  {MARKET_VIEWS[k].tab}
-                </button>
-              ))}
+            <div
+              className="mb-8 flex flex-wrap gap-2"
+              role="group"
+              aria-label="Chart measure"
+            >
+              {(Object.keys(MARKET_VIEWS) as (keyof typeof MARKET_VIEWS)[]).map(
+                (k) => (
+                  <button
+                    key={k}
+                    type="button"
+                    onClick={() => setMarketView(k)}
+                    className={`rounded-full px-4 py-1.5 text-[11px] font-semibold transition-colors ${
+                      marketView === k
+                        ? "bg-[#35d6c0] text-white"
+                        : "bg-slate-100 text-slate-600 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
+                    }`}
+                  >
+                    {MARKET_VIEWS[k].tab}
+                  </button>
+                )
+              )}
             </div>
 
-            {/* Custom Tailwind Bar Chart */}
             <div className="relative flex h-64 w-full items-end justify-around border-b border-slate-100 pb-2 dark:border-slate-800">
-              {/* Y-Axis Grid Lines */}
               <div className="pointer-events-none absolute inset-0 flex flex-col justify-between pb-8">
                 {[1, 0.75, 0.5, 0.25, 0].map((pct, idx) => (
                   <div
@@ -1222,19 +1574,19 @@ export function MemberHomeDashboard() {
                       {marketView === "spending"
                         ? (pct * 4).toFixed(1)
                         : marketView === "market"
-                          ? (pct * 5).toFixed(1)
-                          : (pct * 200).toFixed(0)}
+                        ? (pct * 5).toFixed(1)
+                        : (pct * 200).toFixed(0)}
                     </span>
                   </div>
                 ))}
               </div>
 
-              {/* Bars */}
               <div className="absolute inset-0 z-10 flex items-end justify-around pb-8 pl-8">
                 {MARKET_VIEWS[marketView].data.map((item, i) => {
-                  const maxVal = Math.max(...MARKET_VIEWS[marketView].data.map((d) => d.v));
+                  const maxVal = Math.max(
+                    ...MARKET_VIEWS[marketView].data.map((d) => d.v)
+                  );
                   const heightPct = (item.v / maxVal) * 100;
-
                   return (
                     <div
                       key={i}
@@ -1253,20 +1605,20 @@ export function MemberHomeDashboard() {
                 })}
               </div>
 
-              {/* X-Axis Labels */}
               <div className="absolute bottom-0 left-0 right-0 flex justify-around pl-8">
                 {MARKET_VIEWS[marketView].data.map((item, i) => (
                   <div key={i} className="flex w-16 justify-center">
-                    <span className="text-[11px] font-semibold text-slate-500">{item.year}</span>
+                    <span className="text-[11px] font-semibold text-slate-500">
+                      {item.year}
+                    </span>
                   </div>
                 ))}
               </div>
             </div>
 
-            {/* Chart Note */}
             <p className="mt-6 text-[10px] text-slate-500 dark:text-slate-400">
-              {MARKET_VIEWS[marketView].note} These measures use different methods and should not be
-              compared with each other.
+              {MARKET_VIEWS[marketView].note} These measures use different
+              methods and should not be compared with each other.
             </p>
           </div>
         </section>
