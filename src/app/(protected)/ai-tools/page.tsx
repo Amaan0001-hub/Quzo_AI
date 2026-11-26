@@ -291,7 +291,7 @@ export default function AiToolDemo() { // <-- data-theme prop hata diya taaki gl
 
   return (
     // Wrapper se data-theme hata diya aur direct Tailwind bg classes lagayi
-    <div className="w-full min-w-0 overflow-hidden rounded-[2rem]  p-3 text-slate-900 sm:p-6 dark:bg-[#031b21] dark:text-[#e8ecf8]">
+    <div className="w-full min-w-0 overflow-hidden rounded-[2rem]  p-3 sm:p-6 ">
       <style>{CSS}</style>
       <div className="mx-auto max-w-6xl space-y-5">
         {/* ---------- hero ---------- */}

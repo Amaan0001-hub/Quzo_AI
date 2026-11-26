@@ -19,8 +19,11 @@ import {
   Sparkles,
   Bot,
 } from "lucide-react";
+import { MdMemory, MdRefresh, MdCloudQueue } from "react-icons/md";
+import { FaMicrochip } from "react-icons/fa";
+import { BsLightningCharge } from "react-icons/bs";
 import { apiClient } from "@/lib/api-client";
-import toast from "react-hot-toast";
+import {toast} from "sonner";
 import { useRouter } from "next/navigation";
 import { useTempStorage } from "@/app/components/useTempStorage";
 
@@ -95,6 +98,9 @@ interface RawAgentRow {
   TotalCredit?: number;
   ConsumedCredit?: number;
   BalanceCredit?: number;
+  totalCredit?: number;
+  consumedCredit?: number;
+  balanceCredit?: number;
   MonthlyRevenueAprox?: number;
   agentImage?: string;
   Image?: string;
@@ -172,10 +178,10 @@ export default function DeployAIWorkforce() {
           ? `${description.substring(0, 35)}...`
           : description,
       price: item.LicenseAmount ?? item.Rkprice ?? 0,
-      creditsCost: item.TotalCredit ?? 0,
-      totalCredit: item.TotalCredit ?? 0,
-      consumedCredit: item.ConsumedCredit ?? 0,
-      balanceCredit: item.BalanceCredit ?? 0,
+      creditsCost: item.TotalCredit ?? item.totalCredit ?? 0,
+      totalCredit: item.TotalCredit ?? item.totalCredit ?? 0,
+      consumedCredit: item.ConsumedCredit ?? item.consumedCredit ?? 0,
+      balanceCredit: item.BalanceCredit ?? item.balanceCredit ?? 0,
       monthlyRevenueAprox: item.MonthlyRevenueAprox ?? 0,
       imageUrl: item.agentImage ?? item.Image ?? "",
       agentType: item.AgentType ?? "",
@@ -251,7 +257,7 @@ export default function DeployAIWorkforce() {
           PartnerId: selectedPartner,
         }
       );
-      if (response?.statusCode == 200) {
+      if (response?.statusCode === 200) {
         const orderId = `ORD-${Math.floor(1000 + Math.random() * 900000)}`;
         setOrderData({
           name: response.data?.[0]?.agentName ?? "",
@@ -308,7 +314,6 @@ export default function DeployAIWorkforce() {
           "/WalletReport/getListofUndeployedAgents"
         );
         setAgentsData(extractList(agentsResponse) as RawAgentRow[]);
-        console.log("Undeployed agents response:", agentsResponse);
       } catch (error) {
         console.error("Failed to load undeployed agents:", error);
       }
@@ -318,7 +323,6 @@ export default function DeployAIWorkforce() {
           "/WalletReport/getDeploymentPartners"
         );
         setPartnersData(extractList(partnersResponse) as Partner[]);
-        console.log("Deployment partners response:", partnersResponse);
       } catch (error) {
         console.error("Failed to load deployment partners:", error);
         toast.error("Failed to load deployment partners.");
@@ -347,7 +351,7 @@ export default function DeployAIWorkforce() {
         .gradient-border::before { content: ''; position: absolute; inset: -2px; border-radius: inherit; padding: 2px; background: linear-gradient(135deg, #2196F3, #3F51B5, #3F51B5); -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0); -webkit-mask-composite: xor; mask-composite: exclude; pointer-events: none; }
       `}</style>
 
-      <div className="relative w-full px-3 py-4 overflow-hidden sm:px-5 md:px-6 lg:px-8 sm:py-6 md:py-8 lg:py-10 bg-gradient-to-br from-slate-50 via-white to-blue-50/30 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
+      <div className="relative w-full px-3 py-4 overflow-hidden sm:px-5 md:px-6 lg:px-8 sm:py-6 md:py-8 lg:py-10 ">
         {/* Decorative Background */}
         <div className="fixed inset-0 overflow-hidden pointer-events-none">
           <div className="absolute rounded-full -top-40 -right-40 w-80 h-80 bg-blue-400/20 dark:bg-blue-400/10 blur-3xl animate-float"></div>
@@ -362,14 +366,14 @@ export default function DeployAIWorkforce() {
           {/* Header - Velvora Style */}
           <div className="mb-8 text-center sm:mb-10 md:mb-12">
             <div
-              className="inline-flex items-center gap-2.5 px-4 sm:px-5 py-2 bg-gradient-to-r from-blue-500/10 via-blue-500/10 to-blue-500/10 rounded-full border 
+              className="inline-flex items-center gap-2.5 px-4 sm:px-5 py-2  rounded-full border 
       border-blue-200/30 dark:border-blue-800/30 mb-4 sm:mb-5 shadow-lg shadow-blue-500/5"
             >
               <span className="relative flex h-2.5 w-2.5">
-                <span className="absolute inline-flex w-full h-full bg-blue-400 rounded-full opacity-75 animate-ping"></span>
-                <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-blue-500"></span>
+                <span className="absolute inline-flex w-full h-full bg-green-400 rounded-full opacity-75 animate-ping"></span>
+                <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-green-500"></span>
               </span>
-              <span className="text-xs font-semibold sm:text-sm velvora-gradient-text">
+              <span className="text-xs font-semibold sm:text-sm ">
                 QUZO AI Deployment Platform
               </span>
               <span className="text-[10px] sm:text-xs px-2 py-0.5 bg-gradient-to-r from-blue-600 to-blue-600 text-white rounded-full font-bold">
@@ -408,7 +412,7 @@ export default function DeployAIWorkforce() {
           </div>
 
           {/* Step Indicators */}
-          <div className="flex flex-col items-stretch justify-center gap-2 p-3 mb-8 shadow-2xl sm:flex-row sm:items-center sm:gap-3 sm:mb-10 md:mb-12 sm:p-4 md:p-5 rounded-3xl gradient-border glass-effect shadow-blue-200/20 dark:shadow-blue-900/30">
+          <div className="flex flex-col items-stretch justify-center gap-2 p-3 mb-8 shadow-2xl sm:flex-row sm:items-center sm:gap-3 sm:mb-10 md:mb-12 sm:p-4 md:p-5 rounded-3xl border glass-effect shadow-blue-200/20 dark:shadow-blue-900/30">
             {steps.map((s, idx) => (
               <div
                 key={s.key}
@@ -457,9 +461,9 @@ export default function DeployAIWorkforce() {
           </div>
 
           {/* Step Content */}
-          <div className="relative p-4 overflow-hidden shadow-2xl rounded-3xl gradient-border glass-effect shadow-blue-200/30 dark:shadow-blue-900/50 sm:p-6 md:p-8">
-            <div className="absolute top-0 right-0 w-64 h-64 rounded-full bg-gradient-to-br from-blue-500/5 via-blue-500/5 to-blue-500/5 blur-2xl"></div>
-            <div className="absolute bottom-0 left-0 w-64 h-64 rounded-full bg-gradient-to-tr from-blue-500/5 via-blue-500/5 to-blue-500/5 blur-2xl"></div>
+          <div className="relative p-4 overflow-hidden shadow-2xl rounded-3xl border glass-effect  sm:p-6 md:p-8">
+            {/* <div className="absolute top-0 right-0 w-64 h-64 rounded-full bg-gradient-to-br from-blue-500/5 via-blue-500/5 to-blue-500/5 blur-2xl"></div>
+            <div className="absolute bottom-0 left-0 w-64 h-64 rounded-full bg-gradient-to-tr from-blue-500/5 via-blue-500/5 to-blue-500/5 blur-2xl"></div> */}
 
             <div className="relative">
               {/* Step 0 */}
@@ -468,7 +472,7 @@ export default function DeployAIWorkforce() {
                   <div className="flex flex-col gap-4 mb-6 lg:flex-row lg:items-start lg:justify-between md:mb-7">
                     <div className="min-w-0">
                       <div className="flex items-center gap-3 mb-1">
-                        <div className="grid w-8 h-8 text-sm font-bold text-white shadow-xl rounded-2xl bg-gradient-to-r from-blue-600 to-blue-600 place-items-center shadow-blue-500/30">
+                        <div className="grid w-8 h-8 text-sm font-bold text-white shadow-xl rounded-2xl bg-gradient-to-r from-cyan-600 to-cyan-600 place-items-center shadow-cyan-500/30">
                           1
                         </div>
                         <h2 className="text-xl font-bold text-gray-900 sm:text-2xl dark:text-white">
@@ -577,9 +581,11 @@ export default function DeployAIWorkforce() {
                                     <h3 className="text-sm font-bold text-gray-900 truncate sm:text-base dark:text-white">
                                       {agent.name}
                                     </h3>
-                                    <span className="text-[10px] sm:text-xs px-2.5 py-0.5 rounded-full bg-gradient-to-r from-blue-100 to-blue-100 dark:from-blue-800/50 dark:to-blue-800/50 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-700/50 font-medium">
-                                      {agent.agentType}
-                                    </span>
+                                    {agent.agentType && (
+                                      <span className="text-[10px] sm:text-xs px-2.5 py-0.5 rounded-full bg-gradient-to-r from-blue-100 to-blue-100 dark:from-blue-800/50 dark:to-blue-800/50 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-700/50 font-medium">
+                                        {agent.agentType}
+                                      </span>
+                                    )}
                                     {isSelected && (
                                       <span className="text-[10px] sm:text-xs font-bold px-2.5 py-0.5 rounded-full bg-gradient-to-r from-blue-600 to-blue-600 text-white shadow-lg shadow-blue-500/30 animate-pulse">
                                         Selected
@@ -811,24 +817,11 @@ export default function DeployAIWorkforce() {
               {step === 2 &&
                 (() => {
                   const partner = getSelectedPartnerDetails();
-                  const licenseTier =
-                    Number(selectedAgentData?.price) >= 5000
-                      ? "Industrial"
-                      : Number(selectedAgentData?.price) >= 500
-                      ? "Business"
-                      : "Personal";
-                  const multiplierNum =
-                    parseFloat(selectedAgentData?.rentalMultiplier as string) ||
-                    2;
                   const computeCredits =
                     Number(selectedAgentData?.totalCredit) || 0;
                   const apr =
                     "APYText" in partner ? partner.APYText : "0%";
-                  const revenueShare = 90; // platform takes 10%
-                  const monthlyRevenue =
-                    Number(selectedAgentData?.price) || 0;
-                  const platformFee = Math.round(monthlyRevenue * 0.1);
-                  const userIncome = monthlyRevenue - platformFee;
+                  const revenueShare = 90;
 
                   return (
                     <>
@@ -903,53 +896,64 @@ export default function DeployAIWorkforce() {
                             </div>
                           </div>
 
-                          {/* Monthly Revenue Preview */}
-                          <div>
-                            <h3 className="text-[11px] sm:text-xs font-semibold tracking-widest text-gray-500 mb-2">
-                              MONTHLY REVENUE PREVIEW
+                          {/* Compute Resources (replaces Monthly Revenue Preview) */}
+                          <div className="p-6 bg-white border border-gray-200 shadow-sm dark:bg-gray-800 rounded-xl dark:border-gray-700">
+                            <h3 className="mb-4 font-semibold text-gray-900 dark:text-white">
+                              Compute Resources
                             </h3>
-                            <div className="space-y-2">
-                              <div className="flex items-center justify-between gap-3 p-3 bg-white border border-gray-200 rounded-xl dark:border-white/10 dark:bg-white/5 sm:p-4">
-                                <div className="flex items-center min-w-0 gap-3">
-                                  <div className="grid w-8 h-8 bg-gray-100 rounded-lg dark:bg-white/10 place-items-center shrink-0">
-                                    🏦
-                                  </div>
-                                  <span className="text-xs truncate sm:text-sm">
-                                    Ai Agent Lease Deployment Income
-                                  </span>
-                                </div>
-                                <span className="text-sm font-bold whitespace-nowrap">
-                                  {selectedAgentData?.monthlyRevenueAprox}
-                                </span>
-                              </div>
 
-                              <div className="flex items-center justify-between gap-3 p-3 bg-white border border-gray-200 rounded-xl dark:border-white/10 dark:bg-white/5 sm:p-4">
-                                <div className="flex items-center min-w-0 gap-3">
-                                  <div className="grid w-8 h-8 bg-gray-100 rounded-lg dark:bg-white/10 place-items-center shrink-0">
-                                    %
+                            <div className="grid grid-cols-2 gap-3">
+                              {[
+                                {
+                                  icon: <MdMemory className="w-4 h-4" />,
+                                  label: "CPU Processing",
+                                  desc: "Multi-threaded",
+                                },
+                                {
+                                  icon: <FaMicrochip className="w-4 h-4" />,
+                                  label: "GPU Acceleration",
+                                  desc: "High-performance",
+                                },
+                                {
+                                  icon: <MdRefresh className="w-4 h-4" />,
+                                  label: "Agent Memory",
+                                  desc: "Persistent storage",
+                                },
+                                {
+                                  icon: <Clock className="w-4 h-4" />,
+                                  label: "Runtime",
+                                  desc: "24/7 operation",
+                                },
+                                {
+                                  icon: (
+                                    <BsLightningCharge className="w-4 h-4" />
+                                  ),
+                                  label: "AI Engine",
+                                  desc: "Real-time",
+                                },
+                                {
+                                  icon: <MdCloudQueue className="w-4 h-4" />,
+                                  label: "Usage Monitoring",
+                                  desc: "Track insights",
+                                },
+                              ].map((item, i) => (
+                                <div
+                                  key={i}
+                                  className="flex items-center gap-2 p-2.5 bg-gray-50 dark:bg-gray-700/30 rounded-lg"
+                                >
+                                  <div className="p-1.5 bg-indigo-100 dark:bg-indigo-900/30 rounded-lg text-indigo-600 dark:text-indigo-400">
+                                    {item.icon}
                                   </div>
-                                  <span className="text-xs truncate sm:text-sm">
-                                    Platform operations fee (10%)
-                                  </span>
-                                </div>
-                                <span className="text-sm font-bold text-red-500 whitespace-nowrap">
-                                  −{selectedAgentData?.platformFees}
-                                </span>
-                              </div>
-
-                              <div className="flex items-center justify-between gap-3 p-3 border border-green-200 rounded-xl dark:border-green-500/30 bg-green-50 dark:bg-green-500/10 sm:p-4">
-                                <div className="flex items-center min-w-0 gap-3">
-                                  <div className="grid w-8 h-8 bg-green-100 rounded-lg dark:bg-green-500/20 place-items-center shrink-0">
-                                    💰
+                                  <div>
+                                    <p className="text-xs font-medium text-gray-900 dark:text-white">
+                                      {item.label}
+                                    </p>
+                                    <p className="text-[10px] text-gray-500 dark:text-gray-400">
+                                      {item.desc}
+                                    </p>
                                   </div>
-                                  <span className="text-xs font-semibold truncate sm:text-sm">
-                                    Your Yield income ({revenueShare}%)
-                                  </span>
                                 </div>
-                                <span className="text-sm font-bold text-green-600 dark:text-green-400 whitespace-nowrap">
-                                  {selectedAgentData?.finalYiledIncome}
-                                </span>
-                              </div>
+                              ))}
                             </div>
                           </div>
                         </div>

@@ -226,7 +226,7 @@ export default function MyADeployments() {
 
   return (
     <>
-      <div className="relative w-full min-h-screen px-3 pb-10 space-y-6 overflow-hidden sm:px-4 md:px-6 lg:px-8 md:space-y-8 bg-gradient-to-br from-slate-50 via-white to-blue-50/30 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
+      <div className="relative w-full min-h-screen px-3 pb-10 space-y-6 overflow-hidden sm:px-4 md:px-6 lg:px-8 md:space-y-8 ">
         {/* Decorative Background Elements */}
         <div className="fixed inset-0 overflow-hidden pointer-events-none">
           <div className="absolute rounded-full -top-40 -right-40 w-80 h-80 bg-blue-400/20 dark:bg-blue-400/10 blur-3xl animate-float"></div>

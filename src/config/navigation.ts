@@ -63,8 +63,8 @@ export const primaryNav: NavItem[] = [
     href: "/ai-engine",
     isDropdown: true,
     dropdownItems: [
-      { label: "AI Engine", href: "/ai-engine" },
-      { label: "AI Assistant", href: "/ai-assistant" },
+      // { label: "AI Engine", href: "/ai-engine" },
+      // { label: "AI Assistant", href: "/ai-assistant" },
       { label: "AI Tools", href: "/ai-tools" },
     ],
   },
