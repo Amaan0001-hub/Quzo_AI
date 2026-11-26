@@ -12,7 +12,7 @@ const tabs: { id: ReportTab; label: string }[] = [
   { id: "deposit", label: "USDT Funding Wallet" },
   { id: "performance", label: "Working Reward Wallet" },
   { id: "yield", label: "Trading Reward Wallet" },
-  { id: "quzo", label: "QUZO Coin Wallet" },
+  // { id: "quzo", label: "QUZO Coin Wallet" },
   
   
 ];
@@ -240,10 +240,10 @@ export function WalletManager() {
       label: "USDT Funding Wallet Balance",
       value: Number(summary?.DepositWallet ?? 0),
     },
-    quzo: {
-      label: "QUZO Coin Wallet Balance",
-      value: Number(summary?.QuzoWallet ?? 0),
-    },
+    // quzo: {
+    //   label: "QUZO Coin Wallet Balance",
+    //   value: Number(summary?.QuzoWallet ?? 0),
+    // },
     yield: {
       label: "Trading Reward Wallet Balance",
       value: Number(summary?.YieldWallet ?? 0),

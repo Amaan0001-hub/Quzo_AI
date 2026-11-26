@@ -16,7 +16,7 @@ import {
 } from "react-icons/fa";
 
 export default function Reports() {
-  const [activeTab, setActiveTab] = useState("Direct Referral Income");
+  const [activeTab, setActiveTab] = useState("Agent Access Rewards");
   const pathname = usePathname();
   const pageName = getPageName(pathname);
 
@@ -30,26 +30,26 @@ export default function Reports() {
 
   const getTransactionType = (tabName: string) => {
     const map: Record<string, string> = {
-      "Direct Referral Income": "Direct Referral Income",
-      "Daily Profit Income": "Daily Profit Income",
-      "Level Income": "Level Income",
-      "Booster Income": "Booster Income",
-      "DAO Income": "DAO Income",
-      "Achievement Rewards": "Achievement Rewards",
-      "Salary Income": "Salary Income",
+      "Agent Access Rewards": "Agent Access Rewards",
+      "Direct Activation Rewards": "Direct Activation Rewards",
+      "Booster Profit Protocol": "Booster Profit Protocol",
+      "Referral Royalty Rewards": "Referral Royalty Rewards",
+      "Fleet Leadership Rewards": "Fleet Leadership Rewards",
+      "Performance Rewrads": "Performance Rewrads",
+      "Unity Revenue Clubs": "Unity Revenue Clubs",
 
     };
     return map[tabName] || "ALL";
   };
 
   const tabs = [
-    { id: "Direct Referral Income", label: "Direct Partner Rewards", icon: FaUserPlus },
-    { id: "Daily Profit Income", label: "AI Strategy Rewards", icon: FaMoneyBillWave },
-    { id: "Booster Income", label: "Booster Income", icon: FaGift },
-    { id: "Level Income", label: "Network Rewards", icon: FaCrown },
-    { id: "DAO Income", label: "DAO Income", icon: FaSeedling },
-    { id: "Achievement Rewards", label: "Achievement Rewards", icon: FaLayerGroup },
-    { id: "Salary Income", label: "Salary Income", icon: FaUsers },
+    { id: "Direct Activation Rewards", label: "Direct Activation Rewards", icon: FaMoneyBillWave },
+    { id: "Agent Access Rewards", label: "Agent Access Rewards", icon: FaUserPlus },
+    { id: "Booster Profit Protocol", label: "Booster Profit Protocol", icon: FaGift },
+    { id: "Referral Royalty Rewards", label: "Referral Royalty Rewards", icon: FaCrown },
+    { id: "Fleet Leadership Rewards", label: "Fleet Leadership Rewards", icon: FaSeedling },
+    { id: "Performance Rewrads", label: "Performance Rewrads", icon: FaLayerGroup },
+    { id: "Unity Revenue Clubs", label: "Unity Revenue Clubs", icon: FaUsers },
  
   ];
 
