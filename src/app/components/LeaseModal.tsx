@@ -121,7 +121,6 @@ interface BuyLicensePayload {
   productId: string;
   rkprice: number;
   byAuthlogin: string;
-  RechargeType: number;
 }
 
 /* ─── Plans ───────────────────────────────────────────── */
@@ -432,7 +431,6 @@ export default function LeaseModal({
       productId,
       rkprice: clamped,
       byAuthlogin: searchedUrid!,
-      RechargeType: 1,
     };
 
     try {
