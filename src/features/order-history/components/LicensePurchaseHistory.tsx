@@ -193,7 +193,7 @@ export function LicensePurchaseHistory() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#eef6ff] via-[#f7fbff] to-[#dbeafe] dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 p-6 md:p-8 transition-colors">
+    <div className="min-h-screen  p-6 md:p-8 transition-colors">
       {/* Header */}
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-gray-900 md:text-4xl dark:text-white">

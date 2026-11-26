@@ -56,7 +56,7 @@ export default function Reports() {
   return (
     <>
       {/* <NftSection pageName={pageName} /> */}
-      <div className="w-full px-3 sm:px-4 md:px-6 lg:px-8 pb-6 sm:pb-8 md:pb-10 bg-gradient-to-br from-slate-50 via-white to-blue-50/40 dark:from-[#0b1021] dark:via-[#0b1021] dark:to-[#171a36] min-h-screen relative overflow-hidden">
+      <div className="w-full px-3 sm:px-4 md:px-6 lg:px-8 pb-6 sm:pb-8 md:pb-10  relative overflow-hidden">
 
         {/* Decorative Background Elements */}
         <div className="fixed inset-0 pointer-events-none overflow-hidden">
