@@ -367,7 +367,7 @@ export default function AIBUSINESSHUB() {
     investment: activeTradingPackage || 0,
     totalIncomeCap: totalTradingPackage || 0,
     remainingCap: remaningPackage || 0,
-    capUsedPercent: totalTradingPackage > 0 ? ((activeTradingPackage / totalTradingPackage) * 100) : 0,
+capUsedPercent:totalTradingPackage > 0? Number(((activeTradingPackage / totalTradingPackage) * 100).toFixed(3)): 0,
   };
 
   // QUZO price

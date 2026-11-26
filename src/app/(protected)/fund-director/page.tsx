@@ -2097,7 +2097,7 @@ export default function FundDirectorPage() {
                         className="w-full rounded-xl border-2 border-slate-200 bg-white px-4 py-2.5 font-medium outline-none transition focus:border-[#1680ff] focus:ring-4 focus:ring-blue-500/10 dark:border-slate-700 dark:bg-slate-800 dark:text-white sm:w-auto"
                       >
                         <option value="income">Working Reward Wallet</option>
-                        <option value="yield">Trading Reward Wallet</option>
+                        <option value="yield">Yield Reward Wallet</option>
                       </select>
                     </label>
                   )}
@@ -2354,7 +2354,7 @@ export default function FundDirectorPage() {
                       className="w-full rounded-xl border-2 border-slate-200 bg-white px-4 py-2.5 font-medium outline-none transition focus:border-[#1680ff] focus:ring-4 focus:ring-blue-500/10 dark:border-slate-700 dark:bg-slate-800 dark:text-white sm:w-auto"
                     >
                       <option value="performance">Working Reward Wallet</option>
-                      <option value="yield">Trading Reward Wallet</option>
+                      <option value="yield">Yield Reward Wallet</option>
                     </select>
                   </label>
                   <div className="w-full text-sm font-semibold text-slate-700 dark:text-slate-100 sm:w-auto">

@@ -311,7 +311,7 @@ export function Navbar() {
     },
     {
       id: "yield",
-      name: "Trading Reward Wallet",
+      name: "Yield Reward Wallet",
       balance: walletData?.YieldWallet ? `$${Number(walletData.YieldWallet).toFixed(4)}` : "$0.0000",
       icon: BarChart3,
       color: "#34d399",

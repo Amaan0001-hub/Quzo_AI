@@ -362,7 +362,7 @@ export default function RankPage() {
           }`}
         >
           <Award className="h-4 w-4" />
-          Rank Progress
+          Performance Reward
         </button>
         <button
           onClick={() => setActiveTab("dao")}
@@ -373,7 +373,7 @@ export default function RankPage() {
           }`}
         >
           <Users className="h-4 w-4" />
-          DAO Program
+          Revenue Club
         </button>
       </div>
 
