@@ -329,17 +329,17 @@ export function Navbar() {
       lightColor: "#0e7490",
       bg: "#e0f2fe",
     },
-    // {
-    //   id: "performance",
-    //   name: "QUZO Coin Wallet",
-    //   balance: walletData?.QuzoWallet
-    //     ? `${Number(walletData.QuzoWallet).toFixed(4)}`
-    //     : "0.0000",
-    //   icon: TrendingUp,
-    //   color: "#a78bfa",
-    //   lightColor: "#7c3aed",
-    //   bg: "#ede9fe",
-    // },
+    {
+      id: "performance",
+      name: "QUZO Coin Wallet",
+      balance: walletData?.QuzoWallet
+        ? `${Number(walletData.QuzoWallet).toFixed(4)}`
+        : "0.0000",
+      icon: TrendingUp,
+      color: "#a78bfa",
+      lightColor: "#7c3aed",
+      bg: "#ede9fe",
+    },
   ];
 
   return (
