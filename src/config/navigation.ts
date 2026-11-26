@@ -12,13 +12,15 @@ export const primaryNav: NavItem[] = [
   // },
 
   {
-    label: "AI Subscriptions",
+    label: "AI Agents",
     href: "/",
     isDropdown: true,
     dropdownItems: [
-      { label: "Explore Plans", href: "/investment-amount" },
+      { label: "By Agent License", href: "/investment-amount" },
+      { label: "Deploy Agents", href: "/deploy-agents" },
       // { label: "Booster", href: "/booster" },
-      { label: "Purchase History", href: "/order-history" },
+      { label: "License Purchase History", href: "/order-history" },
+      { label: "Agent Deployment Report", href: "/deploy-report" },
     ],
   },
 

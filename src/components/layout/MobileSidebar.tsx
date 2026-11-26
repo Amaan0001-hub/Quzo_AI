@@ -21,6 +21,7 @@ import {
   Network,
   PackageOpen,
   PanelsTopLeft,
+  Rocket,
   ScrollText,
   UserRoundPlus,
    Sparkles, 
@@ -64,6 +65,11 @@ const menuIcons: Record<string, LucideIcon> = {
   "Network Structure": GitBranch,
   "Extended Network": Network,
   "AI Tools": Sparkles,
+  "AI Agents": Bot,
+  "By Agent License": Coins,
+  "Deploy Agents": Rocket,
+  "License Purchase History": ScrollText,
+  "Agent Deployment Report": ChartNoAxesCombined,
 };
 
 function MenuIcon({ label, className }: { label: string; className?: string }) {
