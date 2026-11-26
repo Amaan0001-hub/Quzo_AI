@@ -713,7 +713,8 @@ export default function InvestmentAmountPage() {
   };
 
   const handleCardClick = (agent: Agent) => {
-    router.push(`/agent-detail?id=${agent.productId}`);
+    // router.push(`/agent-detail?id=${agent.productId}`);
+    router.push("#");
   };
 
   return (
@@ -723,8 +724,8 @@ export default function InvestmentAmountPage() {
 
         <div>
           <div className="pt-4">
-            <h1 className="mb-3 bg-gradient-to-r from-slate-900 via-slate-900 to-cyan-600 bg-clip-text dark:from-white dark:via-white dark:to-[#65e7ff] text-4xl font-bold tracking-tight text-transparent sm:text-5xl">
-              {pageName}
+            <h1 className="mb-3 bg-gradient-to-r from-slate-900 via-slate-900 to-cyan-600 bg-clip-text dark:from-white dark:via-white dark:to-[#65e7ff] text-xl font-medium tracking-tight text-transparent sm:text-5xl">
+              Agent Access Program
             </h1>
             <div className="mb-4 flex items-center gap-3">
               <span className="h-px w-10 bg-cyan-600 dark:bg-[#65e7ff]" />
@@ -1067,11 +1068,11 @@ export default function InvestmentAmountPage() {
                                 Acquire License
                               </button>
                               <button
-                                className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-full border border-cyan-600/40 dark:border-[#65e7ff]/40 bg-slate-50 dark:bg-white/[0.03] px-6 py-3 text-[12px] font-semibold text-slate-900 dark:text-white backdrop-blur-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-cyan-600 hover:bg-cyan-50 dark:hover:border-[#65e7ff] dark:hover:bg-[#65e7ff]/10"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  handleCardClick(agent);
-                                }}
+                                className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-full border border-cyan-600/40 dark:border-[#65e7ff]/40 bg-slate-50 dark:bg-white/[0.03] px-6 py-3 text-[12px] font-semibold text-slate-900 dark:text-white backdrop-blur-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-cyan-600 hover:bg-cyan-50 dark:hover:border-[#65e7ff] dark:hover:bg-[#65e7ff]/10 cursor-not-allowed"
+                                // onClick={(e) => {
+                                //   e.stopPropagation();
+                                //   handleCardClick(agent);
+                                // }}
                               >
                                 <RiEyeLine className="mr-2" />
                                 View Details
