@@ -909,7 +909,6 @@ const MyAgentPage: React.FC = () => {
       };
     }
 
-    // Use PurchaseDate instead of LeaseDate
     const validLeases = analyticsData.data
       .filter(item => item.TotalInvestment && item.PurchaseDate)
       .map(item => {
