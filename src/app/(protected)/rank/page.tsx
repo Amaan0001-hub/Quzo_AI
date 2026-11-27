@@ -569,7 +569,7 @@ export default function RankPage() {
                 <div className="relative overflow-hidden rounded-2xl border border-slate-200/80 bg-white/90 shadow-sm dark:border-slate-700/70 dark:bg-slate-900/75">
                   <div className="flex items-center justify-between border-b border-slate-200 px-4 py-3 dark:border-slate-700">
                     <span className="text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300">
-                      Total DAO Reward
+                      Total Revenue Reward
                     </span>
                     <TrendingUp className="h-4 w-4 text-emerald-500" aria-hidden />
                   </div>
@@ -599,7 +599,7 @@ export default function RankPage() {
                 <div className="absolute inset-x-0 top-0 h-0.5 bg-gradient-to-r from-[#1680ff] via-[#25c6e8] to-[#7d75ff]" />
                 <div className="flex items-center justify-between border-b border-slate-200 px-4 py-4 dark:border-slate-700 sm:px-6">
                   <div>
-                    <h2 className="font-bold text-slate-900 dark:text-white">DAO Reward Table</h2>
+                    <h2 className="font-bold text-slate-900 dark:text-white">Revenue Reward Table</h2>
                     <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
                       {dao.length} pool{dao.length === 1 ? "" : "s"}
                     </p>
@@ -612,7 +612,7 @@ export default function RankPage() {
                       <tr>
                         <th className="whitespace-nowrap px-4 py-3">#</th>
                         <th className="whitespace-nowrap px-4 py-3">DIRECT BUSINESS</th>
-                        <th className="whitespace-nowrap px-4 py-3">DAO REWARD</th>
+                        <th className="whitespace-nowrap px-4 py-3">REVENUE REWARD</th>
                         <th className="whitespace-nowrap px-4 py-3">STATUS</th>
                       </tr>
                     </thead>
@@ -626,7 +626,7 @@ export default function RankPage() {
                       ) : dao.length === 0 ? (
                         <tr>
                           <td colSpan={6} className="px-4 py-10 text-center text-slate-500">
-                            No DAO data found.
+                            No Revenue data found.
                           </td>
                         </tr>
                       ) : (

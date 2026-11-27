@@ -31,6 +31,7 @@ import {
 } from "chart.js";
 import { Line, Pie } from "react-chartjs-2";
 import { RiRobot2Line, RiUserUnfollowLine } from 'react-icons/ri';
+import { useRouter } from "next/navigation";
 
 
 
@@ -339,7 +340,7 @@ interface NoDataStateProps {
 
 const NoDataState: React.FC<NoDataStateProps> = ({ message, statusCode }) => {
   const [dots, setDots] = useState("");
-
+  const router = useRouter()
   useEffect(() => {
     const iv = setInterval(() => {
       setDots((d) => (d.length >= 3 ? "" : d + "."));
@@ -421,7 +422,8 @@ const NoDataState: React.FC<NoDataStateProps> = ({ message, statusCode }) => {
         {/* CTA Buttons */}
         <div className="flex flex-col items-center gap-3 sm:flex-row">
           <button
-            onClick={() => (window.location.href = "/deploy-agent")}
+            // onClick={() => (window.location.href = "/deploy-agents")}
+            onClick={() => router.push("/deploy-agents")}
             className="group inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 px-6 py-3 text-sm font-bold text-white shadow-lg shadow-blue-500/30 transition-all hover:scale-105 hover:shadow-xl hover:shadow-blue-500/40 active:scale-95"
           >
             <MdRocketLaunch className="h-4 w-4 transition-transform group-hover:-translate-y-0.5" />
