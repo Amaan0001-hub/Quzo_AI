@@ -30,8 +30,8 @@ function Logo() {
 const SITE = "https://QUZOai.vercel.app";
 const LINKS = {
   contact: `${SITE}/#`,
-  terms: `${SITE}/#`,
-  privacy: `${SITE}/#`,
+  terms: `/terms`,
+  privacy: `/privacy`,
 };
 
 /* ============================================================
@@ -45,7 +45,7 @@ const PRODUCT: [string, string, string][] = [
 ];
 
 const LEGAL: [string, string, string][] = [
-  ["Contact", LINKS.contact, "contact"],
+  // ["Contact", LINKS.contact, "contact"],
   ["Terms & Conditions", LINKS.terms, "terms"],
   ["Privacy Policy", LINKS.privacy, "privacy"],
 ];
