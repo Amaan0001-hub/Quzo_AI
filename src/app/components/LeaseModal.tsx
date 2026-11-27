@@ -454,7 +454,7 @@ export default function LeaseModal({
       )}
 
       {/* ── Main Modal ── */}
-      <div className="fixed inset-0 z-[50] flex items-center justify-center bg-slate-900/50 p-3 backdrop-blur-md animate-fadeIn dark:bg-[#02050f]/75 sm:p-4"
+      <div className="fixed inset-0 z-[60] flex items-center justify-center bg-slate-900/50 p-3 backdrop-blur-md animate-fadeIn dark:bg-[#02050f]/75 sm:p-4"
         onClick={onClose}
       >
         <div className="relative flex max-h-[92vh] w-full max-w-[900px] overflow-hidden rounded-3xl border border-white/60 bg-white shadow-2xl shadow-slate-900/30 dark:border-emerald-400/20 dark:bg-[#070d1c]"

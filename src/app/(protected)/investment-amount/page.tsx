@@ -166,7 +166,7 @@ export default function InvestmentAmountPage() {
   return (
     <>
       {/* Page canvas: navy base + grid + glow orbs, same mood as the home hero */}
-      <div className="relative isolate mx-auto overflow-hidden p-4 text-slate-900 dark:text-white sm:px-6 lg:px-8">
+      <div className="relative mx-auto overflow-hidden p-4 text-slate-900 dark:text-white sm:px-6 lg:px-8">
 
         <div>
           <div className="pt-4">
