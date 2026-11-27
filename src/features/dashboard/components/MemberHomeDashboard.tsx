@@ -624,7 +624,7 @@ function LicenseCredits({ walletData }: { walletData: WalletData }) {
   const licenseValue = Number(walletData.AIAgentLicense ?? 0);
   const creditsPurchased = Number(walletData.PurchaseCredit ?? 0);
   const creditsUtilized = Number(walletData.DeployedCredit ?? 0);
-  const serviceRevenue = Number(walletData.IncomeWallet ?? 0);
+  const RevenueGenerated = Number(walletData.RevenueGenerated ?? 0);
   const vendorRevenue = Number(walletData.TeamBusiness ?? 0);
 
   const steps: [string, string, number | null, boolean, number, LucideIcon][] = [
@@ -634,7 +634,7 @@ function LicenseCredits({ walletData }: { walletData: WalletData }) {
     [
       "Total Revenue Generated",
       "Revenue, not net profit",
-      serviceRevenue + vendorRevenue,
+      RevenueGenerated,
       true,
       2,
       TrendingUp,
