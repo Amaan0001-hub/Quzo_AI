@@ -154,7 +154,7 @@ const DownlineAffilates = () => {
                     <th className="px-4 py-3 text-xs font-medium tracking-wider text-left text-gray-600 uppercase whitespace-nowrap dark:text-gray-300">Name</th>
                     <th className="px-4 py-3 text-xs font-medium tracking-wider text-left text-gray-600 uppercase whitespace-nowrap dark:text-gray-300">Reg Date</th>
                     <th className="px-4 py-3 text-xs font-medium tracking-wider text-left text-gray-600 uppercase whitespace-nowrap dark:text-gray-300">Topup Date</th>
-                    <th className="px-4 py-3 text-xs font-medium tracking-wider text-left text-gray-600 uppercase whitespace-nowrap dark:text-gray-300">Package</th>
+                    <th className="px-4 py-3 text-xs font-medium tracking-wider text-left text-gray-600 uppercase whitespace-nowrap dark:text-gray-300">License Amount</th>
                     <th className="px-4 py-3 text-xs font-medium tracking-wider text-left text-gray-600 uppercase whitespace-nowrap dark:text-gray-300">Team Business</th>
 
                                         <th className="px-4 py-3 text-xs font-medium tracking-wider text-left text-gray-600 uppercase whitespace-nowrap dark:text-gray-300">Status</th>
