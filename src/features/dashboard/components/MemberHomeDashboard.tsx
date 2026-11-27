@@ -29,6 +29,9 @@ import {
   Layers,
   Sparkles,
   Globe,
+  CheckCircle2,
+  Target,
+  CalendarDays,
 } from "lucide-react";
 import {
   Bar,
@@ -432,11 +435,10 @@ function IncomeRangeTabs({
           type="button"
           aria-pressed={value === key}
           onClick={() => onChange(key)}
-          className={`rounded-full border px-4 py-1.5 text-[11px] font-semibold transition active:scale-95 ${
-            value === key
-              ? "border-[#6b4eff] bg-[#6b4eff] text-white"
-              : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50 dark:border-slate-700 dark:bg-[#07242e] dark:text-slate-300"
-          }`}
+          className={`rounded-full border px-4 py-1.5 text-[11px] font-semibold transition active:scale-95 ${value === key
+            ? "border-[#6b4eff] bg-[#6b4eff] text-white"
+            : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50 dark:border-slate-700 dark:bg-[#07242e] dark:text-slate-300"
+            }`}
         >
           {text}
         </button>
@@ -483,9 +485,8 @@ function IncomeOverviewSection() {
             </div>
             <div className="flex items-center gap-2">
               <span
-                className={`flex items-center gap-1 rounded-md px-2.5 py-1 text-[11px] font-semibold ${
-                  up ? "text-[#12a594]" : "text-rose-500"
-                }`}
+                className={`flex items-center gap-1 rounded-md px-2.5 py-1 text-[11px] font-semibold ${up ? "text-[#12a594]" : "text-rose-500"
+                  }`}
                 style={{
                   background: "color-mix(in srgb, currentColor 12%, transparent)",
                 }}
@@ -592,11 +593,10 @@ function IncomeOverviewSection() {
                     <div className="text-[10px] text-slate-400">{tx.date}</div>
                   </div>
                   <span
-                    className={`text-[11px] font-bold ${
-                      tx.date.includes("Pending")
-                        ? "text-slate-400"
-                        : "text-emerald-600 dark:text-emerald-400"
-                    }`}
+                    className={`text-[11px] font-bold ${tx.date.includes("Pending")
+                      ? "text-slate-400"
+                      : "text-emerald-600 dark:text-emerald-400"
+                      }`}
                   >
                     {tx.amount}
                   </span>
@@ -622,22 +622,8 @@ function LicenseCredits({ walletData }: { walletData: WalletData }) {
 
   const steps: [string, string, number | null, boolean, number, LucideIcon][] = [
     ["AI License Value", "Your agent license", licenseValue, true, 0, BadgeCheck],
-    [
-      "Total Credits Purchased",
-      "AI compute credits",
-      creditsPurchased,
-      false,
-      0,
-      Coins,
-    ],
-    [
-      "Total Credits Utilized",
-      "Consumed or deployed",
-      creditsUtilized,
-      false,
-      0,
-      Cpu,
-    ],
+    ["Total Credits Purchased", "AI compute credits", creditsPurchased, false, 0, Coins],
+    ["Total Credits Utilized", "Consumed or deployed", creditsUtilized, false, 0, Cpu],
     [
       "Total Revenue Generated",
       "Revenue, not net profit",
@@ -654,75 +640,75 @@ function LicenseCredits({ walletData }: { walletData: WalletData }) {
       : Math.min(100, Math.round((creditsUtilized / creditsPurchased) * 100));
 
   return (
-    <div className="relative overflow-hidden rounded-[1.5rem] border border-white/10 bg-[#070b18] p-5 text-white sm:p-6">
-      <div className="absolute -left-24 -top-24 h-64 w-64 rounded-full bg-cyan-500/20 blur-3xl" />
-      <div className="absolute -bottom-24 -right-16 h-72 w-72 rounded-full bg-violet-600/30 blur-3xl" />
+    <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-[#070b18] p-3 text-white sm:p-4 lg:p-5">
+      <div className="absolute -left-24 -top-24 h-52 w-52 rounded-full bg-cyan-500/20 blur-3xl" />
+      <div className="absolute -bottom-24 -right-16 h-56 w-56 rounded-full bg-violet-600/30 blur-3xl" />
+
       <div className="relative">
-        <h3 className="text-lg font-bold">AI License &amp; Credits</h3>
-        <p className="mb-5 text-xs text-slate-400">
+        <h3 className="text-base font-bold sm:text-lg">AI License &amp; Credits</h3>
+        <p className="mb-3 text-[11px] text-slate-400 sm:text-xs">
           License → Credits → Utilization → Revenue
         </p>
 
-        <ol className="grid grid-cols-[repeat(auto-fit,minmax(min(100%,210px),1fr))] gap-3">
+        {/* Mobile: 2 columns | Tablet/Laptop (md+): 4 columns in one row */}
+        <ol className="grid grid-cols-2 gap-2 sm:gap-2.5 md:grid-cols-4">
           {steps.map(([label, sub, value, isMoney, decimals, Icon], i) => (
             <li
               key={label}
-              className="relative rounded-2xl border border-white/10 bg-white/[0.05] p-4 backdrop-blur transition hover:-translate-y-1 hover:border-cyan-300/60"
+              className="relative min-w-0 rounded-xl border border-white/10 bg-white/[0.05] p-2.5 backdrop-blur transition hover:-translate-y-0.5 hover:border-cyan-300/60 sm:p-3"
             >
-              <div className="mb-4 flex items-center justify-between">
-                <span className="rounded-xl bg-gradient-to-br from-cyan-500 to-violet-600 p-2.5 shadow-[0_0_24px_-4px_#22d3ee]">
-                  <Icon className="h-5 w-5" />
+              <div className="mb-2 flex items-center justify-between">
+                <span className="rounded-lg bg-gradient-to-br from-cyan-500 to-violet-600 p-1.5 shadow-[0_0_18px_-4px_#22d3ee] sm:p-2">
+                  <Icon className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                 </span>
                 {i < steps.length - 1 ? (
-                  <ArrowRight className="h-4 w-4 text-cyan-300" />
+                  <ArrowRight className="h-3.5 w-3.5 text-cyan-300" />
                 ) : (
-                  <span className="h-2 w-2 rounded-full bg-emerald-400" />
+                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
                 )}
               </div>
-              <p className="text-xs text-slate-300">{label}</p>
-              <p className="my-1 flex min-h-[2.25rem] items-center text-3xl font-bold">
+
+              <p className="truncate text-[11px] text-slate-300 sm:text-xs">{label}</p>
+              <p className="my-0.5 flex min-h-[1.75rem] items-center break-all text-lg font-bold leading-tight sm:text-xl lg:text-2xl">
                 {value === null ? (
-                  <span className="text-base font-semibold text-slate-400">
-                    {PENDING}
-                  </span>
+                  <span className="text-sm font-semibold text-slate-400">{PENDING}</span>
                 ) : (
-                  <Counter
-                    value={value}
-                    prefix={isMoney ? "$" : ""}
-                    decimals={decimals}
-                  />
+                  <Counter value={value} prefix={isMoney ? "$" : ""} decimals={decimals} />
                 )}
               </p>
-              <p className="text-[11px] text-slate-500">{sub}</p>
+              <p className="truncate text-[10px] text-slate-500">{sub}</p>
             </li>
           ))}
         </ol>
 
-        <div className="mt-5 flex flex-wrap items-center gap-3">
-          <div className="min-w-0 flex-[1_1_240px]">
-            <div className="mb-2 flex justify-between text-xs text-slate-300">
+        <div className="mt-3 flex flex-wrap items-center gap-2.5 sm:gap-3">
+          <div className="min-w-0 flex-[1_1_200px]">
+            <div className="mb-1.5 flex justify-between text-[11px] text-slate-300 sm:text-xs">
               <span>Credit utilization</span>
               <span>{used === null ? PENDING : `${used}%`}</span>
             </div>
-            <div className="h-2 overflow-hidden rounded-full bg-white/10">
+            <div className="h-1.5 overflow-hidden rounded-full bg-white/10">
               <div
                 className="h-full rounded-full bg-gradient-to-r from-cyan-400 to-violet-500 transition-all duration-1000"
                 style={{ width: `${used ?? 0}%` }}
               />
             </div>
           </div>
-          <Link
-  href="/investment-amount"
-  className="rounded-xl bg-gradient-to-r from-[#12a594] to-[#35d6c0] px-4 py-2.5 text-sm font-semibold text-white shadow-[0_4px_14px_rgba(18,165,148,0.3)] transition-opacity hover:opacity-90"
->
-  Buy License
-</Link>
-<Link
-  href="/deploy-agents"
-  className="rounded-xl border border-white/20 bg-white/5 px-4 py-2.5 text-sm font-semibold transition-colors hover:bg-white/10"
->
-  Deploy Credits
-</Link>
+
+          <div className="flex w-full gap-2 sm:w-auto">
+            <Link
+              href="/investment-amount"
+              className="flex-1 rounded-lg bg-gradient-to-r from-[#12a594] to-[#35d6c0] px-3.5 py-2 text-center text-xs font-semibold text-white shadow-[0_4px_14px_rgba(18,165,148,0.3)] transition-opacity hover:opacity-90 sm:flex-none sm:text-[13px]"
+            >
+              Buy License
+            </Link>
+            <Link
+              href="/deploy-agents"
+              className="flex-1 rounded-lg border border-white/20 bg-white/5 px-3.5 py-2 text-center text-xs font-semibold transition-colors hover:bg-white/10 sm:flex-none sm:text-[13px]"
+            >
+              Deploy Credits
+            </Link>
+          </div>
         </div>
       </div>
     </div>
@@ -755,17 +741,15 @@ function RevenueProfit({ walletData }: { walletData: WalletData }) {
             <span
               className="h-full bg-[#3b82f6] transition-all duration-1000"
               style={{
-                width: `${
-                  total > 0 ? Math.round((serviceRevenue / total) * 100) : 0
-                }%`,
+                width: `${total > 0 ? Math.round((serviceRevenue / total) * 100) : 0
+                  }%`,
               }}
             />
             <span
               className="h-full bg-[#6366f1] transition-all duration-1000"
               style={{
-                width: `${
-                  total > 0 ? Math.round((vendorRevenue / total) * 100) : 0
-                }%`,
+                width: `${total > 0 ? Math.round((vendorRevenue / total) * 100) : 0
+                  }%`,
               }}
             />
           </div>
@@ -897,6 +881,772 @@ function CoinChart({ children }: { children?: ReactNode }) {
 /* ============================================================
    MAIN COMPONENT — uses real API walletData
    ============================================================ */
+
+/* ============================================================
+GLOBAL AI MARKET SNAPSHOT
+Paste this ABOVE `export function MemberHomeDashboard()`
+(it uses MARKET_STATS, MARKET_VIEWS, parseMarketValue, Counter, Reveal
+which are already defined in your file).
+
+Lucide imports to ADD:  CalendarDays, CheckCircle2, Target
+============================================================ */
+
+// const STAT_STYLES = [
+//   {
+//     icon: Layers,
+//     card: "border-emerald-100 bg-gradient-to-br from-emerald-50 to-white dark:border-[#153747] dark:from-[#0b3234] dark:to-[#07242e]",
+//     tile: "bg-emerald-500/15 text-emerald-500",
+//     label: "text-emerald-600 dark:text-emerald-400",
+//   },
+//   {
+//     icon: ChartNoAxesCombined,
+//     card: "border-violet-100 bg-gradient-to-br from-violet-50 to-white dark:border-[#153747] dark:from-[#1d1b4a] dark:to-[#07242e]",
+//     tile: "bg-violet-500/15 text-violet-500",
+//     label: "text-violet-600 dark:text-violet-400",
+//   },
+//   {
+//     icon: Users,
+//     card: "border-sky-100 bg-gradient-to-br from-sky-50 to-white dark:border-[#153747] dark:from-[#0b2d47] dark:to-[#07242e]",
+//     tile: "bg-sky-500/15 text-sky-500",
+//     label: "text-sky-600 dark:text-sky-400",
+//   },
+//   {
+//     icon: Briefcase,
+//     card: "border-amber-100 bg-gradient-to-br from-amber-50 to-white dark:border-[#153747] dark:from-[#3a2a0f] dark:to-[#07242e]",
+//     tile: "bg-amber-500/15 text-amber-500",
+//     label: "text-amber-600 dark:text-amber-400",
+//   },
+// ];
+
+// const AXIS_MAX: Record<keyof typeof MARKET_VIEWS, number> = {
+//   spending: 4,
+//   market: 5,
+//   jobs: 200,
+// };
+
+// const RANGE_LABEL: Record<keyof typeof MARKET_VIEWS, string> = {
+//   spending: "2025 – 2027",
+//   market: "2023 – 2033",
+//   jobs: "By 2030",
+// };
+
+// const decimalsOf = (n: number) => String(n).split(".")[1]?.length ?? 0;
+
+// function MarketSnapshotSection() {
+//   const [marketView, setMarketView] =
+//     useState<keyof typeof MARKET_VIEWS>("spending");
+
+//   const view = MARKET_VIEWS[marketView];
+//   const axisMax = AXIS_MAX[marketView];
+//   const count = view.data.length;
+//   const showLine = marketView !== "jobs"; // line only makes sense over time
+
+//   const points = view.data.map((d, i) => ({
+//     ...d,
+//     x: ((i + 0.5) / count) * 100,
+//     y: 100 - Math.min(100, (d.v / axisMax) * 100),
+//   }));
+//   const linePath = points.map((p, i) => `${i ? "L" : "M"}${p.x},${p.y}`).join(" ");
+//   // const areaPath = `${linePath} L${points[count - 1].x},100 L${points[0].x},100 Z`;
+//   const first = points[0];
+//   const last = points[count - 1];
+//   const areaPath =
+//     first && last
+//       ? `${linePath} L${last.x},100 L${first.x},100 Z`
+//       : "";
+//   const ticks = [1, 0.75, 0.5, 0.25, 0].map((p) => p * axisMax);
+//   const tickText = (t: number) =>
+//     t === 0 ? "0" : view.unit === "T" ? `${t.toFixed(1)}T` : `${t}M`;
+
+//   return (
+//     <section className="space-y-3">
+//       {/* ---------- HERO ---------- */}
+//       <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#03161f] via-[#052832] to-[#06303a] p-4 sm:p-6 lg:p-7">
+//         <div className="pointer-events-none absolute -right-10 top-1/2 h-72 w-72 -translate-y-1/2 rounded-full bg-[#12a594]/25 blur-[90px]" />
+//         <div
+//           className="pointer-events-none absolute inset-0 opacity-20"
+//           style={{
+//             backgroundImage:
+//               "linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px)",
+//             backgroundSize: "32px 32px",
+//           }}
+//         />
+
+//         <div className="relative z-10 flex items-center justify-between gap-4">
+//           <div className="min-w-0 max-w-xl">
+//             <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-[#35d6c0] backdrop-blur sm:text-[11px]">
+//               <ChartNoAxesCombined className="h-3.5 w-3.5" />
+//               Global AI Market Snapshot
+//             </div>
+//             <h2 className="text-2xl font-extrabold leading-tight tracking-tight text-white sm:text-3xl lg:text-4xl">
+//               The AI Economy Is Entering Its{" "}
+//               <span className="block text-[#35f0c0]">Trillion-Dollar Era.</span>
+//             </h2>
+//             <p className="mt-2 max-w-md text-xs leading-relaxed text-slate-300 sm:text-sm">
+//               Massive growth in AI spending, market size and global employment is
+//               creating unprecedented opportunities for AI solutions.
+//             </p>
+//           </div>
+
+//           {/* Globe (pure CSS, no image needed) */}
+//           <div className="relative hidden h-28 w-28 shrink-0 sm:block lg:h-36 lg:w-36" aria-hidden="true">
+//             <div
+//               className="absolute inset-0 rounded-full shadow-[0_0_60px_rgba(34,211,238,0.55)]"
+//               style={{
+//                 background:
+//                   "radial-gradient(circle at 35% 30%, #8cf3ff 0%, #1aa6dd 38%, #0a4a8a 70%, #06223f 100%)",
+//               }}
+//             />
+//             <div
+//               className="absolute inset-0 rounded-full opacity-40"
+//               style={{
+//                 backgroundImage:
+//                   "radial-gradient(rgba(255,255,255,0.8) 1px, transparent 1.5px)",
+//                 backgroundSize: "9px 9px",
+//                 maskImage: "radial-gradient(circle, black 55%, transparent 72%)",
+//                 WebkitMaskImage: "radial-gradient(circle, black 55%, transparent 72%)",
+//               }}
+//             />
+//             <span className="absolute inset-0 flex items-center justify-center text-4xl font-extrabold text-white drop-shadow-[0_0_14px_rgba(255,255,255,0.8)] lg:text-5xl">
+//               AI
+//             </span>
+//             <span className="absolute -inset-x-5 inset-y-[36%] -rotate-[16deg] rounded-[50%] border-2 border-[#35f0c0] shadow-[0_0_14px_#35f0c0]" />
+//           </div>
+//         </div>
+//       </div>
+
+//       {/* ---------- STAT CARDS ---------- */}
+//       <div className="grid grid-cols-2 gap-2.5 sm:gap-3 lg:grid-cols-4">
+//         {MARKET_STATS.map((s, i) => {
+//           // const st = STAT_STYLES[i % STAT_STYLES.length];
+//           const st = STAT_STYLES[i % STAT_STYLES.length] ?? STAT_STYLES[0]!;
+//           const Icon = st.icon;
+//           const { num, prefix, suffix } = parseMarketValue(s.value);
+//           return (
+//             <Reveal key={i} delay={i * 0.05} className="h-full">
+//               <div
+//                 className={`relative h-full overflow-hidden rounded-2xl border p-3 shadow-sm sm:p-4 ${st.card}`}
+//               >
+//                 <span
+//                   className={`absolute right-2.5 top-2.5 grid h-9 w-9 place-items-center rounded-xl sm:right-3 sm:top-3 sm:h-12 sm:w-12 ${st.tile}`}
+//                 >
+//                   <Icon className="h-4 w-4 sm:h-6 sm:w-6" />
+//                 </span>
+
+//                 <p
+//                   className={`pr-10 text-[9px] font-bold uppercase tracking-wider sm:pr-14 sm:text-[10px] ${st.label}`}
+//                 >
+//                   {s.type} · {s.year}
+//                 </p>
+//                 <p className="mt-1.5 text-2xl font-extrabold leading-none text-slate-900 dark:text-white sm:text-3xl">
+//                   <Counter
+//                     value={num}
+//                     prefix={prefix}
+//                     suffix={suffix}
+//                     decimals={decimalsOf(num)}
+//                   />
+//                 </p>
+//                 <p className="mt-1.5 text-[10px] leading-snug text-slate-500 dark:text-slate-400 sm:text-[11px]">
+//                   {s.label}
+//                 </p>
+//                 <a
+//                   href="#"
+//                   className="mt-2.5 inline-flex max-w-full items-center gap-1 rounded-md bg-white/70 px-2 py-1 text-[9px] font-medium text-slate-600 ring-1 ring-black/5 transition hover:bg-white dark:bg-white/5 dark:text-slate-300 dark:ring-white/10 sm:text-[10px]"
+//                 >
+//                   <span className="truncate">{s.source}</span>
+//                   <ArrowUpRight className="h-3 w-3 shrink-0" />
+//                 </a>
+//               </div>
+//             </Reveal>
+//           );
+//         })}
+//       </div>
+
+//       {/* ---------- CHART + TAKEAWAYS ---------- */}
+//       <div className="grid gap-3 lg:grid-cols-[1.9fr_1fr]">
+//         {/* Chart */}
+//         <div className="min-w-0 rounded-2xl border border-slate-100 bg-white p-4 shadow-sm dark:border-[#153747] dark:bg-[#07242e] sm:p-5">
+//           <div className="flex flex-wrap items-center justify-between gap-2">
+//             <h3 className="flex items-center gap-2 text-sm font-bold text-slate-900 dark:text-white sm:text-base">
+//               <ChartNoAxesCombined className="h-4 w-4 text-emerald-500" />
+//               AI Industry Outlook
+//             </h3>
+//             <span className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 px-2.5 py-1 text-[11px] font-medium text-slate-600 dark:border-slate-700 dark:text-slate-300">
+//               <CalendarDays className="h-3.5 w-3.5" />
+//               {RANGE_LABEL[marketView]}
+//             </span>
+//           </div>
+
+//           <div className="mt-3 flex flex-wrap gap-2" role="group" aria-label="Chart measure">
+//             {(Object.keys(MARKET_VIEWS) as (keyof typeof MARKET_VIEWS)[]).map((k) => (
+//               <button
+//                 key={k}
+//                 type="button"
+//                 aria-pressed={marketView === k}
+//                 onClick={() => setMarketView(k)}
+//                 className={`rounded-full px-3.5 py-1.5 text-[11px] font-semibold transition-colors ${marketView === k
+//                     ? "bg-emerald-500 text-white"
+//                     : "bg-slate-100 text-slate-600 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
+//                   }`}
+//               >
+//                 {MARKET_VIEWS[k].tab}
+//               </button>
+//             ))}
+//           </div>
+
+//           <div className="mt-8 flex gap-2">
+//             {/* Y axis */}
+//             <div className="relative h-44 w-9 shrink-0 sm:h-56">
+//               {ticks.map((t, i) => (
+//                 <span
+//                   key={i}
+//                   className="absolute right-0 -translate-y-1/2 text-[10px] text-slate-400"
+//                   style={{ top: `${i * 25}%` }}
+//                 >
+//                   {tickText(t)}
+//                 </span>
+//               ))}
+//             </div>
+
+//             {/* Plot */}
+//             <div className="min-w-0 flex-1">
+//               <div className="relative h-44 border-b border-slate-200 dark:border-slate-700 sm:h-56">
+//                 {[0, 25, 50, 75].map((p) => (
+//                   <div
+//                     key={p}
+//                     className="absolute left-0 right-0 border-t border-dashed border-slate-100 dark:border-slate-800"
+//                     style={{ top: `${p}%` }}
+//                   />
+//                 ))}
+
+//                 {/* Bars */}
+//                 <div className="absolute inset-0 flex items-end">
+//                   {points.map((p, i) => (
+//                     <div
+//                       key={`${marketView}-${i}`}
+//                       className="flex h-full items-end justify-center"
+//                       style={{ width: `${100 / count}%` }}
+//                     >
+//                       <div
+//                         className="w-[42%] max-w-[64px] rounded-t-lg bg-gradient-to-t from-[#10b981] to-[#34e0a1] shadow-[0_6px_16px_-6px_rgba(16,185,129,0.6)] transition-[height] duration-700"
+//                         style={{ height: `${100 - p.y}%`, minHeight: 4 }}
+//                       />
+//                     </div>
+//                   ))}
+//                 </div>
+
+//                 {/* Trend line + area */}
+//                 {showLine && count > 1 && (
+//                   <svg
+//                     viewBox="0 0 100 100"
+//                     preserveAspectRatio="none"
+//                     className="pointer-events-none absolute inset-0 h-full w-full overflow-visible"
+//                     aria-hidden="true"
+//                   >
+//                     <defs>
+//                       <linearGradient id="mktArea" x1="0" y1="0" x2="0" y2="1">
+//                         <stop offset="0%" stopColor="#10b981" stopOpacity="0.22" />
+//                         <stop offset="100%" stopColor="#10b981" stopOpacity="0" />
+//                       </linearGradient>
+//                     </defs>
+//                     <path d={areaPath} fill="url(#mktArea)" />
+//                     <path
+//                       d={linePath}
+//                       fill="none"
+//                       stroke="#10b981"
+//                       strokeWidth="2"
+//                       vectorEffect="non-scaling-stroke"
+//                     />
+//                   </svg>
+//                 )}
+
+//                 {/* Dots + value bubbles */}
+//                 {points.map((p, i) => (
+//                   <div
+//                     key={`b-${marketView}-${i}`}
+//                     className="pointer-events-none absolute transition-all duration-700"
+//                     style={{ left: `${p.x}%`, top: `${p.y}%` }}
+//                   >
+//                     {showLine && (
+//                       <span className="absolute left-0 top-0 h-2.5 w-2.5 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-emerald-500 bg-white" />
+//                     )}
+//                     <span className="absolute left-0 top-0 -translate-x-1/2 -translate-y-[170%] whitespace-nowrap rounded-lg bg-white px-2 py-0.5 text-[10px] font-bold text-slate-800 shadow-md ring-1 ring-black/5 dark:bg-[#0b2f3b] dark:text-white dark:ring-white/10 sm:text-xs">
+//                       {p.v}
+//                       {view.unit}
+//                     </span>
+//                   </div>
+//                 ))}
+//               </div>
+
+//               {/* X labels */}
+//               <div className="mt-2 flex">
+//                 {points.map((p, i) => (
+//                   <span
+//                     key={i}
+//                     className="text-center text-[11px] font-semibold text-slate-500 dark:text-slate-400"
+//                     style={{ width: `${100 / count}%` }}
+//                   >
+//                     {p.year}
+//                   </span>
+//                 ))}
+//               </div>
+//             </div>
+//           </div>
+
+//           <p className="mt-4 flex gap-1.5 text-[10px] leading-relaxed text-slate-500 dark:text-slate-400">
+//             <span className="mt-[1px] inline-block h-3 w-3 shrink-0 rounded-full border border-slate-300 text-center text-[8px] leading-[10px] dark:border-slate-600">
+//               i
+//             </span>
+//             <span>
+//               {view.note} These measures use different methods and should not be
+//               compared with each other.
+//             </span>
+//           </p>
+//         </div>
+
+//         {/* Key takeaways */}
+//         <div className="relative min-w-0 overflow-hidden rounded-2xl border border-slate-100 bg-white p-4 shadow-sm dark:border-[#153747] dark:bg-[#07242e] sm:p-5">
+//           <h3 className="flex items-center gap-2 text-sm font-bold text-slate-900 dark:text-white sm:text-base">
+//             <span className="grid h-7 w-7 place-items-center rounded-full bg-emerald-500/15 text-emerald-500">
+//               <Target className="h-4 w-4" />
+//             </span>
+//             Key Takeaways
+//           </h3>
+
+//           <ul className="relative z-10 mt-4 space-y-3.5 pb-16 text-xs text-slate-700 dark:text-slate-200 sm:text-[13px]">
+//             {[
+//               ["AI spending to reach ", "$2.67 trillion", " in 2026."],
+//               ["Global AI market size projected at ", "$4.8 trillion", " by 2033."],
+//               ["", "78 million", " net new jobs across industries by 2030."],
+//               ["", "170 million", " new jobs created by 2030."],
+//             ].map(([a, b, c], i) => (
+//               <li key={i} className="flex items-start gap-2.5">
+//                 <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-emerald-500" />
+//                 <span>
+//                   {a}
+//                   <strong className="font-bold text-slate-900 dark:text-white">{b}</strong>
+//                   {c}
+//                 </span>
+//               </li>
+//             ))}
+//           </ul>
+
+//           {/* Decorative wave */}
+//           <svg
+//             viewBox="0 0 400 100"
+//             preserveAspectRatio="none"
+//             className="pointer-events-none absolute inset-x-0 bottom-0 h-16 w-full"
+//             aria-hidden="true"
+//           >
+//             <defs>
+//               <linearGradient id="mktWave" x1="0" y1="0" x2="0" y2="1">
+//                 <stop offset="0%" stopColor="#34e0a1" stopOpacity="0.45" />
+//                 <stop offset="100%" stopColor="#34e0a1" stopOpacity="0.05" />
+//               </linearGradient>
+//             </defs>
+//             <path
+//               d="M0,70 C60,90 110,30 180,50 C250,70 300,10 400,40 L400,100 L0,100 Z"
+//               fill="url(#mktWave)"
+//             />
+//             <path
+//               d="M0,78 C70,95 120,45 190,62 C260,80 320,28 400,52 L400,100 L0,100 Z"
+//               fill="#10b981"
+//               fillOpacity="0.12"
+//             />
+//           </svg>
+//         </div>
+//       </div>
+//     </section>
+//   );
+// }
+
+/* ============================================================
+   GLOBAL AI MARKET SNAPSHOT
+   Paste this ABOVE `export function MemberHomeDashboard()`
+   (it uses MARKET_STATS, MARKET_VIEWS, parseMarketValue, Counter, Reveal
+   which are already defined in your file).
+
+   Lucide imports to ADD:  CalendarDays, CheckCircle2, Target
+   Banner image: copy ai-market-banner.webp into your Next.js /public folder
+   ============================================================ */
+
+const STAT_STYLES = [
+  {
+    // mint
+    icon: Layers,
+    card: "border-emerald-200/70 bg-gradient-to-br from-[#e2fbf1] to-[#f4fdf9] dark:border-emerald-400/20 dark:from-emerald-500/15 dark:to-[#07242e]",
+    tile: "bg-gradient-to-br from-emerald-400 to-teal-500 text-white shadow-lg shadow-emerald-500/30",
+    label: "text-slate-700 dark:text-emerald-300",
+    mini: "text-emerald-500",
+    chip: "text-slate-700 dark:text-slate-200",
+  },
+  {
+    // lavender
+    icon: ChartNoAxesCombined,
+    card: "border-violet-200/70 bg-gradient-to-br from-[#ebe7ff] to-[#f7f4ff] dark:border-violet-400/20 dark:from-violet-500/15 dark:to-[#07242e]",
+    tile: "bg-gradient-to-br from-violet-400 to-indigo-500 text-white shadow-lg shadow-violet-500/30",
+    label: "text-indigo-600 dark:text-violet-300",
+    mini: "text-indigo-500",
+    chip: "text-indigo-700 dark:text-violet-200",
+  },
+  {
+    // sky blue
+    icon: Users,
+    card: "border-sky-200/70 bg-gradient-to-br from-[#dff2ff] to-[#f1faff] dark:border-sky-400/20 dark:from-sky-500/15 dark:to-[#07242e]",
+    tile: "bg-gradient-to-br from-sky-400 to-blue-500 text-white shadow-lg shadow-sky-500/30",
+    label: "text-sky-700 dark:text-sky-300",
+    mini: "text-sky-500",
+    chip: "text-sky-800 dark:text-sky-200",
+  },
+  {
+    // peach
+    icon: Briefcase,
+    card: "border-amber-200/70 bg-gradient-to-br from-[#ffeed9] to-[#fff8ee] dark:border-amber-400/20 dark:from-amber-500/15 dark:to-[#07242e]",
+    tile: "bg-gradient-to-br from-amber-300 to-orange-400 text-white shadow-lg shadow-amber-500/30",
+    label: "text-amber-700 dark:text-amber-300",
+    mini: "text-amber-500",
+    chip: "text-amber-900 dark:text-amber-200",
+  },
+];
+
+/** Top value of each chart's Y axis */
+const AXIS_MAX: Record<keyof typeof MARKET_VIEWS, number> = {
+  spending: 4,
+  market: 5,
+  jobs: 200,
+};
+
+const RANGE_LABEL: Record<keyof typeof MARKET_VIEWS, string> = {
+  spending: "2025 – 2027",
+  market: "2023 – 2033",
+  jobs: "By 2030",
+};
+
+const decimalsOf = (n: number) => String(n).split(".")[1]?.length ?? 0;
+
+function MarketSnapshotSection() {
+  const [marketView, setMarketView] =
+    useState<keyof typeof MARKET_VIEWS>("spending");
+
+  const view = MARKET_VIEWS[marketView];
+  const axisMax = AXIS_MAX[marketView];
+  const count = view.data.length;
+  const showLine = marketView !== "jobs"; // line only makes sense over time
+
+  const points = view.data.map((d, i) => ({
+    ...d,
+    x: ((i + 0.5) / count) * 100,
+    y: 100 - Math.min(100, (d.v / axisMax) * 100),
+  }));
+  const linePath = points.map((p, i) => `${i ? "L" : "M"}${p.x},${p.y}`).join(" ");
+  const first = points[0];
+  const last = points[count - 1];
+  const areaPath =
+    first && last ? `${linePath} L${last.x},100 L${first.x},100 Z` : "";
+
+  const ticks = [1, 0.75, 0.5, 0.25, 0].map((p) => p * axisMax);
+  const tickText = (t: number) =>
+    t === 0 ? "0" : view.unit === "T" ? `${t.toFixed(1)}T` : `${t}M`;
+
+  return (
+    <section className="space-y-3">
+      {/* ---------- HERO (image banner) ---------- */}
+      <div className="relative isolate min-h-[190px] overflow-hidden rounded-2xl bg-[#03161f] sm:min-h-[210px] lg:min-h-[240px]">
+       
+        {/* <Image
+          src="/ai-market-banner.webp"
+          alt=""
+          fill
+          priority
+          sizes="(min-width: 1280px) 1200px, 100vw"
+          className="-z-20 object-cover object-[80%_top] md:object-[90%_top]"
+        /> */}
+        <Image
+          src="/ai-market-banner.webp"
+          alt=""
+          fill
+          priority
+          sizes="(min-width: 1280px) 1200px, 100vw"
+          className="-z-20 object-cover object-[75%_center] md:object-[80%_center]"
+        />
+        {/* left fade keeps the text readable on small screens */}
+        <div className="pointer-events-none absolute inset-0 -z-10 bg-gradient-to-r from-[#03161f]/90 via-[#03161f]/55 to-transparent md:from-[#03161f]/70 md:via-[#03161f]/20" />
+
+        <div className="relative flex h-full min-h-[inherit] items-center px-4 py-5 sm:px-6 sm:py-7 lg:px-8">
+          <div className="min-w-0 max-w-xl">
+            <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-[#35d6c0] backdrop-blur sm:text-[11px]">
+              <ChartNoAxesCombined className="h-3.5 w-3.5" />
+              Global AI Market Snapshot
+            </div>
+            <h2 className="text-2xl font-extrabold leading-tight tracking-tight text-white sm:text-3xl lg:text-4xl">
+              The AI Economy Is Entering Its{" "}
+              <span className="block text-[#35f0c0]">Trillion-Dollar Era.</span>
+            </h2>
+            <p className="mt-2 max-w-md text-xs leading-relaxed text-slate-300 sm:text-sm">
+              Massive growth in AI spending, market size and global employment is
+              creating unprecedented opportunities for AI solutions.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* ---------- STAT CARDS ---------- */}
+      <div className="grid grid-cols-2 gap-2.5 sm:gap-3 lg:grid-cols-4">
+        {MARKET_STATS.map((s, i) => {
+          const st = STAT_STYLES[i % STAT_STYLES.length] ?? STAT_STYLES[0]!;
+          const Icon = st.icon;
+          const { num, prefix, suffix } = parseMarketValue(s.value);
+          return (
+            <Reveal key={i} delay={i * 0.05} className="h-full">
+              <div
+                className={`relative h-full overflow-hidden rounded-2xl border p-3 shadow-sm sm:p-4 ${st.card}`}
+              >
+                <span
+                  className={`absolute right-2.5 top-2.5 grid h-9 w-9 place-items-center rounded-xl sm:right-3 sm:top-3 sm:h-12 sm:w-12 ${st.tile}`}
+                >
+                  <Icon className="h-4 w-4 sm:h-6 sm:w-6" />
+                </span>
+
+                <p
+                  className={`flex items-center gap-1.5 pr-10 text-[9px] font-bold uppercase tracking-wider sm:pr-14 sm:text-[10px] ${st.label}`}
+                >
+                  <Icon className={`h-3.5 w-3.5 shrink-0 ${st.mini}`} />
+                  <span className="truncate">
+                    {s.type} · {s.year}
+                  </span>
+                </p>
+                <p className="mt-1.5 text-2xl font-extrabold leading-none text-slate-900 dark:text-white sm:text-3xl">
+                  <Counter
+                    value={num}
+                    prefix={prefix}
+                    suffix={suffix}
+                    decimals={decimalsOf(num)}
+                  />
+                </p>
+                <p className="mt-1.5 text-[10px] leading-snug text-slate-500 dark:text-slate-400 sm:text-[11px]">
+                  {s.label}
+                </p>
+                <a
+                  href="#"
+                  className={`mt-2.5 inline-flex max-w-full items-center gap-1 rounded-lg bg-white/60 px-2 py-1 text-[9px] font-semibold ring-1 ring-black/5 transition hover:bg-white/90 dark:bg-white/5 dark:ring-white/10 sm:text-[10px] ${st.chip}`}
+                >
+                  <span className="truncate">{s.source}</span>
+                  <ArrowUpRight className="h-3 w-3 shrink-0" />
+                </a>
+              </div>
+            </Reveal>
+          );
+        })}
+      </div>
+
+      {/* ---------- CHART + TAKEAWAYS ---------- */}
+      <div className="grid gap-3 lg:grid-cols-[1.9fr_1fr]">
+        {/* Chart */}
+        <div className="min-w-0 rounded-2xl border border-slate-100 bg-white p-4 shadow-sm dark:border-[#153747] dark:bg-[#07242e] sm:p-5">
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <h3 className="flex items-center gap-2 text-sm font-bold text-slate-900 dark:text-white sm:text-base">
+              <ChartNoAxesCombined className="h-4 w-4 text-emerald-500" />
+              AI Industry Outlook
+            </h3>
+            <span className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 px-2.5 py-1 text-[11px] font-medium text-slate-600 dark:border-slate-700 dark:text-slate-300">
+              <CalendarDays className="h-3.5 w-3.5" />
+              {RANGE_LABEL[marketView]}
+            </span>
+          </div>
+
+          <div className="mt-3 flex flex-wrap gap-2" role="group" aria-label="Chart measure">
+            {(Object.keys(MARKET_VIEWS) as (keyof typeof MARKET_VIEWS)[]).map((k) => (
+              <button
+                key={k}
+                type="button"
+                aria-pressed={marketView === k}
+                onClick={() => setMarketView(k)}
+                className={`rounded-full px-3.5 py-1.5 text-[11px] font-semibold transition-colors ${marketView === k
+                  ? "bg-emerald-500 text-white"
+                  : "bg-slate-100 text-slate-600 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
+                  }`}
+              >
+                {MARKET_VIEWS[k].tab}
+              </button>
+            ))}
+          </div>
+
+          <div className="mt-8 flex gap-2">
+            {/* Y axis */}
+            <div className="relative h-44 w-9 shrink-0 sm:h-56">
+              {ticks.map((t, i) => (
+                <span
+                  key={i}
+                  className="absolute right-0 -translate-y-1/2 text-[10px] text-slate-400"
+                  style={{ top: `${i * 25}%` }}
+                >
+                  {tickText(t)}
+                </span>
+              ))}
+            </div>
+
+            {/* Plot */}
+            <div className="min-w-0 flex-1">
+              <div className="relative h-44 border-b border-slate-200 dark:border-slate-700 sm:h-56">
+                {[0, 25, 50, 75].map((p) => (
+                  <div
+                    key={p}
+                    className="absolute left-0 right-0 border-t border-dashed border-slate-100 dark:border-slate-800"
+                    style={{ top: `${p}%` }}
+                  />
+                ))}
+
+                {/* Bars */}
+                <div className="absolute inset-0 flex items-end">
+                  {points.map((p, i) => (
+                    <div
+                      key={`${marketView}-${i}`}
+                      className="flex h-full items-end justify-center"
+                      style={{ width: `${100 / count}%` }}
+                    >
+                      <div
+                        className="w-[42%] max-w-[64px] rounded-t-lg bg-gradient-to-t from-[#10b981] to-[#34e0a1] shadow-[0_6px_16px_-6px_rgba(16,185,129,0.6)] transition-[height] duration-700"
+                        style={{ height: `${100 - p.y}%`, minHeight: 4 }}
+                      />
+                    </div>
+                  ))}
+                </div>
+
+                {/* Trend line + area */}
+                {showLine && count > 1 && (
+                  <svg
+                    viewBox="0 0 100 100"
+                    preserveAspectRatio="none"
+                    className="pointer-events-none absolute inset-0 h-full w-full overflow-visible"
+                    aria-hidden="true"
+                  >
+                    <defs>
+                      <linearGradient id="mktArea" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stopColor="#10b981" stopOpacity="0.22" />
+                        <stop offset="100%" stopColor="#10b981" stopOpacity="0" />
+                      </linearGradient>
+                    </defs>
+                    <path d={areaPath} fill="url(#mktArea)" />
+                    <path
+                      d={linePath}
+                      fill="none"
+                      stroke="#10b981"
+                      strokeWidth="2"
+                      vectorEffect="non-scaling-stroke"
+                    />
+                  </svg>
+                )}
+
+                {/* Dots + value bubbles */}
+                {points.map((p, i) => (
+                  <div
+                    key={`b-${marketView}-${i}`}
+                    className="pointer-events-none absolute transition-all duration-700"
+                    style={{ left: `${p.x}%`, top: `${p.y}%` }}
+                  >
+                    {showLine && (
+                      <span className="absolute left-0 top-0 h-2.5 w-2.5 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-emerald-500 bg-white" />
+                    )}
+                    <span className="absolute left-0 top-0 -translate-x-1/2 -translate-y-[170%] whitespace-nowrap rounded-lg bg-white px-2 py-0.5 text-[10px] font-bold text-slate-800 shadow-md ring-1 ring-black/5 dark:bg-[#0b2f3b] dark:text-white dark:ring-white/10 sm:text-xs">
+                      {p.v}
+                      {view.unit}
+                    </span>
+                  </div>
+                ))}
+              </div>
+
+              {/* X labels */}
+              <div className="mt-2 flex">
+                {points.map((p, i) => (
+                  <span
+                    key={i}
+                    className="text-center text-[11px] font-semibold text-slate-500 dark:text-slate-400"
+                    style={{ width: `${100 / count}%` }}
+                  >
+                    {p.year}
+                  </span>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          <p className="mt-4 flex gap-1.5 text-[10px] leading-relaxed text-slate-500 dark:text-slate-400">
+            <span className="mt-[1px] inline-block h-3 w-3 shrink-0 rounded-full border border-slate-300 text-center text-[8px] leading-[10px] dark:border-slate-600">
+              i
+            </span>
+            <span>
+              {view.note} These measures use different methods and should not be
+              compared with each other.
+            </span>
+          </p>
+        </div>
+
+        {/* Key takeaways */}
+        <div className="relative min-w-0 overflow-hidden rounded-2xl border border-slate-100 bg-white p-4 shadow-sm dark:border-[#153747] dark:bg-[#07242e] sm:p-5">
+          <h3 className="flex items-center gap-2 text-sm font-bold text-slate-900 dark:text-white sm:text-base">
+            <span className="grid h-7 w-7 place-items-center rounded-full bg-emerald-500/15 text-emerald-500">
+              <Target className="h-4 w-4" />
+            </span>
+            Key Takeaways
+          </h3>
+
+          <ul className="relative z-10 mt-4 space-y-3.5 pb-16 text-xs text-slate-700 dark:text-slate-200 sm:text-[13px]">
+            {[
+              ["AI spending to reach ", "$2.67 trillion", " in 2026."],
+              ["Global AI market size projected at ", "$4.8 trillion", " by 2033."],
+              ["", "78 million", " net new jobs across industries by 2030."],
+              ["", "170 million", " new jobs created by 2030."],
+            ].map(([a, b, c], i) => (
+              <li key={i} className="flex items-start gap-2.5">
+                <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-emerald-500" />
+                <span>
+                  {a}
+                  <strong className="font-bold text-slate-900 dark:text-white">{b}</strong>
+                  {c}
+                </span>
+              </li>
+            ))}
+          </ul>
+
+          {/* Decorative wave */}
+          <svg
+            viewBox="0 0 400 100"
+            preserveAspectRatio="none"
+            className="pointer-events-none absolute inset-x-0 bottom-0 h-16 w-full"
+            aria-hidden="true"
+          >
+            <defs>
+              <linearGradient id="mktWave" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor="#34e0a1" stopOpacity="0.45" />
+                <stop offset="100%" stopColor="#34e0a1" stopOpacity="0.05" />
+              </linearGradient>
+            </defs>
+            <path
+              d="M0,70 C60,90 110,30 180,50 C250,70 300,10 400,40 L400,100 L0,100 Z"
+              fill="url(#mktWave)"
+            />
+            <path
+              d="M0,78 C70,95 120,45 190,62 C260,80 320,28 400,52 L400,100 L0,100 Z"
+              fill="#10b981"
+              fillOpacity="0.12"
+            />
+          </svg>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ------------------------------------------------------------
+   In MemberHomeDashboard: replace the whole old
+   <section> ... Global AI Market Snapshot ... </section>
+   block with:
+
+        <MarketSnapshotSection />
+
+   (You can also delete the `marketView` useState from
+    MemberHomeDashboard — it is no longer used there.)
+   ------------------------------------------------------------ */
 export function MemberHomeDashboard() {
   const [mounted, setMounted] = useState(false);
   const [copied, setCopied] = useState(false);
@@ -937,69 +1687,81 @@ export function MemberHomeDashboard() {
   const yieldWallet = Number(walletData.YieldWallet ?? 0);
 
   return (
-    <div className="min-h-screen w-full bg-[#f4f7f9] font-sans text-[#06262f] selection:bg-[#12a594]/30 dark:bg-[#03161f] dark:text-[#e6f7f9]">
+    <div className="min-h-screen w-full  font-sans text-[#06262f] selection:bg-[#12a594]/30 dark:text-[#e6f7f9]">
       {/* HERO */}
-      <div className="relative w-full overflow-hidden rounded-b-[2rem] bg-[#03161f] px-4 pb-12 pt-6 sm:px-6 md:px-8 lg:px-12">
-        <div className="pointer-events-none absolute right-0 top-1/2 h-[600px] w-[600px] -translate-y-1/2 translate-x-1/4 rounded-full bg-[#12a594]/10 blur-[100px]" />
-        <div className="pointer-events-none absolute right-1/4 top-0 h-[300px] w-[300px] rounded-full bg-[#35d6c0]/10 blur-[80px]" />
+
+      <section className="relative w-full overflow-hidden rounded-b-2xl bg-[#03161f] px-4 py-4 sm:px-6 sm:py-5 lg:px-12 lg:py-6">
+        {/* Background glow + grid */}
+        <div className="pointer-events-none absolute -right-20 top-1/2 h-[300px] w-[300px] -translate-y-1/2 rounded-full bg-[#12a594]/15 blur-[80px]" />
         <div
           className="pointer-events-none absolute inset-0 opacity-20"
           style={{
             backgroundImage:
-              "linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px)",
-            backgroundSize: "40px 40px",
+              "linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px)",
+            backgroundSize: "32px 32px",
+            maskImage:
+              "radial-gradient(ellipse at 75% 50%, black 25%, transparent 75%)",
+            WebkitMaskImage:
+              "radial-gradient(ellipse at 75% 50%, black 25%, transparent 75%)",
           }}
         />
 
-        <div className="relative z-10 mx-auto grid max-w-[1300px] grid-cols-1 items-center gap-8 lg:grid-cols-[1.1fr_0.9fr]">
-          <div className="relative z-20 flex flex-col items-start pt-4 lg:pt-0">
-            <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-[#12a594]/30 bg-[#12a594]/10 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.15em] text-[#35d6c0] backdrop-blur-md">
-              <span className="h-1.5 w-1.5 rounded-full bg-[#35d6c0] shadow-[0_0_10px_#35d6c0]" />
-              YOUR AI BUSINESS PANEL
+        <div className="relative z-10 mx-auto flex max-w-[1300px] items-center justify-between gap-4 lg:gap-8">
+          {/* Text */}
+          <div className="flex min-w-0 flex-1 flex-col items-start">
+            <div className="mb-2 inline-flex items-center gap-1.5 rounded-full border border-[#12a594]/30 bg-[#12a594]/10 px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-[0.12em] text-[#35d6c0]">
+              <span className="h-1.5 w-1.5 rounded-full bg-[#35d6c0] shadow-[0_0_8px_#35d6c0]" />
+              Your AI business panel
             </div>
-            <h1 className="mb-3 text-3xl font-extrabold leading-[1.1] tracking-tight text-white sm:text-4xl lg:text-[3.2rem]">
-              THE FUTURE IS NO LONGER COMING. <br />
+
+            <h1 className="mb-1.5 text-xl font-extrabold leading-tight tracking-tight text-white sm:text-2xl lg:text-3xl">
+              The future is no longer coming.{" "}
               <span className="bg-gradient-to-r from-[#12a594] to-[#35d6c0] bg-clip-text text-transparent">
-                {"IT'S HERE."}
+                It&apos;s here.
               </span>
             </h1>
-            <p className="mb-6 max-w-[480px] text-[13px] leading-relaxed text-slate-400 sm:text-[14px]">
-              Discover the next generation of AI agents, autonomous robotics,
-              intelligent automation and global business opportunities.
+
+            <p className="mb-3 hidden max-w-[460px] text-[13px] leading-snug text-slate-400 sm:block">
+              AI agents, robotics, automation and global business opportunities.
             </p>
-            <div className="relative z-20 flex flex-wrap items-center gap-3">
-              <button className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-[#12a594] to-[#35d6c0] px-5 py-2.5 text-[13px] font-semibold text-white shadow-[0_0_20px_rgba(18,165,148,0.3)] transition-all hover:opacity-90">
-                <Bot className="h-4 w-4" /> Explore AI Marketplace{" "}
-                <ArrowRight className="ml-1 h-4 w-4" />
+
+            <div className="mt-1 flex w-full flex-wrap items-center gap-2 sm:mt-0">
+              <button className="flex items-center gap-1.5 rounded-lg bg-gradient-to-r from-[#12a594] to-[#35d6c0] px-3.5 py-2 text-xs font-semibold text-white shadow-[0_0_16px_rgba(18,165,148,0.3)] transition hover:opacity-90 sm:text-[13px]">
+                <Bot className="h-3.5 w-3.5" />
+                Explore AI Marketplace
+                <ArrowRight className="h-3.5 w-3.5" />
               </button>
-              <button className="flex items-center gap-2 rounded-xl border border-[#12a594]/30 bg-white/5 px-5 py-2.5 text-[13px] font-semibold text-white backdrop-blur-sm transition-all hover:bg-white/10">
-                <Globe className="h-4 w-4 text-[#35d6c0]" /> Discover Opportunities
+              <button className="flex items-center gap-1.5 rounded-lg border border-[#12a594]/30 bg-white/5 px-3 py-2 text-xs font-semibold text-white transition hover:bg-white/10 sm:text-[13px]">
+                <Globe className="h-3.5 w-3.5 text-[#35d6c0]" />
+                Opportunities
               </button>
-             <Link
-  href="/deploy-agents"
-  className="mt-2 flex items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-5 py-2.5 text-[13px] font-semibold text-white backdrop-blur-sm transition-all hover:bg-white/10 sm:mt-0"
->
-  <Sparkles className="h-4 w-4 text-[#12a594]" /> Deploy Agents
-</Link>
+              <Link
+                href="/deploy-agents"
+                className="flex items-center gap-1.5 rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-xs font-semibold text-white transition hover:bg-white/10 sm:text-[13px]"
+              >
+                <Sparkles className="h-3.5 w-3.5 text-[#12a594]" />
+                Deploy Agents
+              </Link>
             </div>
           </div>
 
-          <div className="relative z-10 flex h-[300px] items-center justify-center lg:h-[380px]">
-            <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(18,165,148,0.15)_0%,transparent_60%)]" />
+          {/* Robot: small, hidden on mobile */}
+          <div className="relative hidden shrink-0 items-center justify-center sm:flex">
+            <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(18,165,148,0.18)_0%,transparent_65%)]" />
             <Image
               src="/quzo-hero-robot.webp"
               alt="QUZO AI Robot"
-              width={400}
-              height={400}
+              width={200}
+              height={200}
               priority
-              className="relative z-10 h-auto w-[200px] animate-[float_6s_ease-in-out_infinite] object-contain drop-shadow-[0_0_40px_rgba(18,165,148,0.2)] lg:w-[300px]"
+              className="relative z-10 h-auto w-[100px] animate-[float_6s_ease-in-out_infinite] object-contain drop-shadow-[0_0_24px_rgba(18,165,148,0.25)] md:w-[120px] lg:w-[150px]"
             />
           </div>
         </div>
-      </div>
+      </section>
 
       {/* MAIN CONTENT */}
-      <div className="mx-auto max-w-[1200px] space-y-6 px-4 py-8 sm:px-6 md:px-8 lg:px-12">
+      <div className="mx-auto space-y-6 px-4 py-8">
         {/* Overview */}
         <section>
           <div className="mb-2 text-[10px] font-semibold uppercase tracking-[0.15em] text-[#35d6c0]">
@@ -1121,7 +1883,7 @@ export function MemberHomeDashboard() {
               <div className="mt-4 flex items-end justify-between gap-2">
                 <strong className="text-2xl text-[#06262f] dark:text-white">
                   {walletData.RewardTotal !== undefined &&
-                  walletData.RewardAmtQualify !== undefined
+                    walletData.RewardAmtQualify !== undefined
                     ? rewardPct.toFixed(1)
                     : "0"}
                   %
@@ -1228,11 +1990,10 @@ export function MemberHomeDashboard() {
               {["7 Days", "30 Days", "90 Days", "1 Year"].map((t, i) => (
                 <button
                   key={t}
-                  className={`rounded-full border px-4 py-1.5 text-[11px] font-medium transition-colors ${
-                    i === 1
-                      ? "border-[#6b4eff] bg-[#6b4eff] text-white"
-                      : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50 dark:border-slate-700 dark:bg-[#07242e] dark:text-slate-300"
-                  }`}
+                  className={`rounded-full border px-4 py-1.5 text-[11px] font-medium transition-colors ${i === 1
+                    ? "border-[#6b4eff] bg-[#6b4eff] text-white"
+                    : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50 dark:border-slate-700 dark:bg-[#07242e] dark:text-slate-300"
+                    }`}
                 >
                   {t}
                 </button>
@@ -1373,18 +2134,16 @@ export function MemberHomeDashboard() {
                         <td className="px-5 py-4">
                           <div className="flex items-center gap-2">
                             <span
-                              className={`h-1.5 w-1.5 rounded-full ${
-                                row.status === "Active"
-                                  ? "bg-[#10b981]"
-                                  : "bg-slate-400"
-                              }`}
+                              className={`h-1.5 w-1.5 rounded-full ${row.status === "Active"
+                                ? "bg-[#10b981]"
+                                : "bg-slate-400"
+                                }`}
                             />
                             <span
-                              className={`font-medium ${
-                                row.status === "Active"
-                                  ? "text-slate-700 dark:text-slate-300"
-                                  : "text-slate-500"
-                              }`}
+                              className={`font-medium ${row.status === "Active"
+                                ? "text-slate-700 dark:text-slate-300"
+                                : "text-slate-500"
+                                }`}
                             >
                               {row.status}
                             </span>
@@ -1503,7 +2262,7 @@ export function MemberHomeDashboard() {
         </section>
 
         {/* AI ECONOMY */}
-        <section>
+        {/* <section>
           <div className="mb-2 text-[10px] font-semibold uppercase tracking-[0.15em] text-[#35d6c0]">
             Global AI Market Snapshot
           </div>
@@ -1551,11 +2310,10 @@ export function MemberHomeDashboard() {
                     key={k}
                     type="button"
                     onClick={() => setMarketView(k)}
-                    className={`rounded-full px-4 py-1.5 text-[11px] font-semibold transition-colors ${
-                      marketView === k
-                        ? "bg-[#35d6c0] text-white"
-                        : "bg-slate-100 text-slate-600 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
-                    }`}
+                    className={`rounded-full px-4 py-1.5 text-[11px] font-semibold transition-colors ${marketView === k
+                      ? "bg-[#35d6c0] text-white"
+                      : "bg-slate-100 text-slate-600 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
+                      }`}
                   >
                     {MARKET_VIEWS[k].tab}
                   </button>
@@ -1574,8 +2332,8 @@ export function MemberHomeDashboard() {
                       {marketView === "spending"
                         ? (pct * 4).toFixed(1)
                         : marketView === "market"
-                        ? (pct * 5).toFixed(1)
-                        : (pct * 200).toFixed(0)}
+                          ? (pct * 5).toFixed(1)
+                          : (pct * 200).toFixed(0)}
                     </span>
                   </div>
                 ))}
@@ -1621,7 +2379,8 @@ export function MemberHomeDashboard() {
               methods and should not be compared with each other.
             </p>
           </div>
-        </section>
+        </section> */}
+        <MarketSnapshotSection />
       </div>
     </div>
   );

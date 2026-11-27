@@ -136,7 +136,7 @@ const PLANS: Record<PlanKey, Plan> = {
     name: "Personal",
     multiplier: 2.5,
     revenueShare: "6%-7%",
-    range: { min: 10, max: 490, step: 10 },
+    range: { min: 50, max: 490, step: 10 },
     badge: "Starter",
     Icon: RiFlashlightLine,
     tw: {
