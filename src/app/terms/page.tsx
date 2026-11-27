@@ -99,7 +99,7 @@ export default function TermsPage() {
           For any questions regarding these Terms, please contact us at{" "}
           <a
             href="mailto:support@quzo.com"
-            className="text-[#19D8D0] underline transition-colors hover:text-[#7FF3EC]"
+            className="text-[#7FF3EC] underline transition-colors hover:text-[#4FD1E0]"
           >
             support@quzo.com
           </a>
@@ -111,19 +111,18 @@ export default function TermsPage() {
 
   return (
     <>
-      {/* <PublicNavbar /> - Header Removed */}
-      <main className="relative isolate overflow-hidden bg-[#031B23] px-4 pb-20 pt-24 text-white sm:px-6 sm:pb-24 sm:pt-28 lg:px-16">
+      <main className="relative isolate min-h-screen overflow-hidden bg-[#05060A] px-4 pb-20 pt-32 text-white sm:px-6 sm:pb-24 sm:pt-36 lg:px-16">
         
-        {/* Glow Effects in Quzo Colors */}
-        <div className="pointer-events-none absolute -right-36 -top-32 z-0 h-96 w-96 rounded-full bg-[#19D8D0]/10 blur-3xl" />
-        <div className="pointer-events-none absolute -bottom-40 -left-32 z-0 h-[28rem] w-[28rem] rounded-full bg-[#64BDB7]/10 blur-3xl" />
+        {/* Glow Effects matching the Home Page */}
+        <div className="pointer-events-none absolute -right-36 -top-32 z-0 h-96 w-96 rounded-full bg-[#19D8D0]/5 blur-[120px]" />
+        <div className="pointer-events-none absolute -bottom-40 -left-32 z-0 h-[28rem] w-[28rem] rounded-full bg-[#19D8D0]/5 blur-[120px]" />
         
         <div className="relative z-10 mx-auto max-w-5xl">
           <div className="mb-16">
-            <p className="mb-4 text-xs font-semibold uppercase tracking-[0.2em] text-[#19D8D0]">
+            <p className="mb-4 text-xs font-semibold uppercase tracking-[0.2em] text-[#4FD1E0]">
               Legal
             </p>
-            <h1 className="mb-6 font-serif text-4xl leading-tight md:text-5xl lg:text-6xl text-transparent bg-clip-text bg-gradient-to-r from-[#19D8D0] to-[#64BDB7]">
+            <h1 className="mb-6 font-serif text-4xl leading-tight md:text-5xl lg:text-6xl text-transparent bg-clip-text bg-gradient-to-r from-[#4FD1E0] to-[#19D8D0]">
               Terms & Conditions
             </h1>
             <p className="text-sm text-slate-400">
@@ -136,8 +135,8 @@ export default function TermsPage() {
             </p>
           </div>
 
-          <div className="relative mb-12 overflow-hidden rounded-2xl border border-white/10 bg-[#031B23]/70 p-6 shadow-sm backdrop-blur-md md:p-8">
-            <div className="absolute inset-x-0 top-0 h-0.5 bg-gradient-to-r from-transparent via-[#19D8D0] to-transparent" />
+          <div className="relative mb-12 overflow-hidden rounded-2xl border border-white/10 bg-[#0A0D14]/80 p-6 shadow-sm backdrop-blur-md md:p-8">
+            <div className="absolute inset-x-0 top-0 h-0.5 bg-gradient-to-r from-transparent via-[#4FD1E0] to-transparent opacity-50" />
             <p className="text-sm leading-relaxed text-slate-300 md:text-base">
               Welcome to Quzo. These Terms & Conditions govern your use of our
               AI-powered Web3 ecosystem, decentralized finance (DeFi) tools, intelligent trading solutions, and related services.
@@ -148,10 +147,10 @@ export default function TermsPage() {
             {sections.map((section) => (
               <section
                 key={section.number}
-                className="relative overflow-hidden rounded-2xl border border-white/10 bg-[#031B23]/70 p-6 shadow-sm backdrop-blur-md transition duration-300 hover:-translate-y-0.5 hover:border-[#19D8D0]/50 hover:shadow-[0_0_20px_rgba(25,216,208,0.15)] md:p-8"
+                className="relative overflow-hidden rounded-2xl border border-white/5 bg-[#0A0D14]/60 p-6 shadow-sm backdrop-blur-md transition duration-300 hover:-translate-y-0.5 hover:border-[#4FD1E0]/30 hover:shadow-[0_0_20px_rgba(79,209,224,0.1)] md:p-8"
               >
-                <div className="absolute inset-x-0 top-0 h-0.5 bg-gradient-to-r from-transparent via-[#19D8D0] to-transparent opacity-50" />
-                <p className="mb-4 text-xs font-semibold uppercase tracking-[0.2em] text-[#19D8D0]">
+                <div className="absolute inset-x-0 top-0 h-0.5 bg-gradient-to-r from-transparent via-[#4FD1E0] to-transparent opacity-30" />
+                <p className="mb-4 text-xs font-semibold uppercase tracking-[0.2em] text-[#4FD1E0]">
                   Section {section.number}
                 </p>
                 <h2 className="mb-4 font-serif text-2xl text-white md:text-3xl">
@@ -167,7 +166,7 @@ export default function TermsPage() {
           <div className="mt-16 border-t border-white/10 pt-8">
             <Link
               href="/"
-              className="inline-flex items-center gap-2 text-sm font-medium text-[#19D8D0] transition-colors hover:text-[#7FF3EC]"
+              className="inline-flex items-center gap-2 text-sm font-medium text-[#4FD1E0] transition-colors hover:text-[#7FF3EC]"
             >
               ← Back to home
             </Link>
