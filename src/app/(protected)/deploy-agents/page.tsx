@@ -151,11 +151,13 @@ export default function DeployAIWorkforce() {
   ]);
 
   const [priceFilter, setPriceFilter] = useState<string>("");
+  const [isDeploying, setIsDeploying] = useState<boolean>(false);
   const [, setOrderData] = useTempStorage<OrderData>("orderData");
   const route = useRouter();
 
   const [agentsData, setAgentsData] = useState<RawAgentRow[]>([]);
   const [partnersData, setPartnersData] = useState<Partner[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
 
   const extractList = (payload: unknown): unknown[] => {
     if (Array.isArray(payload)) return payload;
@@ -248,8 +250,10 @@ export default function DeployAIWorkforce() {
   };
 
   const handleDeploy = async (): Promise<void> => {
+    setIsDeploying(true);
     try {
       const agent = getAgentByProductId(selectedAgent);
+      const partner = getSelectedPartnerDetails();
       const response = await apiClient.post<DeployResponse>(
         "/WalletReport/agentDeploymentUser",
         {
@@ -259,14 +263,15 @@ export default function DeployAIWorkforce() {
       );
       if (response?.statusCode === 200) {
         const orderId = `ORD-${Math.floor(1000 + Math.random() * 900000)}`;
-        setOrderData({
-          name: response.data?.[0]?.agentName ?? "",
-          image: response.data?.[0]?.agentImage ?? "",
-          Rkprice: response.data?.[0]?.LicenseAmount ?? "",
-          PartnerName: response.data?.[0]?.PartnerName ?? "",
+        const orderData = {
+          name: response.data?.[0]?.agentName ?? agent?.name ?? "",
+          image: response.data?.[0]?.agentImage ?? agent?.imageUrl ?? "",
+          Rkprice: response.data?.[0]?.LicenseAmount ?? agent?.price ?? "",
+          PartnerName: response.data?.[0]?.PartnerName ?? partner?.Name ?? "",
           usernameInput: response.data?.[0]?.AuthLogin ?? "",
           orderId,
-        });
+        };
+        setOrderData(orderData);
         route.push("/deploy-sucess");
         toast.success(response.message);
       } else {
@@ -274,6 +279,8 @@ export default function DeployAIWorkforce() {
       }
     } catch (error) {
       console.error("Deploy Error:", error);
+    } finally {
+      setIsDeploying(false);
     }
   };
 
@@ -309,6 +316,7 @@ export default function DeployAIWorkforce() {
 
   useEffect(() => {
     const fetchDeployData = async (): Promise<void> => {
+      setIsLoading(true);
       try {
         const agentsResponse = await apiClient.get<unknown>(
           "/WalletReport/getListofUndeployedAgents"
@@ -326,6 +334,8 @@ export default function DeployAIWorkforce() {
       } catch (error) {
         console.error("Failed to load deployment partners:", error);
         toast.error("Failed to load deployment partners.");
+      } finally {
+        setIsLoading(false);
       }
     };
     void fetchDeployData();
@@ -510,14 +520,20 @@ export default function DeployAIWorkforce() {
                     </div>
                   </div>
 
-                  {filteredAgents.length === 0 ? (
+                  {isLoading ? (
+                    <div className="py-16 text-sm text-center text-gray-500 border-2 border-gray-200 border-dashed bg-gray-50/50 dark:bg-gray-700/20 rounded-3xl dark:border-gray-700">
+                      <div className="flex justify-center mb-4">
+                        <div className="h-10 w-10 animate-spin rounded-full border-3 border-gray-300 border-t-blue-500 sm:h-12 sm:w-12" />
+                      </div>
+                      <p className="font-medium">
+                        Loading agents...
+                      </p>
+                    </div>
+                  ) : filteredAgents.length === 0 ? (
                     <div className="py-16 text-sm text-center text-gray-500 border-2 border-gray-200 border-dashed bg-gray-50/50 dark:bg-gray-700/20 rounded-3xl dark:border-gray-700">
                       <Bot className="w-12 h-12 mx-auto mb-4 text-gray-300 sm:w-16 sm:h-16" />
                       <p className="font-medium">
                         No agents match your search or filter criteria.
-                      </p>
-                      <p className="mt-1 text-xs text-gray-400">
-                        Try adjusting your search or filter settings
                       </p>
                     </div>
                   ) : (
@@ -1072,10 +1088,19 @@ export default function DeployAIWorkforce() {
 
                             <button
                               onClick={handleDeploy}
-                              disabled={!contractAgreed.every(Boolean)}
+                              disabled={!contractAgreed.every(Boolean) || isDeploying}
                               className="w-full inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl text-sm font-semibold bg-[#235ae3]  text-white  transition disabled:opacity-50 disabled:cursor-not-allowed"
                             >
-                              🔗 Activate Deployment
+                              {isDeploying ? (
+                                <span className="flex items-center gap-2">
+                                  <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/40 border-t-white dark:border-[#050a18]/30 dark:border-t-[#050a18]" />
+                                  Processing…
+                                </span>
+                              ) : (
+                                <>
+                                  🔗 Activate Deployment
+                                </>
+                              )}
                             </button>
                           </div>
                         </div>

@@ -224,7 +224,7 @@ export function Navbar() {
     if (!notificationUserKey || notificationUserKey === "Account") return;
     try {
       const savedSeenNotifications = localStorage.getItem(
-        `kaliki-seen-notifications:${notificationUserKey}`,
+        `Quzo-seen-notifications:${notificationUserKey}`,
       );
       const parsed: unknown = savedSeenNotifications ? JSON.parse(savedSeenNotifications) : [];
       setSeenNotifications(
@@ -242,7 +242,7 @@ export function Navbar() {
   useEffect(() => {
     if (seenNotificationsUser !== notificationUserKey || notificationUserKey === "Account") return;
     localStorage.setItem(
-      `kaliki-seen-notifications:${notificationUserKey}`,
+      `Quzo-seen-notifications:${notificationUserKey}`,
       JSON.stringify([...seenNotifications]),
     );
   }, [notificationUserKey, seenNotifications, seenNotificationsUser]);

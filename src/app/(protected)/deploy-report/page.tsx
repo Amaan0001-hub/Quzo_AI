@@ -663,7 +663,9 @@ export default function MyADeployments() {
                       <p>Thank you for your business!</p>
                       <p>
                         For questions contact{" "}
-                        <span className="font-medium">hello@Quzo.io</span>
+                        <span className="font-medium">
+                          support@quzo.network
+                        </span>
                       </p>
                     </div>
                   </div>
