@@ -44,15 +44,7 @@ import {
 } from "recharts";
 import { useDashboardSummary } from "@/features/dashboard/hooks/useDashboardSummary";
 
-/* ============================================================
-   TYPES
-   ============================================================ */
 
-/**
- * Shape returned by GET /user-details (matches the real API response).
- * Only the fields this dashboard consumes are listed; extra fields are
- * safely ignored thanks to the index signature.
- */
 interface WalletData {
   FullName?: string;
   AuthLogin?: string;
@@ -145,7 +137,7 @@ const MARKET_STATS = [
   },
 ];
 
-const PENDING = "To be updated";
+const PENDING = "$0.00";
 
 function parseMarketValue(v: string) {
   const prefix = v.startsWith("$") ? "$" : "";
@@ -289,15 +281,21 @@ const OPPORTUNITIES = [
   },
 ];
 
-const QUICK_LINKS = [
+interface QuickLink {
+  label: string;
+  icon: LucideIcon;
+  href?: string;
+}
+
+const QUICK_LINKS: QuickLink[] = [
   { label: "My OTC", icon: CircleDollarSign },
   { label: "My Coins", icon: Coins },
   { label: "My Customers", icon: Users },
   { label: "My Payouts", icon: Wallet },
-  { label: "My Team", icon: Users },
+  { label: "My Team", icon: Users, href: "/direct-partners" },
   { label: "My Vendors", icon: Briefcase },
-  { label: "My Plans", icon: Layers },
-  { label: "My Assets", icon: Settings },
+  { label: "My Plans", icon: Layers, href: "/investment-amount" },
+  { label: "My Assets", icon: Settings, href: "/fund-director" },
 ];
 
 const NOTIFICATIONS = [
@@ -721,7 +719,8 @@ function LicenseCredits({ walletData }: { walletData: WalletData }) {
 function RevenueProfit({ walletData }: { walletData: WalletData }) {
   const serviceRevenue = Number(walletData.IncomeWallet ?? 0);
   const vendorRevenue = Number(walletData.TeamBusiness ?? 0);
-  const total = serviceRevenue + vendorRevenue;
+  // const total = serviceRevenue + vendorRevenue;
+  const total = 0;
 
   return (
     <div className="rounded-3xl border border-slate-100 bg-white p-5 shadow-sm dark:border-[#153747] dark:bg-[#07242e] sm:p-6">
@@ -759,8 +758,11 @@ function RevenueProfit({ walletData }: { walletData: WalletData }) {
                 <span className="h-2.5 w-2.5 shrink-0 rounded-full bg-[#3b82f6]" />
                 AI Service Revenue
               </span>
-              <span className="font-bold text-slate-900 dark:text-white">
+              {/* <span className="font-bold text-slate-900 dark:text-white">
                 ${formatMoney(serviceRevenue)}
+              </span> */}
+              <span className="font-bold text-slate-900 dark:text-white">
+                $0.00
               </span>
             </li>
             <li className="flex items-center justify-between gap-3 text-sm">
@@ -768,9 +770,13 @@ function RevenueProfit({ walletData }: { walletData: WalletData }) {
                 <span className="h-2.5 w-2.5 shrink-0 rounded-full bg-[#6366f1]" />
                 Vendor Deployment Revenue
               </span>
+              {/* <span className="font-bold text-slate-900 dark:text-white">
+                  ${formatMoney(vendorRevenue)}
+                </span> */}
               <span className="font-bold text-slate-900 dark:text-white">
-                ${formatMoney(vendorRevenue)}
+                $0.00
               </span>
+
             </li>
           </ul>
         </div>
@@ -787,9 +793,6 @@ function RevenueProfit({ walletData }: { walletData: WalletData }) {
             </span>
             <span className="text-xl font-bold text-slate-400">{PENDING}</span>
           </div>
-          <button className="inline-flex items-center gap-2 text-sm font-semibold text-[#3b82f6] hover:underline">
-            View revenue reports <ArrowRight className="h-4 w-4" />
-          </button>
         </div>
       </div>
     </div>
@@ -878,425 +881,34 @@ function CoinChart({ children }: { children?: ReactNode }) {
   );
 }
 
-/* ============================================================
-   MAIN COMPONENT — uses real API walletData
-   ============================================================ */
-
-/* ============================================================
-GLOBAL AI MARKET SNAPSHOT
-Paste this ABOVE `export function MemberHomeDashboard()`
-(it uses MARKET_STATS, MARKET_VIEWS, parseMarketValue, Counter, Reveal
-which are already defined in your file).
-
-Lucide imports to ADD:  CalendarDays, CheckCircle2, Target
-============================================================ */
-
-// const STAT_STYLES = [
-//   {
-//     icon: Layers,
-//     card: "border-emerald-100 bg-gradient-to-br from-emerald-50 to-white dark:border-[#153747] dark:from-[#0b3234] dark:to-[#07242e]",
-//     tile: "bg-emerald-500/15 text-emerald-500",
-//     label: "text-emerald-600 dark:text-emerald-400",
-//   },
-//   {
-//     icon: ChartNoAxesCombined,
-//     card: "border-violet-100 bg-gradient-to-br from-violet-50 to-white dark:border-[#153747] dark:from-[#1d1b4a] dark:to-[#07242e]",
-//     tile: "bg-violet-500/15 text-violet-500",
-//     label: "text-violet-600 dark:text-violet-400",
-//   },
-//   {
-//     icon: Users,
-//     card: "border-sky-100 bg-gradient-to-br from-sky-50 to-white dark:border-[#153747] dark:from-[#0b2d47] dark:to-[#07242e]",
-//     tile: "bg-sky-500/15 text-sky-500",
-//     label: "text-sky-600 dark:text-sky-400",
-//   },
-//   {
-//     icon: Briefcase,
-//     card: "border-amber-100 bg-gradient-to-br from-amber-50 to-white dark:border-[#153747] dark:from-[#3a2a0f] dark:to-[#07242e]",
-//     tile: "bg-amber-500/15 text-amber-500",
-//     label: "text-amber-600 dark:text-amber-400",
-//   },
-// ];
-
-// const AXIS_MAX: Record<keyof typeof MARKET_VIEWS, number> = {
-//   spending: 4,
-//   market: 5,
-//   jobs: 200,
-// };
-
-// const RANGE_LABEL: Record<keyof typeof MARKET_VIEWS, string> = {
-//   spending: "2025 – 2027",
-//   market: "2023 – 2033",
-//   jobs: "By 2030",
-// };
-
-// const decimalsOf = (n: number) => String(n).split(".")[1]?.length ?? 0;
-
-// function MarketSnapshotSection() {
-//   const [marketView, setMarketView] =
-//     useState<keyof typeof MARKET_VIEWS>("spending");
-
-//   const view = MARKET_VIEWS[marketView];
-//   const axisMax = AXIS_MAX[marketView];
-//   const count = view.data.length;
-//   const showLine = marketView !== "jobs"; // line only makes sense over time
-
-//   const points = view.data.map((d, i) => ({
-//     ...d,
-//     x: ((i + 0.5) / count) * 100,
-//     y: 100 - Math.min(100, (d.v / axisMax) * 100),
-//   }));
-//   const linePath = points.map((p, i) => `${i ? "L" : "M"}${p.x},${p.y}`).join(" ");
-//   // const areaPath = `${linePath} L${points[count - 1].x},100 L${points[0].x},100 Z`;
-//   const first = points[0];
-//   const last = points[count - 1];
-//   const areaPath =
-//     first && last
-//       ? `${linePath} L${last.x},100 L${first.x},100 Z`
-//       : "";
-//   const ticks = [1, 0.75, 0.5, 0.25, 0].map((p) => p * axisMax);
-//   const tickText = (t: number) =>
-//     t === 0 ? "0" : view.unit === "T" ? `${t.toFixed(1)}T` : `${t}M`;
-
-//   return (
-//     <section className="space-y-3">
-//       {/* ---------- HERO ---------- */}
-//       <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#03161f] via-[#052832] to-[#06303a] p-4 sm:p-6 lg:p-7">
-//         <div className="pointer-events-none absolute -right-10 top-1/2 h-72 w-72 -translate-y-1/2 rounded-full bg-[#12a594]/25 blur-[90px]" />
-//         <div
-//           className="pointer-events-none absolute inset-0 opacity-20"
-//           style={{
-//             backgroundImage:
-//               "linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px)",
-//             backgroundSize: "32px 32px",
-//           }}
-//         />
-
-//         <div className="relative z-10 flex items-center justify-between gap-4">
-//           <div className="min-w-0 max-w-xl">
-//             <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-[#35d6c0] backdrop-blur sm:text-[11px]">
-//               <ChartNoAxesCombined className="h-3.5 w-3.5" />
-//               Global AI Market Snapshot
-//             </div>
-//             <h2 className="text-2xl font-extrabold leading-tight tracking-tight text-white sm:text-3xl lg:text-4xl">
-//               The AI Economy Is Entering Its{" "}
-//               <span className="block text-[#35f0c0]">Trillion-Dollar Era.</span>
-//             </h2>
-//             <p className="mt-2 max-w-md text-xs leading-relaxed text-slate-300 sm:text-sm">
-//               Massive growth in AI spending, market size and global employment is
-//               creating unprecedented opportunities for AI solutions.
-//             </p>
-//           </div>
-
-//           {/* Globe (pure CSS, no image needed) */}
-//           <div className="relative hidden h-28 w-28 shrink-0 sm:block lg:h-36 lg:w-36" aria-hidden="true">
-//             <div
-//               className="absolute inset-0 rounded-full shadow-[0_0_60px_rgba(34,211,238,0.55)]"
-//               style={{
-//                 background:
-//                   "radial-gradient(circle at 35% 30%, #8cf3ff 0%, #1aa6dd 38%, #0a4a8a 70%, #06223f 100%)",
-//               }}
-//             />
-//             <div
-//               className="absolute inset-0 rounded-full opacity-40"
-//               style={{
-//                 backgroundImage:
-//                   "radial-gradient(rgba(255,255,255,0.8) 1px, transparent 1.5px)",
-//                 backgroundSize: "9px 9px",
-//                 maskImage: "radial-gradient(circle, black 55%, transparent 72%)",
-//                 WebkitMaskImage: "radial-gradient(circle, black 55%, transparent 72%)",
-//               }}
-//             />
-//             <span className="absolute inset-0 flex items-center justify-center text-4xl font-extrabold text-white drop-shadow-[0_0_14px_rgba(255,255,255,0.8)] lg:text-5xl">
-//               AI
-//             </span>
-//             <span className="absolute -inset-x-5 inset-y-[36%] -rotate-[16deg] rounded-[50%] border-2 border-[#35f0c0] shadow-[0_0_14px_#35f0c0]" />
-//           </div>
-//         </div>
-//       </div>
-
-//       {/* ---------- STAT CARDS ---------- */}
-//       <div className="grid grid-cols-2 gap-2.5 sm:gap-3 lg:grid-cols-4">
-//         {MARKET_STATS.map((s, i) => {
-//           // const st = STAT_STYLES[i % STAT_STYLES.length];
-//           const st = STAT_STYLES[i % STAT_STYLES.length] ?? STAT_STYLES[0]!;
-//           const Icon = st.icon;
-//           const { num, prefix, suffix } = parseMarketValue(s.value);
-//           return (
-//             <Reveal key={i} delay={i * 0.05} className="h-full">
-//               <div
-//                 className={`relative h-full overflow-hidden rounded-2xl border p-3 shadow-sm sm:p-4 ${st.card}`}
-//               >
-//                 <span
-//                   className={`absolute right-2.5 top-2.5 grid h-9 w-9 place-items-center rounded-xl sm:right-3 sm:top-3 sm:h-12 sm:w-12 ${st.tile}`}
-//                 >
-//                   <Icon className="h-4 w-4 sm:h-6 sm:w-6" />
-//                 </span>
-
-//                 <p
-//                   className={`pr-10 text-[9px] font-bold uppercase tracking-wider sm:pr-14 sm:text-[10px] ${st.label}`}
-//                 >
-//                   {s.type} · {s.year}
-//                 </p>
-//                 <p className="mt-1.5 text-2xl font-extrabold leading-none text-slate-900 dark:text-white sm:text-3xl">
-//                   <Counter
-//                     value={num}
-//                     prefix={prefix}
-//                     suffix={suffix}
-//                     decimals={decimalsOf(num)}
-//                   />
-//                 </p>
-//                 <p className="mt-1.5 text-[10px] leading-snug text-slate-500 dark:text-slate-400 sm:text-[11px]">
-//                   {s.label}
-//                 </p>
-//                 <a
-//                   href="#"
-//                   className="mt-2.5 inline-flex max-w-full items-center gap-1 rounded-md bg-white/70 px-2 py-1 text-[9px] font-medium text-slate-600 ring-1 ring-black/5 transition hover:bg-white dark:bg-white/5 dark:text-slate-300 dark:ring-white/10 sm:text-[10px]"
-//                 >
-//                   <span className="truncate">{s.source}</span>
-//                   <ArrowUpRight className="h-3 w-3 shrink-0" />
-//                 </a>
-//               </div>
-//             </Reveal>
-//           );
-//         })}
-//       </div>
-
-//       {/* ---------- CHART + TAKEAWAYS ---------- */}
-//       <div className="grid gap-3 lg:grid-cols-[1.9fr_1fr]">
-//         {/* Chart */}
-//         <div className="min-w-0 rounded-2xl border border-slate-100 bg-white p-4 shadow-sm dark:border-[#153747] dark:bg-[#07242e] sm:p-5">
-//           <div className="flex flex-wrap items-center justify-between gap-2">
-//             <h3 className="flex items-center gap-2 text-sm font-bold text-slate-900 dark:text-white sm:text-base">
-//               <ChartNoAxesCombined className="h-4 w-4 text-emerald-500" />
-//               AI Industry Outlook
-//             </h3>
-//             <span className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 px-2.5 py-1 text-[11px] font-medium text-slate-600 dark:border-slate-700 dark:text-slate-300">
-//               <CalendarDays className="h-3.5 w-3.5" />
-//               {RANGE_LABEL[marketView]}
-//             </span>
-//           </div>
-
-//           <div className="mt-3 flex flex-wrap gap-2" role="group" aria-label="Chart measure">
-//             {(Object.keys(MARKET_VIEWS) as (keyof typeof MARKET_VIEWS)[]).map((k) => (
-//               <button
-//                 key={k}
-//                 type="button"
-//                 aria-pressed={marketView === k}
-//                 onClick={() => setMarketView(k)}
-//                 className={`rounded-full px-3.5 py-1.5 text-[11px] font-semibold transition-colors ${marketView === k
-//                     ? "bg-emerald-500 text-white"
-//                     : "bg-slate-100 text-slate-600 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
-//                   }`}
-//               >
-//                 {MARKET_VIEWS[k].tab}
-//               </button>
-//             ))}
-//           </div>
-
-//           <div className="mt-8 flex gap-2">
-//             {/* Y axis */}
-//             <div className="relative h-44 w-9 shrink-0 sm:h-56">
-//               {ticks.map((t, i) => (
-//                 <span
-//                   key={i}
-//                   className="absolute right-0 -translate-y-1/2 text-[10px] text-slate-400"
-//                   style={{ top: `${i * 25}%` }}
-//                 >
-//                   {tickText(t)}
-//                 </span>
-//               ))}
-//             </div>
-
-//             {/* Plot */}
-//             <div className="min-w-0 flex-1">
-//               <div className="relative h-44 border-b border-slate-200 dark:border-slate-700 sm:h-56">
-//                 {[0, 25, 50, 75].map((p) => (
-//                   <div
-//                     key={p}
-//                     className="absolute left-0 right-0 border-t border-dashed border-slate-100 dark:border-slate-800"
-//                     style={{ top: `${p}%` }}
-//                   />
-//                 ))}
-
-//                 {/* Bars */}
-//                 <div className="absolute inset-0 flex items-end">
-//                   {points.map((p, i) => (
-//                     <div
-//                       key={`${marketView}-${i}`}
-//                       className="flex h-full items-end justify-center"
-//                       style={{ width: `${100 / count}%` }}
-//                     >
-//                       <div
-//                         className="w-[42%] max-w-[64px] rounded-t-lg bg-gradient-to-t from-[#10b981] to-[#34e0a1] shadow-[0_6px_16px_-6px_rgba(16,185,129,0.6)] transition-[height] duration-700"
-//                         style={{ height: `${100 - p.y}%`, minHeight: 4 }}
-//                       />
-//                     </div>
-//                   ))}
-//                 </div>
-
-//                 {/* Trend line + area */}
-//                 {showLine && count > 1 && (
-//                   <svg
-//                     viewBox="0 0 100 100"
-//                     preserveAspectRatio="none"
-//                     className="pointer-events-none absolute inset-0 h-full w-full overflow-visible"
-//                     aria-hidden="true"
-//                   >
-//                     <defs>
-//                       <linearGradient id="mktArea" x1="0" y1="0" x2="0" y2="1">
-//                         <stop offset="0%" stopColor="#10b981" stopOpacity="0.22" />
-//                         <stop offset="100%" stopColor="#10b981" stopOpacity="0" />
-//                       </linearGradient>
-//                     </defs>
-//                     <path d={areaPath} fill="url(#mktArea)" />
-//                     <path
-//                       d={linePath}
-//                       fill="none"
-//                       stroke="#10b981"
-//                       strokeWidth="2"
-//                       vectorEffect="non-scaling-stroke"
-//                     />
-//                   </svg>
-//                 )}
-
-//                 {/* Dots + value bubbles */}
-//                 {points.map((p, i) => (
-//                   <div
-//                     key={`b-${marketView}-${i}`}
-//                     className="pointer-events-none absolute transition-all duration-700"
-//                     style={{ left: `${p.x}%`, top: `${p.y}%` }}
-//                   >
-//                     {showLine && (
-//                       <span className="absolute left-0 top-0 h-2.5 w-2.5 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-emerald-500 bg-white" />
-//                     )}
-//                     <span className="absolute left-0 top-0 -translate-x-1/2 -translate-y-[170%] whitespace-nowrap rounded-lg bg-white px-2 py-0.5 text-[10px] font-bold text-slate-800 shadow-md ring-1 ring-black/5 dark:bg-[#0b2f3b] dark:text-white dark:ring-white/10 sm:text-xs">
-//                       {p.v}
-//                       {view.unit}
-//                     </span>
-//                   </div>
-//                 ))}
-//               </div>
-
-//               {/* X labels */}
-//               <div className="mt-2 flex">
-//                 {points.map((p, i) => (
-//                   <span
-//                     key={i}
-//                     className="text-center text-[11px] font-semibold text-slate-500 dark:text-slate-400"
-//                     style={{ width: `${100 / count}%` }}
-//                   >
-//                     {p.year}
-//                   </span>
-//                 ))}
-//               </div>
-//             </div>
-//           </div>
-
-//           <p className="mt-4 flex gap-1.5 text-[10px] leading-relaxed text-slate-500 dark:text-slate-400">
-//             <span className="mt-[1px] inline-block h-3 w-3 shrink-0 rounded-full border border-slate-300 text-center text-[8px] leading-[10px] dark:border-slate-600">
-//               i
-//             </span>
-//             <span>
-//               {view.note} These measures use different methods and should not be
-//               compared with each other.
-//             </span>
-//           </p>
-//         </div>
-
-//         {/* Key takeaways */}
-//         <div className="relative min-w-0 overflow-hidden rounded-2xl border border-slate-100 bg-white p-4 shadow-sm dark:border-[#153747] dark:bg-[#07242e] sm:p-5">
-//           <h3 className="flex items-center gap-2 text-sm font-bold text-slate-900 dark:text-white sm:text-base">
-//             <span className="grid h-7 w-7 place-items-center rounded-full bg-emerald-500/15 text-emerald-500">
-//               <Target className="h-4 w-4" />
-//             </span>
-//             Key Takeaways
-//           </h3>
-
-//           <ul className="relative z-10 mt-4 space-y-3.5 pb-16 text-xs text-slate-700 dark:text-slate-200 sm:text-[13px]">
-//             {[
-//               ["AI spending to reach ", "$2.67 trillion", " in 2026."],
-//               ["Global AI market size projected at ", "$4.8 trillion", " by 2033."],
-//               ["", "78 million", " net new jobs across industries by 2030."],
-//               ["", "170 million", " new jobs created by 2030."],
-//             ].map(([a, b, c], i) => (
-//               <li key={i} className="flex items-start gap-2.5">
-//                 <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-emerald-500" />
-//                 <span>
-//                   {a}
-//                   <strong className="font-bold text-slate-900 dark:text-white">{b}</strong>
-//                   {c}
-//                 </span>
-//               </li>
-//             ))}
-//           </ul>
-
-//           {/* Decorative wave */}
-//           <svg
-//             viewBox="0 0 400 100"
-//             preserveAspectRatio="none"
-//             className="pointer-events-none absolute inset-x-0 bottom-0 h-16 w-full"
-//             aria-hidden="true"
-//           >
-//             <defs>
-//               <linearGradient id="mktWave" x1="0" y1="0" x2="0" y2="1">
-//                 <stop offset="0%" stopColor="#34e0a1" stopOpacity="0.45" />
-//                 <stop offset="100%" stopColor="#34e0a1" stopOpacity="0.05" />
-//               </linearGradient>
-//             </defs>
-//             <path
-//               d="M0,70 C60,90 110,30 180,50 C250,70 300,10 400,40 L400,100 L0,100 Z"
-//               fill="url(#mktWave)"
-//             />
-//             <path
-//               d="M0,78 C70,95 120,45 190,62 C260,80 320,28 400,52 L400,100 L0,100 Z"
-//               fill="#10b981"
-//               fillOpacity="0.12"
-//             />
-//           </svg>
-//         </div>
-//       </div>
-//     </section>
-//   );
-// }
-
-/* ============================================================
-   GLOBAL AI MARKET SNAPSHOT
-   Paste this ABOVE `export function MemberHomeDashboard()`
-   (it uses MARKET_STATS, MARKET_VIEWS, parseMarketValue, Counter, Reveal
-   which are already defined in your file).
-
-   Lucide imports to ADD:  CalendarDays, CheckCircle2, Target
-   Banner image: copy ai-market-banner.webp into your Next.js /public folder
-   ============================================================ */
 
 const STAT_STYLES = [
   {
-    // mint
+    // mint - improved visibility in both modes
     icon: Layers,
-    card: "border-emerald-200/70 bg-gradient-to-br from-[#e2fbf1] to-[#f4fdf9] dark:border-emerald-400/20 dark:from-emerald-500/15 dark:to-[#07242e]",
-    tile: "bg-gradient-to-br from-emerald-400 to-teal-500 text-white shadow-lg shadow-emerald-500/30",
-    label: "text-slate-700 dark:text-emerald-300",
-    mini: "text-emerald-500",
-    chip: "text-slate-700 dark:text-slate-200",
+    card: "border-emerald-300/80 bg-gradient-to-br from-[#d1fae5] to-[#ecfdf5] dark:border-emerald-500/40 dark:from-emerald-500/25 dark:to-[#064e3b]",
+    tile: "bg-gradient-to-br from-emerald-500 to-teal-600 text-white shadow-lg shadow-emerald-500/40",
+    label: "text-emerald-800 dark:text-emerald-200",
+    mini: "text-emerald-600 dark:text-emerald-400",
+    chip: "text-emerald-800 dark:text-emerald-100",
   },
   {
-    // lavender
+    // teal - MARKET SIZE card
     icon: ChartNoAxesCombined,
-    card: "border-violet-200/70 bg-gradient-to-br from-[#ebe7ff] to-[#f7f4ff] dark:border-violet-400/20 dark:from-violet-500/15 dark:to-[#07242e]",
-    tile: "bg-gradient-to-br from-violet-400 to-indigo-500 text-white shadow-lg shadow-violet-500/30",
-    label: "text-indigo-600 dark:text-violet-300",
-    mini: "text-indigo-500",
-    chip: "text-indigo-700 dark:text-violet-200",
+    card: "border-teal-200/80 bg-gradient-to-br from-[#ccfbf1] to-[#f0fdfa] dark:border-teal-400/40 dark:from-teal-500/15 dark:to-[#115e59]",
+    tile: "bg-gradient-to-br from-teal-400 to-cyan-500 text-white shadow-lg shadow-teal-400/30",
+    label: "text-teal-700 dark:text-teal-200",
+    mini: "text-teal-500 dark:text-teal-300",
+    chip: "text-teal-800 dark:text-teal-100",
   },
   {
-    // sky blue
+    // green - EMPLOYMENT card - lighter
     icon: Users,
-    card: "border-sky-200/70 bg-gradient-to-br from-[#dff2ff] to-[#f1faff] dark:border-sky-400/20 dark:from-sky-500/15 dark:to-[#07242e]",
-    tile: "bg-gradient-to-br from-sky-400 to-blue-500 text-white shadow-lg shadow-sky-500/30",
-    label: "text-sky-700 dark:text-sky-300",
-    mini: "text-sky-500",
-    chip: "text-sky-800 dark:text-sky-200",
+    card: "border-green-200/80 bg-gradient-to-br from-[#ecfdf5] to-[#f0fdf4] dark:border-green-400/40 dark:from-green-500/15 dark:to-[#065f46]",
+    tile: "bg-gradient-to-br from-green-400 to-emerald-500 text-white shadow-lg shadow-green-400/30",
+    label: "text-green-700 dark:text-green-200",
+    mini: "text-green-500 dark:text-green-300",
+    chip: "text-green-800 dark:text-green-100",
   },
   {
     // peach
@@ -1352,7 +964,7 @@ function MarketSnapshotSection() {
     <section className="space-y-3">
       {/* ---------- HERO (image banner) ---------- */}
       <div className="relative isolate min-h-[190px] overflow-hidden rounded-2xl bg-[#03161f] sm:min-h-[210px] lg:min-h-[240px]">
-       
+
         {/* <Image
           src="/ai-market-banner.webp"
           alt=""
@@ -1399,7 +1011,7 @@ function MarketSnapshotSection() {
           return (
             <Reveal key={i} delay={i * 0.05} className="h-full">
               <div
-                className={`relative h-full overflow-hidden rounded-2xl border p-3 shadow-sm sm:p-4 ${st.card}`}
+                className={`relative h-full overflow-visible rounded-2xl border p-3 shadow-sm sm:p-4 ${st.card}`}
               >
                 <span
                   className={`absolute right-2.5 top-2.5 grid h-9 w-9 place-items-center rounded-xl sm:right-3 sm:top-3 sm:h-12 sm:w-12 ${st.tile}`}
@@ -1423,7 +1035,7 @@ function MarketSnapshotSection() {
                     decimals={decimalsOf(num)}
                   />
                 </p>
-                <p className="mt-1.5 text-[10px] leading-snug text-slate-500 dark:text-slate-400 sm:text-[11px]">
+                <p className="mt-1.5 min-h-[2.2em] text-[10px] leading-relaxed text-slate-500 dark:text-slate-400 sm:text-[11px]">
                   {s.label}
                 </p>
                 <a
@@ -1808,12 +1420,18 @@ export function MemberHomeDashboard() {
             </div>
 
             <div className="flex flex-wrap gap-3 pt-2">
-              <button className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-[#12a594] to-[#35d6c0] px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-opacity hover:opacity-90">
+              <Link
+                href="/fund-director"
+                className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-[#12a594] to-[#35d6c0] px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-opacity hover:opacity-90"
+              >
                 <Plus className="h-4 w-4" /> Add Funds
-              </button>
-              <button className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-5 py-2.5 text-sm font-semibold text-slate-700 shadow-sm transition-colors hover:bg-slate-50 dark:border-slate-700 dark:bg-[#07242e] dark:text-slate-300 dark:hover:bg-slate-800">
+              </Link>
+              <Link
+                href="/fund-director"
+                className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-5 py-2.5 text-sm font-semibold text-slate-700 shadow-sm transition-colors hover:bg-slate-50 dark:border-slate-700 dark:bg-[#07242e] dark:text-slate-300 dark:hover:bg-slate-800"
+              >
                 <ArrowDownToLine className="h-4 w-4" /> Withdraw
-              </button>
+              </Link>
             </div>
           </div>
         </section>
@@ -2192,17 +1810,33 @@ export function MemberHomeDashboard() {
           </div>
           <h2 className="mb-4 text-xl font-bold">Your Business Command Center</h2>
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-8">
-            {QUICK_LINKS.map((link, i) => (
-              <button
-                key={i}
-                className="group flex flex-col items-center justify-center gap-2 rounded-xl border border-[#d9e8ec] bg-white p-3 transition-colors hover:border-[#3b82f6] dark:border-[#153747] dark:bg-[#07242e] dark:hover:border-[#3b82f6]"
-              >
-                <link.icon className="h-5 w-5 text-slate-400 transition-colors group-hover:text-[#3b82f6]" />
-                <span className="text-center text-[10px] font-medium leading-tight text-slate-600 dark:text-slate-300">
-                  {link.label}
-                </span>
-              </button>
-            ))}
+            {QUICK_LINKS.map((link, i) => {
+              if (link.href) {
+                return (
+                  <Link
+                    key={i}
+                    href={link.href}
+                    className="group flex flex-col items-center justify-center gap-2 rounded-xl border border-[#d9e8ec] bg-white p-3 transition-colors hover:border-[#3b82f6] dark:border-[#153747] dark:bg-[#07242e] dark:hover:border-[#3b82f6]"
+                  >
+                    <link.icon className="h-5 w-5 text-slate-400 transition-colors group-hover:text-[#3b82f6]" />
+                    <span className="text-center text-[10px] font-medium leading-tight text-slate-600 dark:text-slate-300">
+                      {link.label}
+                    </span>
+                  </Link>
+                );
+              }
+              return (
+                <button
+                  key={i}
+                  className="group flex flex-col items-center justify-center gap-2 rounded-xl border border-[#d9e8ec] bg-white p-3 transition-colors hover:border-[#3b82f6] dark:border-[#153747] dark:bg-[#07242e] dark:hover:border-[#3b82f6]"
+                >
+                  <link.icon className="h-5 w-5 text-slate-400 transition-colors group-hover:text-[#3b82f6]" />
+                  <span className="text-center text-[10px] font-medium leading-tight text-slate-600 dark:text-slate-300">
+                    {link.label}
+                  </span>
+                </button>
+              );
+            })}
           </div>
         </section>
 

@@ -237,7 +237,7 @@ function ThankYouContent() {
             {orderData?.image && (
               <div className="absolute top-0 right-0 w-32 h-32 overflow-hidden">
                 <div className="absolute top-6 bottom-2 right-[-42px] pb-3 rotate-45 bg-red-600 text-white text-xs font-bold h-6 w-[160px] flex items-center justify-center shadow-lg">
-                  UNPAID
+                  Paid
                 </div>
               </div>
             )}
