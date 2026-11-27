@@ -722,9 +722,6 @@ function LicenseCredits({ walletData }: { walletData: WalletData }) {
   );
 }
 
-/* ---------------------------------------------------------------
-   RevenueProfit — now API-driven
-   --------------------------------------------------------------- */
 function RevenueProfit({ walletData }: { walletData: WalletData }) {
   const serviceRevenue = Number(walletData.Aiservice ?? 0);
   const vendorRevenue = Number(walletData.VendorDeployment ?? 0);
