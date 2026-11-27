@@ -1,7 +1,7 @@
 "use client";
 
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import { Brain, Check, Clock, Command, Copy, Download, Eye, FileText, History, Loader2, Lock, Play, Radio, RotateCcw, Search, Send, Sparkles, Square, ThumbsDown, ThumbsUp, WifiOff, X } from "lucide-react";
+import { Bot, Brain, Check, Clock, Command, Copy, Download, Eye, FileText, History, Loader2, Lock, Play, Radio, RotateCcw, Search, Send, Sparkles, Square, ThumbsDown, ThumbsUp, WifiOff, X } from "lucide-react";
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { AGENTS, type Block } from "./components/agents";
@@ -150,6 +150,7 @@ export default function AiToolDemo() { // <-- data-theme prop hata diya taaki gl
   const [query, setQuery] = useState("");
   const [history, setHistory] = useState<Run[]>([]);
   const [mode, setMode] = useState<Mode>("offline");
+  const [liveModalOpen, setLiveModalOpen] = useState(false);
   const [prompt, setPrompt] = useState("");
   const [liveRun, setLiveRun] = useState<LiveRun | null>(null);
 
@@ -224,17 +225,24 @@ export default function AiToolDemo() { // <-- data-theme prop hata diya taaki gl
     setPhase("thinking");
   }, [reset, mode, prompt, agentId]);
 
+  const closeLiveMode = useCallback(() => {
+    setLiveModalOpen(false);
+  }, []);
+
   // Shortcuts: Ctrl/Cmd + Enter runs, Esc stops.
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if ((e.metaKey || e.ctrlKey) && e.key === "Enter" && !busy) {
+      if ((e.metaKey || e.ctrlKey) && e.key === "Enter" && !busy && !liveModalOpen) {
         e.preventDefault();
         run();
-      } else if (e.key === "Escape" && busy) setPhase("stopped");
+      } else if (e.key === "Escape") {
+        if (liveModalOpen) closeLiveMode();
+        else if (busy) setPhase("stopped");
+      }
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [busy, run]);
+  }, [busy, run, liveModalOpen, closeLiveMode]);
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -260,9 +268,14 @@ export default function AiToolDemo() { // <-- data-theme prop hata diya taaki gl
     consoleRef.current?.scrollIntoView({ behavior: reduced ? "auto" : "smooth", block: "nearest" });
   };
   const switchMode = (m: Mode) => {
-    if (m === mode) return;
-    reset();
-    setMode(m);
+    if (m === "live") {
+      setLiveModalOpen(true);
+      return;
+    }
+
+    if (mode !== "offline") reset();
+    setMode("offline");
+    setLiveModalOpen(false);
   };
   const copy = async () => {
     try {
@@ -321,7 +334,8 @@ export default function AiToolDemo() { // <-- data-theme prop hata diya taaki gl
                   <button
                     key={m}
                     type="button"
-                    aria-pressed={on}
+                    aria-pressed={isLive ? undefined : on}
+                    aria-haspopup={isLive ? "dialog" : undefined}
                     onClick={() => switchMode(m)}
                     className={`inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold transition ${on ? (isLive ? "bg-emerald-500 text-white shadow-lg shadow-emerald-500/30" : "bg-slate-900 text-white dark:bg-white dark:text-slate-900") : "text-slate-500 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white"}`}
                   >
@@ -333,7 +347,7 @@ export default function AiToolDemo() { // <-- data-theme prop hata diya taaki gl
               })}
             </div>
           </div>
-          
+
           <dl className="relative mt-8 grid grid-cols-3 gap-3 sm:max-w-lg">
             {stats.map((s) => (
               <div key={s.label} className="rounded-2xl border border-black/10 bg-black/5 px-4 py-3 backdrop-blur dark:border-white/10 dark:bg-white/5">
@@ -646,6 +660,65 @@ export default function AiToolDemo() { // <-- data-theme prop hata diya taaki gl
           </section>
         </div>
       </div>
+      {liveModalOpen && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/75 p-4 backdrop-blur-md"
+          role="presentation"
+          onMouseDown={(event) => {
+            if (event.target === event.currentTarget) closeLiveMode();
+          }}
+        >
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="live-mode-dialog-title"
+            className="relative w-full max-w-md overflow-hidden rounded-3xl border border-slate-200 bg-white p-7 shadow-[0_24px_80px_rgba(2,8,23,0.35)] dark:border-white/10 dark:bg-[#0b1020]"
+          >
+            <div
+              className="pointer-events-none absolute -right-12 -top-16 h-44 w-44 rounded-full opacity-20 blur-3xl"
+              style={{ backgroundColor: agent.color }}
+              aria-hidden="true"
+            />
+            <div className="relative">
+              <div className="mb-6 flex items-start justify-between gap-4">
+                <div className="flex items-center gap-4">
+                  <span
+                    className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl text-white shadow-lg"
+                    style={{ background: `linear-gradient(135deg, ${agent.color}, #4338ca)` }}
+                  >
+                    <Bot className="h-7 w-7" />
+                  </span>
+                  <div>
+                    <span className="mb-1 inline-flex items-center gap-1.5 rounded-full bg-emerald-500/10 px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.16em] text-emerald-600 dark:text-emerald-300">
+                      <Radio className="h-3 w-3" />
+                      Live Mode
+                    </span>
+                    <h2 id="live-mode-dialog-title" className="text-2xl font-extrabold tracking-tight">Coming Soon</h2>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={closeLiveMode}
+                  aria-label="Close"
+                  className="rounded-xl p-2 text-slate-500 transition hover:bg-slate-100 hover:text-slate-900 dark:hover:bg-white/10 dark:hover:text-white"
+                >
+                  <X className="h-5 w-5" />
+                </button>
+              </div>
+              <p className="text-sm leading-relaxed text-slate-600 dark:text-slate-300">
+                Live Mode is coming soon. We&apos;re working on a smarter, real-time AI experience.
+              </p>
+              <button
+                type="button"
+                onClick={closeLiveMode}
+                className="mt-7 w-full rounded-xl bg-gradient-to-r from-emerald-500 to-cyan-500 px-4 py-3 text-sm font-bold text-white shadow-lg shadow-emerald-500/20 transition hover:brightness-110 active:scale-[0.99]"
+              >
+                Got it
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

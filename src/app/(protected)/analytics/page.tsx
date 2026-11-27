@@ -134,6 +134,9 @@ interface AnalyticsDataItem {
   activeagent?: number;
   location?: string;
   lastLocationUpdate?: number;
+  TodayCPUUsage?: number;
+  TodayGPUUsage?: number;
+  TodayMemoryUsage?: number;
 }
 
 interface AnalyticsAPIResponseItem {
@@ -149,6 +152,7 @@ interface AnalyticsAPIResponseItem {
   UptimeHours?: number;
   Efficiency?: number;
   CreatedDate?: string;
+  TodayRevenue?: number;
   YieldIncome?: number;
   CreditsPurchased?: number;
   PeakHourFlag?: string;
@@ -168,6 +172,10 @@ interface AnalyticsAPIResponseItem {
   LifetimeRevenue?: number;
   DirectActivationRewards?: number;
   AgentAccessRewards?: number;
+  AgenticFleetLeadershipRewards?: number;
+  ReferralRoyaltyRewards?: number;
+  PerformanceRewrads?: number;
+  UnityRevenueClubs?: number;
   ComputeRevenueShare?: number;
   RewardBonus?: number;
   RankBonus?: number;
@@ -268,7 +276,6 @@ interface GroupedDataItem {
 
 interface Totals {
   values: number[];
-  total: number;
 }
 
 interface FeedItem {
@@ -451,21 +458,21 @@ const NoDataState: React.FC<NoDataStateProps> = ({ message, statusCode }) => {
   );
 };
 
-const AgentPerformanceCard: React.FC<AgentPerformanceCardProps> = ({ 
-  agent, 
-  status, 
-  location, 
-  units, 
-  energy, 
-  memory, 
-  profit, 
-  roi, 
-  uptime, 
-  efficiency, 
-  CreatedDate, 
-  YieldIncome, 
+const AgentPerformanceCard: React.FC<AgentPerformanceCardProps> = ({
+  agent,
+  status,
+  location,
+  units,
+  energy,
+  memory,
+  profit,
+  roi,
+  uptime,
+  efficiency,
+  CreatedDate,
+  YieldIncome,
   CreditsPurchased,
-  apiResponse 
+  apiResponse
 }) => {
   const [showDetails, setShowDetails] = useState(false);
 
@@ -477,12 +484,12 @@ const AgentPerformanceCard: React.FC<AgentPerformanceCardProps> = ({
     const agentData = apiResponse.filter(item => item.Agent === agent);
     if (agentData.length === 0) return { labels: [], data: [] };
 
-    const startDate = dayjs(createdDate);
+    const startDate = dayjs(createdDate.split("T")[0]);
 
     const dataMap: Record<string, number> = {};
     agentData.forEach(item => {
-      const date = dayjs(item.CreatedDate).format("DD/MM");
-      const value = parseFloat(String(item.MemoryUsage).replace(/[^0-9.]/g, "")) || 0;
+      const date = dayjs(item.CreatedDate.split("T")[0]).format("DD/MM");
+      const value = item.TodayRevenue || 0;
       dataMap[date] = value;
     });
 
@@ -504,7 +511,7 @@ const AgentPerformanceCard: React.FC<AgentPerformanceCardProps> = ({
       labels,
       datasets: [
         {
-          label: "Memory Usage (GB)",
+          label: "Today Revenue ($)",
           data,
           borderColor: "#3B82F6",
           backgroundColor: "rgba(59, 130, 246, 0.2)",
@@ -537,6 +544,7 @@ const AgentPerformanceCard: React.FC<AgentPerformanceCardProps> = ({
     },
     scales: {
       x: {
+        offset: true,
         grid: { display: false },
         ticks: {
           color: "#6B7280",
@@ -545,12 +553,10 @@ const AgentPerformanceCard: React.FC<AgentPerformanceCardProps> = ({
       },
       y: {
         min: 0,
-        max: 3.0,
         ticks: {
-          stepSize: 1.0,
           color: "#6B7280",
           font: { size: 12 },
-          callback: (value: string | number) => Number(value).toFixed(1),
+          callback: (value: string | number) => `$${Number(value).toFixed(2)}`,
         },
         grid: {
           color: "rgba(107, 114, 128, 0.1)",
@@ -621,7 +627,7 @@ const AgentPerformanceCard: React.FC<AgentPerformanceCardProps> = ({
               <p className="ml-1 text-sm font-bold text-blue-600 dark:text-blue-400 sm:text-base">{CreatedDate ? CreatedDate.split("T")[0]?.split("-").reverse().join("-") : "N/A"}</p>
             </div>
             <div className="text-center w-[47%]">
-              <p className="ml-2 text-xs text-gray-500 dark:text-gray-400 sm:text-sm">Yield Income</p>
+              <p className="ml-2 text-xs text-gray-500 dark:text-gray-400 sm:text-sm">Today Revenue Income</p>
               <p className="ml-1 text-sm font-bold text-blue-600 dark:text-blue-400 sm:text-base">${YieldIncome}</p>
             </div>
             <div className="flex items-center justify-center w-[47%]">
@@ -650,12 +656,12 @@ const AgentPerformanceCard: React.FC<AgentPerformanceCardProps> = ({
                     <p className="text-xs text-gray-500 dark:text-gray-400 sm:text-sm">Deploy Credit</p>
                     <p className="mt-1 text-base font-bold text-gray-900 dark:text-white sm:text-lg">{CreditsPurchased || "247"}</p>
                   </div>
-                  
+
                 </div>
               </div>
 
               <div className="bg-white rounded-lg shadow-sm dark:bg-gray-800">
-                <h4 className="p-4 mb-4 text-lg font-semibold text-gray-900 dark:text-white sm:text-xl">7-Day Memory Usage Trend</h4>
+                <h4 className="p-4 mb-4 text-lg font-semibold text-gray-900 dark:text-white sm:text-xl">7-Day Revenue Trend</h4>
                 <div className="p-4">
                   <div className="h-32 sm:h-48 lg:h-64">
                     <Line data={chartData} options={options} />
@@ -686,14 +692,10 @@ const MyAgentPage: React.FC = () => {
 
   const CheckContractStatus = analyticsData?.data?.[0]?.CheckContractStatus;
   const gpuUsage = useMemo(() => {
-    if (!analyticsData?.data || analyticsData.data.length === 0) return 0;
-    const total = analyticsData.data.reduce((sum, item) => sum + (item.GPUUsage || 0), 0);
-    return (total / analyticsData.data.length).toFixed(2);
+    return analyticsData?.data?.[0]?.TodayGPUUsage?.toFixed(2) ?? "0.00";
   }, [analyticsData]);
   const cpuUsage = useMemo(() => {
-    if (!analyticsData?.data || analyticsData.data.length === 0) return 0;
-    const total = analyticsData.data.reduce((sum, item) => sum + (item.CPUUsage || 0), 0);
-    return (total / analyticsData.data.length).toFixed(2);
+    return analyticsData?.data?.[0]?.TodayCPUUsage?.toFixed(2) ?? "0.00";
   }, [analyticsData]);
 
   const ContractRechargeID = analyticsData?.data?.[0]?.ContractRechargeID;
@@ -809,10 +811,10 @@ const MyAgentPage: React.FC = () => {
       };
     }
 
-    const totalRevenueShare = analyticsData.data.reduce((sum, item) => sum + (item.LifetimeRevenue || 0), 0);
-    const thisWeek = analyticsData.data.reduce((sum, item) => sum + (item.WeeklyYiled || 0), 0);
-    const thisMonth = analyticsData.data.reduce((sum, item) => sum + (item.MonthlyRevenue || 0), 0);
-    const TotalYieldLimit = analyticsData.data.reduce((sum, item) => sum + (item.TotalYieldLimit || 0), 0);
+    const totalRevenueShare = analyticsData.data[0]?.TotalYieldEarning || 0;
+    const thisWeek = analyticsData.data[0]?.WeeklyYiled || 0;
+    const thisMonth = analyticsData.data[0]?.MonthlyRevenue || 0;
+    const TotalYieldLimit = analyticsData.data[0]?.LifetimeRevenue || 0;
 
     return {
       totalRevenueShare,
@@ -825,7 +827,6 @@ const MyAgentPage: React.FC = () => {
   const pieData = useMemo(() => {
     if (!analyticsData?.data || analyticsData.data.length === 0) {
       const values = [0, 0, 0];
-      const total = 0;
       return {
         labels: ["Total Performance Earning", "Performance Limit", "Pending Limit"],
         datasets: [
@@ -835,16 +836,14 @@ const MyAgentPage: React.FC = () => {
             hoverOffset: 20,
           },
         ],
-        total,
       };
     }
 
-    const totalPerformanceEarning = analyticsData.data.reduce((sum, item) => sum + (item.WorkingTotalEarning || 0), 0);
-    const performanceLimit = analyticsData.data.reduce((sum, item) => sum + (item.WorkingTotalLimit || 0), 0);
-    const pendingLimit = analyticsData.data.reduce((sum, item) => sum + (item.WorkingPendingLimit || 0), 0);
+    const totalPerformanceEarning = analyticsData.data[0]?.WorkingTotalEarning || 0;
+    const performanceLimit = analyticsData.data[0]?.WorkingTotalLimit || 0;
+    const pendingLimit = analyticsData.data[0]?.WorkingPendingLimit || 0;
 
     const values = [totalPerformanceEarning, performanceLimit, pendingLimit];
-    const total = values.reduce((sum, val) => sum + val, 0);
 
     return {
       labels: ["Total Performance Earning", "Performance Limit", "Pending Limit"],
@@ -855,7 +854,6 @@ const MyAgentPage: React.FC = () => {
           hoverOffset: 20,
         },
       ],
-      total,
     };
   }, [analyticsData]);
 
@@ -868,13 +866,13 @@ const MyAgentPage: React.FC = () => {
       };
     }
 
-    const DirectActivationRewards = analyticsData.data.reduce((sum, item) => sum + (item.DirectActivationRewards || 0), 0);
-    const AgentAccessRewards = analyticsData.data.reduce((sum, item) => sum + (item.AgentAccessRewards || 0), 0);
-    const AgenticFleetLeadershipRewards = analyticsData.data.reduce((sum, item) => sum + (item.AgenticFleetLeadershipRewards || 0), 0);
-    const ReferralRoyaltyRewards = analyticsData.data.reduce((sum, item) => sum + (item.ReferralRoyaltyRewards || 0), 0);
-    const PerformanceRewrads = analyticsData.data.reduce((sum, item) => sum + (item.PerformanceRewrads || 0), 0);
-    const UnityRevenueClubs = analyticsData.data.reduce((sum, item) => sum + (item.UnityRevenueClubs || 0), 0);
-    const levelIncome = analyticsData.data.reduce((sum, item) => sum + (item.LevelIncome || 0), 0);
+    const DirectActivationRewards = analyticsData.data[0]?.DirectActivationRewards || 0;
+    const AgentAccessRewards = analyticsData.data[0]?.AgentAccessRewards || 0;
+    const AgenticFleetLeadershipRewards = analyticsData.data[0]?.AgenticFleetLeadershipRewards || 0;
+    const ReferralRoyaltyRewards = analyticsData.data[0]?.ReferralRoyaltyRewards || 0;
+    const PerformanceRewrads = analyticsData.data[0]?.PerformanceRewrads || 0;
+    const UnityRevenueClubs = analyticsData.data[0]?.UnityRevenueClubs || 0;
+    const levelIncome = analyticsData.data[0]?.LevelIncome || 0;
 
     return {
       labels: ["Direct Activation Rewards ", "Agent Access Rewards", "Agentic Fleet Leadership Rewards", "Referral Royalty Rewards", "Performance Rewards", "Unity Revenue Clubs", "Level Income"],
@@ -911,7 +909,6 @@ const MyAgentPage: React.FC = () => {
       };
     }
 
-    // Use PurchaseDate instead of LeaseDate
     const validLeases = analyticsData.data
       .filter(item => item.TotalInvestment && item.PurchaseDate)
       .map(item => {
@@ -1084,18 +1081,16 @@ const MyAgentPage: React.FC = () => {
   const totals = useMemo<Totals>(() => {
     if (!analyticsData?.data || analyticsData.data.length === 0) {
       const values = [0, 0, 0].map(v => Number(v.toFixed(2)));
-      const total = 0;
-      return { values, total };
+      return { values };
     }
 
-    const totalPerformanceEarning = analyticsData.data.reduce((sum, item) => sum + (item.WorkingTotalEarning || 0), 0);
-    const performanceLimit = analyticsData.data.reduce((sum, item) => sum + (item.WorkingTotalLimit || 0), 0);
-    const pendingLimit = analyticsData.data.reduce((sum, item) => sum + (item.WorkingPendingLimit || 0), 0);
+    const totalPerformanceEarning = analyticsData.data[0]?.WorkingTotalEarning || 0;
+    const performanceLimit = analyticsData.data[0]?.WorkingTotalLimit || 0;
+    const pendingLimit = analyticsData.data[0]?.WorkingPendingLimit || 0;
 
     const values = [totalPerformanceEarning, performanceLimit, pendingLimit].map(v => Number(v.toFixed(2)));
-    const total = values.reduce((s, v) => s + v, 0);
 
-    return { values, total };
+    return { values };
   }, [analyticsData]);
 
   const allLabels = ["Total Performance Earning", "Performance Limit", "Pending Limit"];
@@ -1113,13 +1108,12 @@ const MyAgentPage: React.FC = () => {
             hoverOffset: 20,
           },
         ],
-        total: 0,
       };
     }
 
-    const totalPerformanceEarning = analyticsData.data.reduce((sum, item) => sum + (item.WorkingTotalEarning || 0), 0);
-    const performanceLimit = analyticsData.data.reduce((sum, item) => sum + (item.WorkingTotalLimit || 0), 0);
-    const pendingLimit = analyticsData.data.reduce((sum, item) => sum + (item.WorkingPendingLimit || 0), 0);
+    const totalPerformanceEarning = analyticsData.data[0]?.WorkingTotalEarning || 0;
+    const performanceLimit = analyticsData.data[0]?.WorkingTotalLimit || 0;
+    const pendingLimit = analyticsData.data[0]?.WorkingPendingLimit || 0;
 
     const values = [totalPerformanceEarning, performanceLimit, pendingLimit];
     return {
@@ -1131,7 +1125,6 @@ const MyAgentPage: React.FC = () => {
           hoverOffset: 20,
         },
       ],
-      total: values.reduce((s, v) => s + v, 0),
     };
   }, [allLabels, allColors, analyticsData]);
 
@@ -1256,7 +1249,7 @@ const MyAgentPage: React.FC = () => {
 
       const ctx = canvas.getContext("2d");
       if (!ctx) return;
-      
+
       const w = canvas.width, h = canvas.height;
 
       const rev = revenueChartData.revenue.length > 0 ? revenueChartData.revenue : [28, 35, 22, 40, 38, 45, 52, 48, 55, 60, 58, 62, 70, 65, 72, 80, 75, 82, 90, 85, 92, 88, 95, 102, 98, 105, 112, 108, 115, 124];
@@ -1357,7 +1350,7 @@ const MyAgentPage: React.FC = () => {
           const shareValue = share[index] ?? 0;
           const revY = pad.t + iH - (revValue / max) * iH;
           const shareY = pad.t + iH - (shareValue / max) * iH;
-          
+
           ctx.beginPath();
           ctx.arc(pointX, revY, 5, 0, Math.PI * 2);
           ctx.fillStyle = "#00D4FF";
@@ -1365,7 +1358,7 @@ const MyAgentPage: React.FC = () => {
           ctx.strokeStyle = "#FFFFFF";
           ctx.lineWidth = 2;
           ctx.stroke();
-          
+
           ctx.beginPath();
           ctx.arc(pointX, shareY, 5, 0, Math.PI * 2);
           ctx.fillStyle = "#F5A623";
@@ -1376,21 +1369,21 @@ const MyAgentPage: React.FC = () => {
 
           const agentYields = yieldIncomeByAgent[index] || [];
           const tooltipText = agentYields.flatMap(a => [`Agent: ${a.agent}`, `YieldIncome: ${a.yieldIncome.toFixed(2)}`]);
-          
+
           const tooltipWidth = 160;
           const tooltipHeight = 20 + (agentYields.length * 32);
           const tooltipPadding = 8;
           const tooltipX = pointX - tooltipWidth / 2;
           const tooltipY = Math.min(revY, shareY) - tooltipHeight - 10;
-          
+
           const clampedTooltipX = Math.max(5, Math.min(canvas.width - tooltipWidth - 5, tooltipX));
           const clampedTooltipY = Math.max(5, tooltipY);
-          
+
           ctx.fillStyle = "rgba(31, 41, 55, 0.95)";
           ctx.beginPath();
           ctx.roundRect(clampedTooltipX, clampedTooltipY, tooltipWidth, tooltipHeight, 6);
           ctx.fill();
-          
+
           ctx.fillStyle = "#FFFFFF";
           ctx.font = "11px Inter";
           ctx.textAlign = "left";
@@ -1407,12 +1400,12 @@ const MyAgentPage: React.FC = () => {
 
     canvas.addEventListener("mousemove", handleMouseMove);
     canvas.addEventListener("mouseleave", handleMouseLeave);
-    
+
     const handleResize = () => {
       chartData = draw();
     };
     window.addEventListener("resize", handleResize);
-    
+
     return () => {
       window.removeEventListener("resize", handleResize);
       canvas.removeEventListener("mousemove", handleMouseMove);
@@ -1483,6 +1476,7 @@ const MyAgentPage: React.FC = () => {
             Uptime: (item.RuntimeHours && item.RuntimeHours > 0 && item.UptimeHours) ? ((item.UptimeHours / item.RuntimeHours) * 100).toFixed(2) : "0",
             Efficiency: item.Efficiency?.toString() || "0",
             CreatedDate: item.CreatedDate || "",
+            TodayRevenue: item.TodayRevenue || 0,
             YieldIncome: item.YieldIncome || 0,
             CreditsPurchased: item.CreditsPurchased || 0,
             PeakHourFlag: item.PeakHourFlag || "No",
@@ -1500,6 +1494,10 @@ const MyAgentPage: React.FC = () => {
             LifetimeRevenue: item.LifetimeRevenue || 0,
             DirectActivationRewards: item.DirectActivationRewards || 0,
             AgentAccessRewards: item.AgentAccessRewards || 0,
+            AgenticFleetLeadershipRewards: item.AgenticFleetLeadershipRewards || 0,
+            ReferralRoyaltyRewards: item.ReferralRoyaltyRewards || 0,
+            PerformanceRewrads: item.PerformanceRewrads || 0,
+            UnityRevenueClubs: item.UnityRevenueClubs || 0,
             ComputeRevenueShare: item.ComputeRevenueShare || 0,
             RewardBonus: item.RewardBonus || 0,
             RankBonus: item.RankBonus || 0,
@@ -1592,7 +1590,7 @@ const MyAgentPage: React.FC = () => {
     WeeklyYiled: 0,
     MonthlyRevenue: 0,
     LifetimeRevenue: 0,
-    DirectActivationRewards : 0,
+    DirectActivationRewards: 0,
     AgentAccessRewards: 0,
     AgenticFleetLeadershipRewards: 0,
     ReferralRoyaltyRewards: 0,
@@ -1613,13 +1611,13 @@ const MyAgentPage: React.FC = () => {
   const cards = useMemo(() => [
     {
       label: 'Active Agents',
-      value: analyticsData?.data?.reduce((sum, item) => sum + (item.ActiveAgent || 0), 0) || 0,
+      value: analyticsData?.data?.[0]?.ActiveAgent || 0,
       icon: <RiRobot2Line className="text-xl sm:text-2xl" />,
       gradient: 'from-green-500 to-emerald-500',
     },
     {
       label: 'Idle Agent',
-      value: analyticsData?.data?.reduce((sum, item) => sum + (item.IdleAgent || 0), 0) || 0,
+      value: analyticsData?.data?.[0]?.IdleAgent || 0,
       icon: <RiUserUnfollowLine className="text-xl sm:text-2xl" />,
       gradient: 'from-blue-500 to-pink-500',
     },
@@ -1863,7 +1861,7 @@ const MyAgentPage: React.FC = () => {
               </div>
               <div className="mb-2">
                 <h3 className="text-sm font-medium text-green-700 dark:text-green-400 whitespace-nowrap">Yield Income</h3>
-                <div className="mt-1 text-2xl font-bold text-green-900 dark:text-green-300">${analyticsData?.data?.reduce((sum, item) => sum + (item.TodayYieldIncome || 0), 0).toFixed(2) || "0.00"}</div>
+                <div className="mt-1 text-2xl font-bold text-green-900 dark:text-green-300">${analyticsData?.data?.[0]?.TodayYieldIncome?.toFixed(2) || "0.00"}</div>
               </div>
             </div>
 
@@ -1899,7 +1897,7 @@ const MyAgentPage: React.FC = () => {
               </div>
               <div className="mb-2">
                 <h3 className="text-sm font-medium text-pink-700 dark:text-pink-400 whitespace-nowrap">Daily Memory Consumption</h3>
-                <div className="mt-1 text-2xl font-bold text-pink-900 dark:text-pink-300">{analyticsData?.data?.reduce((sum, item) => sum + (item.MemoryUsage || 0), 0).toFixed(2) || "0.00"} GB</div>
+                <div className="mt-1 text-2xl font-bold text-pink-900 dark:text-pink-300">{analyticsData?.data?.[0]?.TodayMemoryUsage?.toFixed(2) || "0.00"} GB</div>
               </div>
             </div>
 
@@ -2020,15 +2018,15 @@ const MyAgentPage: React.FC = () => {
                 <div className="pt-4 mt-6 border-t border-gray-100 dark:border-gray-700">
                   <div className="flex items-center justify-between">
                     <span className="text-sm font-semibold text-gray-700 dark:text-gray-300 sm:text-base">Total Performance Earning:</span>
-                    <span className="text-xl font-bold text-gray-900 dark:text-white sm:text-2xl">${analyticsData?.data?.reduce((sum, item) => sum + (item.WorkingTotalEarning || 0), 0).toFixed(2) || "0.00"}</span>
+                    <span className="text-xl font-bold text-gray-900 dark:text-white sm:text-2xl">${analyticsData?.data?.[0]?.WorkingTotalEarning?.toFixed(2) ?? "0.00"}</span>
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="text-sm font-semibold text-gray-700 dark:text-gray-300 sm:text-base">Performance Limit:</span>
-                    <span className="text-xl font-bold text-gray-900 dark:text-white sm:text-2xl">${analyticsData?.data?.reduce((sum, item) => sum + (item.WorkingTotalLimit || 0), 0).toFixed(2) || "0.00"}</span>
+                    <span className="text-xl font-bold text-gray-900 dark:text-white sm:text-2xl">${analyticsData?.data?.[0]?.WorkingTotalLimit?.toFixed(2) ?? "0.00"}</span>
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="text-sm font-semibold text-gray-700 dark:text-gray-300 sm:text-base">Pending Limit:</span>
-                    <span className="text-xl font-bold text-gray-900 dark:text-white sm:text-2xl">${analyticsData?.data?.reduce((sum, item) => sum + (item.WorkingPendingLimit || 0), 0).toFixed(2) || "0.00"}</span>
+                    <span className="text-xl font-bold text-gray-900 dark:text-white sm:text-2xl">${analyticsData?.data?.[0]?.WorkingPendingLimit?.toFixed(2) ?? "0.00"}</span>
                   </div>
                 </div>
               </div>
@@ -2097,7 +2095,7 @@ const MyAgentPage: React.FC = () => {
                 </div>
                 <div className="text-center">
                   <p className="text-xs text-gray-500 dark:text-gray-400 sm:text-sm">Active Agents</p>
-                  <p className="text-lg font-bold text-green-600 dark:text-green-400 sm:text-2xl">{analyticsData?.data?.reduce((sum, item) => sum + (item.ActiveAgent || 0), 0) || 0}</p>
+                  <p className="text-lg font-bold text-green-600 dark:text-green-400 sm:text-2xl">{analyticsData?.data?.[0]?.ActiveAgent || 0}</p>
                 </div>
               </div>
             </div>
@@ -2185,9 +2183,9 @@ const MyAgentPage: React.FC = () => {
             <div className="vv-card bg-white/[0.92] dark:bg-gray-800/90 rounded-[16px] border border-[#0B1437]/[0.08] dark:border-gray-700 backdrop-blur-[12px] p-6">
               <div className="grid grid-cols-2 gap-4 mb-5 lg:grid-cols-4">
                 {[
-                  { label: "Total Revenue Share", val: `$${revenueStats.totalRevenueShare.toFixed(2)}`, cls: 'text-[#F5A623]', size: 'text-[35px]'},
+                  { label: "Total Revenue Share", val: `$${revenueStats.totalRevenueShare.toFixed(2)}`, cls: 'text-[#F5A623]', size: 'text-[35px]' },
                   { label: 'This Week', val: `$${revenueStats.thisWeek.toFixed(2)}`, cls: 'text-[#0B1437] dark:text-white', size: 'text-[35px]' },
-                  { label: 'This Month', val: `$${revenueStats.thisMonth.toFixed(2)}`, cls: 'text-[#0B1437] dark:text-white', size: 'text-[35px]'},
+                  { label: 'This Month', val: `$${revenueStats.thisMonth.toFixed(2)}`, cls: 'text-[#0B1437] dark:text-white', size: 'text-[35px]' },
                   { label: 'Lifetime Reward', val: `$${revenueStats.TotalYieldLimit.toFixed(2)}`, cls: 'text-[#0B1437] dark:text-white', sub: 'Total earned since deploy', size: 'text-[35px]' },
                 ].map((r, i) => (
                   <div key={i} className="p-5 bg-white dark:bg-gray-800/50 rounded-xl border border-[#0B1437]/[0.08] dark:border-gray-700">

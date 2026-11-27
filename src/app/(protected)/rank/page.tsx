@@ -355,22 +355,20 @@ export default function RankPage() {
       <div className="flex flex-wrap gap-3">
         <button
           onClick={() => setActiveTab("rank")}
-          className={`flex items-center gap-2 rounded-lg px-4 py-2.5 text-sm font-semibold transition-all ${
-            activeTab === "rank"
-              ? "bg-gradient-to-r from-[#1680ff] via-[#25c6e8] to-[#7d75ff] text-white shadow-lg"
-              : "bg-slate-100 text-slate-600 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
-          }`}
+          className={`flex items-center gap-2 rounded-lg px-4 py-2.5 text-sm font-semibold transition-all ${activeTab === "rank"
+            ? "bg-gradient-to-r from-[#1680ff] via-[#25c6e8] to-[#7d75ff] text-white shadow-lg"
+            : "bg-slate-100 text-slate-600 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
+            }`}
         >
           <Award className="h-4 w-4" />
           Performance Reward
         </button>
         <button
           onClick={() => setActiveTab("dao")}
-          className={`flex items-center gap-2 rounded-lg px-4 py-2.5 text-sm font-semibold transition-all ${
-            activeTab === "dao"
-              ? "bg-gradient-to-r from-[#1680ff] via-[#25c6e8] to-[#7d75ff] text-white shadow-lg"
-              : "bg-slate-100 text-slate-600 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
-          }`}
+          className={`flex items-center gap-2 rounded-lg px-4 py-2.5 text-sm font-semibold transition-all ${activeTab === "dao"
+            ? "bg-gradient-to-r from-[#1680ff] via-[#25c6e8] to-[#7d75ff] text-white shadow-lg"
+            : "bg-slate-100 text-slate-600 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
+            }`}
         >
           <Users className="h-4 w-4" />
           Revenue Club
@@ -413,7 +411,7 @@ export default function RankPage() {
                   </div>
                 </div>
 
-                 <div className="relative overflow-hidden rounded-2xl border border-slate-200/80 bg-white/90 shadow-sm dark:border-slate-700/70 dark:bg-slate-900/75">
+                <div className="relative overflow-hidden rounded-2xl border border-slate-200/80 bg-white/90 shadow-sm dark:border-slate-700/70 dark:bg-slate-900/75">
                   <div className="flex items-center justify-between border-b border-slate-200 px-4 py-3 dark:border-slate-700">
                     <span className="text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300">
                       Next Salary Date
@@ -425,7 +423,7 @@ export default function RankPage() {
                   </div>
                 </div>
 
-              
+
 
                 <div className="relative overflow-hidden rounded-2xl border border-slate-200/80 bg-white/90 shadow-sm dark:border-slate-700/70 dark:bg-slate-900/75">
                   <div className="flex items-center justify-between border-b border-slate-200 px-4 py-3 dark:border-slate-700">
@@ -472,9 +470,9 @@ export default function RankPage() {
                     <thead className="bg-gradient-to-r from-blue-50/80 via-cyan-50/60 to-violet-50/80 text-xs uppercase tracking-wider text-slate-600 dark:from-blue-900/20 dark:via-cyan-900/10 dark:to-violet-900/20 dark:text-slate-300">
                       <tr>
                         <th className="whitespace-nowrap px-4 py-3">#</th>
-                        <th className="whitespace-nowrap px-4 py-3">TITLE</th>
+                        <th className="whitespace-nowrap px-4 py-3">LEVEL</th>
                         <th className="whitespace-nowrap px-4 py-3">BUSINESS VOLUME</th>
-                        <th className="whitespace-nowrap px-4 py-3">REWARD</th>
+                        <th className="whitespace-nowrap px-4 py-3">SPEEDY REWARD</th>
                         <th className="whitespace-nowrap px-4 py-3">MONTHLY SALARY</th>
                         <th className="whitespace-nowrap px-4 py-3">STATUS</th>
                       </tr>
@@ -512,15 +510,14 @@ export default function RankPage() {
                                 ${row.RewardAmt}
                               </td>
                               <td className="whitespace-nowrap px-4 py-3">
-                                ${row.MonthlySalary}
+                                {row.MonthlySalary}
                               </td>
                               <td className="whitespace-nowrap px-4 py-3">
                                 <span
-                                  className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-bold ${
-                                    isQualified
-                                      ? "border-emerald-200 bg-emerald-100 text-emerald-700 dark:border-emerald-700/50 dark:bg-emerald-900/30 dark:text-emerald-300"
-                                      : "border-amber-200 bg-amber-100 text-amber-700 dark:border-amber-700/50 dark:bg-amber-900/30 dark:text-amber-300"
-                                  }`}
+                                  className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-bold ${isQualified
+                                    ? "border-emerald-200 bg-emerald-100 text-emerald-700 dark:border-emerald-700/50 dark:bg-emerald-900/30 dark:text-emerald-300"
+                                    : "border-amber-200 bg-amber-100 text-amber-700 dark:border-amber-700/50 dark:bg-amber-900/30 dark:text-amber-300"
+                                    }`}
                                 >
                                   {row.Statusx}
                                 </span>
@@ -538,7 +535,7 @@ export default function RankPage() {
         </>
       )}
 
-     
+
 
       {/* DAO Program Tab */}
       {activeTab === "dao" && (
@@ -564,7 +561,7 @@ export default function RankPage() {
           {!daoError && (
             <>
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-               
+
 
                 <div className="relative overflow-hidden rounded-2xl border border-slate-200/80 bg-white/90 shadow-sm dark:border-slate-700/70 dark:bg-slate-900/75">
                   <div className="flex items-center justify-between border-b border-slate-200 px-4 py-3 dark:border-slate-700">
@@ -647,11 +644,10 @@ export default function RankPage() {
                               </td>
                               <td className="whitespace-nowrap px-4 py-3">
                                 <span
-                                  className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-bold ${
-                                    isQualified
-                                      ? "border-emerald-200 bg-emerald-100 text-emerald-700 dark:border-emerald-700/50 dark:bg-emerald-900/30 dark:text-emerald-300"
-                                      : "border-amber-200 bg-amber-100 text-amber-700 dark:border-amber-700/50 dark:bg-amber-900/30 dark:text-amber-300"
-                                  }`}
+                                  className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-bold ${isQualified
+                                    ? "border-emerald-200 bg-emerald-100 text-emerald-700 dark:border-emerald-700/50 dark:bg-emerald-900/30 dark:text-emerald-300"
+                                    : "border-amber-200 bg-amber-100 text-amber-700 dark:border-amber-700/50 dark:bg-amber-900/30 dark:text-amber-300"
+                                    }`}
                                 >
                                   {row.Statusx}
                                 </span>
