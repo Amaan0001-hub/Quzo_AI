@@ -11,7 +11,7 @@ type ReportRow = Record<string, unknown>;
 const tabs: { id: ReportTab; label: string }[] = [
   { id: "deposit", label: "USDT Funding Wallet" },
   { id: "performance", label: "Working Reward Wallet" },
-  { id: "yield", label: "Trading Reward Wallet" },
+  { id: "yield", label: "Yield Reward Wallet" },
   { id: "quzo", label: "QUZO Coin Wallet" },
   
   
@@ -245,7 +245,7 @@ export function WalletManager() {
       value: Number(summary?.QuzoWallet ?? 0),
     },
     yield: {
-      label: "Trading Reward Wallet Balance",
+      label: "Yield Reward Wallet Balance",
       value: Number(summary?.YieldWallet ?? 0),
     },
     performance: {
