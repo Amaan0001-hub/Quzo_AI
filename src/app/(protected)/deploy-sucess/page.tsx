@@ -40,7 +40,6 @@ function ThankYouContent() {
   const invoiceRef = useRef<HTMLDivElement>(null);
   const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
   const [orderData] = useTempStorage<OrderData>("orderData");
-  console.log("YIYIYIYI",orderData);
   const [isLoading, setIsLoading] = useState(true);
   const [customerName, setCustomerName] = useState("");
   const [customerEmail, setCustomerEmail] = useState("");
@@ -120,7 +119,6 @@ function ThankYouContent() {
     tax: 0,
     total: orderData?.Rkprice?.toString() || "",
   };
-  console.log("XXXXXX",order)
 
   const downloadInvoice = async () => {
     if (!invoiceRef.current || isGeneratingPDF) return;
@@ -325,7 +323,9 @@ function ThankYouContent() {
               <p>Thank you for your business!</p>
               <p>
                 For questions contact{" "}
-                <span className="font-medium">hello@Quzo.io</span>
+                <span className="font-medium">
+                  support@quzo.network
+                </span>
               </p>
             </div>
           </div>
