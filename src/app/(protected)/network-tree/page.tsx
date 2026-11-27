@@ -154,7 +154,7 @@ const CustomNode = ({ nodeDatum, toggleNode }: CustomNodeElementProps) => {
               {nodeDatum.name}
             </h3>
             <p className="text-[11px] text-gray-600 dark:text-gray-400 mt-0.5">
-              Package: ${formatAmount(package_amount)}
+              License Amount: ${formatAmount(package_amount)}
             </p>
 
             <p className="text-[10px] text-gray-400 dark:text-gray-500 mt-1">

@@ -306,9 +306,6 @@ export function LicensePurchaseHistory() {
                         <div className="font-medium text-gray-900 dark:text-white">
                           {item.DDate}
                         </div>
-                        <div className="text-xs text-gray-400 dark:text-gray-500">
-                          {item.CreatedDate}
-                        </div>
                       </td>
                       <td className="px-4 py-4">
                         <div className="flex items-center gap-3">
@@ -347,7 +344,7 @@ export function LicensePurchaseHistory() {
                             fallbackCategoryStyle
                           }`}
                         >
-                          {item.PartnerCategoryName}
+                          {item.PartnerCategoryName || "N/A"}
                         </span>
                       </td>
                       <td className="px-4 py-4">
