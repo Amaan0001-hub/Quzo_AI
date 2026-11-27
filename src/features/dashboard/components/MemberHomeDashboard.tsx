@@ -66,6 +66,11 @@ interface WalletData {
   IncomeWallet?: number;
   YieldWallet?: number;
   QuzoWallet?: number;
+  Revenueprofit?: number;
+  netptofit?: number;
+  Pendingpayout?: number;
+  Aiservice?: number;
+  VendorDeplloyment?: number;
   TradingPackage?: number; // may not exist in API — treated as optional
   [key: string]: unknown;
 }
@@ -263,38 +268,42 @@ const OPPORTUNITIES = [
     title: "AI Agents License",
     desc: "Access curated AI services using x402 payments and earn commissions.",
     icon: Bot,
+    href: "/investment-amount",
   },
   {
-    title: "Vendor Deployment",
+    title: "Agent Deployment",
     desc: "Deploy your AI tools on the marketplace, list services and receive payments.",
     icon: LayoutGrid,
+    href: "/deploy-agents",
   },
   {
     title: "Affiliate Program",
     desc: "Earn rewards by inviting new users to join the ecosystem.",
     icon: Users,
+    href: "/ai-business-hub",
   },
   {
-    title: "AI Agent Services",
+    title: "Your Agent History",
     desc: "Launch AI service requests and connect with enterprise users.",
     icon: Sparkles,
+    href: "/order-history",
   },
 ];
 
 interface QuickLink {
   label: string;
   icon: LucideIcon;
-  href?: string;
+  href: string;
 }
 
 const QUICK_LINKS: QuickLink[] = [
-  { label: "My OTC", icon: CircleDollarSign },
-  { label: "My Coins", icon: Coins },
-  { label: "My Customers", icon: Users },
-  { label: "My Payouts", icon: Wallet },
-  { label: "My Team", icon: Users, href: "/direct-partners" },
-  { label: "My Vendors", icon: Briefcase },
-  { label: "My Plans", icon: Layers, href: "/investment-amount" },
+  { label: "Business Affiliate", icon: CircleDollarSign, href: "/ai-business-hub" },
+  { label: "Wallet Manager", icon: Coins, href: "/reports" },
+  { label: "Deploy Agents", icon: Users, href: "/deploy-agents" },
+  { label: "Income Report", icon: Wallet, href: "/income-reports" },
+  { label: "My Partners", icon: Users, href: "/direct-partners" },
+  { label: "Agent Deployment Report", icon: Briefcase, href: "/deploy-report" },
+  { label: "By Agent License", icon: Layers, href: "/investment-amount" },
   { label: "My Assets", icon: Settings, href: "/fund-director" },
 ];
 
@@ -717,10 +726,11 @@ function LicenseCredits({ walletData }: { walletData: WalletData }) {
    RevenueProfit — now API-driven
    --------------------------------------------------------------- */
 function RevenueProfit({ walletData }: { walletData: WalletData }) {
-  const serviceRevenue = Number(walletData.IncomeWallet ?? 0);
-  const vendorRevenue = Number(walletData.TeamBusiness ?? 0);
-  // const total = serviceRevenue + vendorRevenue;
-  const total = 0;
+  const serviceRevenue = Number(walletData.Aiservice ?? 0);
+  const vendorRevenue = Number(walletData.VendorDeployment ?? 0);
+  const total = Number(walletData.Revenueprofit ?? 0);
+  const netProfit = Number(walletData.netprofit ?? 0);
+  const pendingPayout = Number(walletData.Pendingpayout ?? 0);
 
   return (
     <div className="rounded-3xl border border-slate-100 bg-white p-5 shadow-sm dark:border-[#153747] dark:bg-[#07242e] sm:p-6">
@@ -758,11 +768,8 @@ function RevenueProfit({ walletData }: { walletData: WalletData }) {
                 <span className="h-2.5 w-2.5 shrink-0 rounded-full bg-[#3b82f6]" />
                 AI Service Revenue
               </span>
-              {/* <span className="font-bold text-slate-900 dark:text-white">
-                ${formatMoney(serviceRevenue)}
-              </span> */}
               <span className="font-bold text-slate-900 dark:text-white">
-                $0.00
+                ${formatMoney(serviceRevenue)}
               </span>
             </li>
             <li className="flex items-center justify-between gap-3 text-sm">
@@ -770,11 +777,8 @@ function RevenueProfit({ walletData }: { walletData: WalletData }) {
                 <span className="h-2.5 w-2.5 shrink-0 rounded-full bg-[#6366f1]" />
                 Vendor Deployment Revenue
               </span>
-              {/* <span className="font-bold text-slate-900 dark:text-white">
-                  ${formatMoney(vendorRevenue)}
-                </span> */}
               <span className="font-bold text-slate-900 dark:text-white">
-                $0.00
+                ${formatMoney(vendorRevenue)}
               </span>
 
             </li>
@@ -785,13 +789,13 @@ function RevenueProfit({ walletData }: { walletData: WalletData }) {
             <span className="text-sm font-medium text-slate-700 dark:text-slate-300">
               Net Profit
             </span>
-            <span className="text-xl font-bold text-slate-400">{PENDING}</span>
+            <span className="text-xl font-bold text-slate-900 dark:text-white">${formatMoney(netProfit)}</span>
           </div>
           <div className="flex flex-wrap items-center justify-between gap-2 rounded-2xl border border-slate-100 bg-slate-50 p-5 dark:border-slate-800 dark:bg-[#051c25]">
             <span className="text-sm font-medium text-slate-700 dark:text-slate-300">
               Pending Payout
             </span>
-            <span className="text-xl font-bold text-slate-400">{PENDING}</span>
+            <span className="text-xl font-bold text-slate-900 dark:text-white">${formatMoney(pendingPayout)}</span>
           </div>
         </div>
       </div>
@@ -1262,19 +1266,26 @@ function MarketSnapshotSection() {
 export function MemberHomeDashboard() {
   const [mounted, setMounted] = useState(false);
   const [copied, setCopied] = useState(false);
-  const copyLink = () => {
-    navigator.clipboard.writeText(
-      `${window.location.origin}/register?ref=DEMO1234`
-    );
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  };
-
   const { data: dashboardSummary, isLoading: isDashboardLoading } =
     useDashboardSummary();
 
   // Real API data — no more hardcoded object
   const walletData: WalletData = (dashboardSummary?.data?.[0] ?? {}) as WalletData;
+  const referralId = walletData.AuthLogin || "DEMO1234";
+  const referralLink = typeof window !== "undefined"
+    ? `${window.location.origin}/register?${new URLSearchParams({ RefID: referralId }).toString()}`
+    : "";
+  const copyLink = async () => {
+    const fullMessage = `🚀 𝐉𝐨𝐢𝐧 Quzo – 𝐄𝐦𝐩𝐨𝐰𝐞𝐫𝐢𝐧𝐠 𝐭𝐡𝐞 𝐅𝐮𝐭𝐮𝐫𝐞 𝐨𝐟 𝐓𝐫𝐚𝐝𝐢𝐧𝐠. Start your trading journey today and explore exciting market opportunities. Sign up using my referral link and unlock exclusive rewards: 👉 ${referralLink}`;
+
+    try {
+      await navigator.clipboard.writeText(fullMessage);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch (error) {
+      console.error("Failed to copy referral message:", error);
+    }
+  };
 
   const [marketView, setMarketView] =
     useState<keyof typeof MARKET_VIEWS>("spending");
@@ -1563,9 +1574,7 @@ export function MemberHomeDashboard() {
                   Your referral link
                 </p>
                 <p className="text-sm font-bold text-slate-900 dark:text-white">
-                  {walletData.AuthLogin
-                    ? `${typeof window !== "undefined" ? window.location.origin : ""}/register?ref=${walletData.AuthLogin}`
-                    : "http://localhost:3001/register?ref=DEMO1234"}
+                  {referralLink}
                 </p>
               </div>
               <div className="flex w-full items-center gap-2 md:w-auto">
@@ -1575,9 +1584,9 @@ export function MemberHomeDashboard() {
                 >
                   {copied ? "Copied!" : "Copy link"}
                 </button>
-                <button className="flex-1 rounded-xl bg-slate-100 px-4 py-2 text-[12px] font-semibold text-slate-700 transition-colors hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700 md:flex-none">
+                <Link href="/ai-business-hub" className="flex-1 rounded-xl bg-slate-100 px-4 py-2 text-[12px] font-semibold text-slate-700 transition-colors hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700 md:flex-none">
                   Affiliate dashboard
-                </button>
+                </Link>
               </div>
             </div>
 
@@ -1603,176 +1612,6 @@ export function MemberHomeDashboard() {
               ))}
             </div>
 
-            {/* Time filters */}
-            <div className="flex gap-2">
-              {["7 Days", "30 Days", "90 Days", "1 Year"].map((t, i) => (
-                <button
-                  key={t}
-                  className={`rounded-full border px-4 py-1.5 text-[11px] font-medium transition-colors ${i === 1
-                    ? "border-[#6b4eff] bg-[#6b4eff] text-white"
-                    : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50 dark:border-slate-700 dark:bg-[#07242e] dark:text-slate-300"
-                    }`}
-                >
-                  {t}
-                </button>
-              ))}
-            </div>
-
-            {/* Charts */}
-            <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-              <div className="rounded-2xl border border-slate-100 bg-white p-6 shadow-sm dark:border-[#153747] dark:bg-[#07242e]">
-                <h4 className="mb-6 text-sm font-bold text-slate-900 dark:text-white">
-                  Team members over time
-                </h4>
-                <div className="relative h-[220px] w-full">
-                  <div className="pointer-events-none absolute inset-0 flex flex-col justify-between pb-6">
-                    {[60, 45, 30, 15, 0].map((val) => (
-                      <div key={val} className="flex w-full items-center">
-                        <span className="w-6 text-[10px] text-slate-400">
-                          {val}
-                        </span>
-                        <div className="ml-2 flex-1 border-t border-slate-100 dark:border-slate-800"></div>
-                      </div>
-                    ))}
-                  </div>
-                  <div className="absolute inset-0 ml-8 pb-6">
-                    <svg
-                      viewBox="0 0 100 100"
-                      preserveAspectRatio="none"
-                      className="h-full w-full overflow-visible"
-                    >
-                      <defs>
-                        <linearGradient
-                          id="chartGradient"
-                          x1="0"
-                          y1="0"
-                          x2="0"
-                          y2="1"
-                        >
-                          <stop
-                            offset="0%"
-                            stopColor="#3b82f6"
-                            stopOpacity="0.2"
-                          />
-                          <stop
-                            offset="100%"
-                            stopColor="#3b82f6"
-                            stopOpacity="0"
-                          />
-                        </linearGradient>
-                      </defs>
-                      <path
-                        d="M0,50 L25,45 L50,40 L75,35 L100,30 L100,100 L0,100 Z"
-                        fill="url(#chartGradient)"
-                      />
-                      <path
-                        d="M0,50 L25,45 L50,40 L75,35 L100,30"
-                        fill="none"
-                        stroke="#3b82f6"
-                        strokeWidth="2"
-                        vectorEffect="non-scaling-stroke"
-                      />
-                    </svg>
-                  </div>
-                  <div className="absolute bottom-0 left-0 right-0 flex justify-between pl-8">
-                    {["Wk 1", "Wk 2", "Wk 3", "Wk 4", "Wk 5"].map((label) => (
-                      <span key={label} className="text-[10px] text-slate-400">
-                        {label}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              </div>
-
-              <div className="rounded-2xl border border-slate-100 bg-white p-6 shadow-sm dark:border-[#153747] dark:bg-[#07242e]">
-                <h4 className="mb-6 text-sm font-bold text-slate-900 dark:text-white">
-                  Level-wise team
-                </h4>
-                <div className="space-y-6">
-                  {LEVEL_INCOME.map((lvl, i) => (
-                    <div key={i}>
-                      <div className="mb-2 flex items-center justify-between text-[12px]">
-                        <span className="text-slate-700 dark:text-slate-300">
-                          {lvl.level}{" "}
-                          <span className="text-slate-400">· {lvl.members}</span>
-                        </span>
-                        <span className="font-semibold text-slate-600 dark:text-slate-400">
-                          $
-                          <Counter
-                            value={Number(lvl.value.replace(/[^0-9.]/g, ""))}
-                          />
-                        </span>
-                      </div>
-                      <div className="h-2 rounded-full bg-slate-100 dark:bg-slate-800">
-                        <div
-                          className="h-full rounded-full bg-[#3b82f6]"
-                          style={{ width: `${lvl.percent}%` }}
-                        />
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-
-            {/* Recently joined */}
-            <div className="overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-sm dark:border-[#153747] dark:bg-[#07242e]">
-              <div className="border-b border-slate-100 p-5 dark:border-slate-800">
-                <h4 className="text-sm font-bold text-slate-900 dark:text-white">
-                  Recently joined
-                </h4>
-              </div>
-              <div className="overflow-x-auto">
-                <table className="w-full text-left text-[13px]">
-                  <thead>
-                    <tr className="border-b border-slate-100 bg-slate-50/50 text-slate-400 dark:border-slate-800 dark:bg-slate-800/20">
-                      <th className="px-5 py-3 font-medium">Member</th>
-                      <th className="w-24 px-5 py-3 text-center font-medium">
-                        Level
-                      </th>
-                      <th className="px-5 py-3 font-medium">Joined</th>
-                      <th className="px-5 py-3 font-medium">Status</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-slate-100 dark:divide-slate-800/50">
-                    {RECENT_JOINED.map((row, i) => (
-                      <tr
-                        key={i}
-                        className="transition-colors hover:bg-slate-50 dark:hover:bg-slate-800/30"
-                      >
-                        <td className="px-5 py-4 font-semibold text-slate-800 dark:text-slate-200">
-                          {row.name}
-                        </td>
-                        <td className="px-5 py-4 text-center text-slate-500">
-                          {row.level}
-                        </td>
-                        <td className="px-5 py-4 text-slate-500">
-                          {row.joined}
-                        </td>
-                        <td className="px-5 py-4">
-                          <div className="flex items-center gap-2">
-                            <span
-                              className={`h-1.5 w-1.5 rounded-full ${row.status === "Active"
-                                ? "bg-[#10b981]"
-                                : "bg-slate-400"
-                                }`}
-                            />
-                            <span
-                              className={`font-medium ${row.status === "Active"
-                                ? "text-slate-700 dark:text-slate-300"
-                                : "text-slate-500"
-                                }`}
-                            >
-                              {row.status}
-                            </span>
-                          </div>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
           </div>
         </section>
 
@@ -1783,9 +1622,10 @@ export function MemberHomeDashboard() {
           </div>
           <h2 className="mb-4 text-xl font-bold">Grow Your Business With Quzo</h2>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {OPPORTUNITIES.map((opp, i) => (
-              <div
-                key={i}
+            {OPPORTUNITIES.map((opp) => (
+              <Link
+                key={opp.href}
+                href={opp.href}
                 className="group cursor-pointer rounded-2xl border border-[#d9e8ec] bg-white p-5 shadow-sm transition-transform hover:-translate-y-1 dark:border-[#153747] dark:bg-[#07242e]"
               >
                 <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-xl bg-[#3b82f6]/10 transition-colors group-hover:bg-[#3b82f6]/20">
@@ -1798,7 +1638,7 @@ export function MemberHomeDashboard() {
                 <div className="flex items-center gap-1 text-[10px] font-semibold text-[#12a594] transition-all group-hover:gap-2">
                   Explore <ArrowRight className="h-3 w-3" />
                 </div>
-              </div>
+              </Link>
             ))}
           </div>
         </section>
@@ -1810,33 +1650,18 @@ export function MemberHomeDashboard() {
           </div>
           <h2 className="mb-4 text-xl font-bold">Your Business Command Center</h2>
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-8">
-            {QUICK_LINKS.map((link, i) => {
-              if (link.href) {
-                return (
-                  <Link
-                    key={i}
-                    href={link.href}
-                    className="group flex flex-col items-center justify-center gap-2 rounded-xl border border-[#d9e8ec] bg-white p-3 transition-colors hover:border-[#3b82f6] dark:border-[#153747] dark:bg-[#07242e] dark:hover:border-[#3b82f6]"
-                  >
-                    <link.icon className="h-5 w-5 text-slate-400 transition-colors group-hover:text-[#3b82f6]" />
-                    <span className="text-center text-[10px] font-medium leading-tight text-slate-600 dark:text-slate-300">
-                      {link.label}
-                    </span>
-                  </Link>
-                );
-              }
-              return (
-                <button
-                  key={i}
-                  className="group flex flex-col items-center justify-center gap-2 rounded-xl border border-[#d9e8ec] bg-white p-3 transition-colors hover:border-[#3b82f6] dark:border-[#153747] dark:bg-[#07242e] dark:hover:border-[#3b82f6]"
-                >
-                  <link.icon className="h-5 w-5 text-slate-400 transition-colors group-hover:text-[#3b82f6]" />
-                  <span className="text-center text-[10px] font-medium leading-tight text-slate-600 dark:text-slate-300">
-                    {link.label}
-                  </span>
-                </button>
-              );
-            })}
+            {QUICK_LINKS.map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                className="group flex flex-col items-center justify-center gap-2 rounded-xl border border-[#d9e8ec] bg-white p-3 transition-colors hover:border-[#3b82f6] dark:border-[#153747] dark:bg-[#07242e] dark:hover:border-[#3b82f6]"
+              >
+                <link.icon className="h-5 w-5 text-slate-400 transition-colors group-hover:text-[#3b82f6]" />
+                <span className="text-center text-[10px] font-medium leading-tight text-slate-600 dark:text-slate-300">
+                  {link.label}
+                </span>
+              </Link>
+            ))}
           </div>
         </section>
 

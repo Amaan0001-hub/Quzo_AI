@@ -335,7 +335,7 @@ export default function AIBUSINESSHUB() {
   const PerformanceRewrads = getNumber(affiliate?.PerformanceRewrads);
 
   // Package API values
-  const totalTradingPackage = getNumber(affiliate?.TotalEarning);
+  const totalTradingPackage = getNumber(affiliate?.EarningLimit);
   const remaningPackage = getNumber(affiliate?.RemainingLimit);
   const activeTradingPackage = getNumber(affiliate?.TradingPackage);
   const activeSmartBondPack = getNumber(affiliate?.SmartBondPack);
@@ -367,7 +367,7 @@ export default function AIBUSINESSHUB() {
     investment: activeTradingPackage || 0,
     totalIncomeCap: totalTradingPackage || 0,
     remainingCap: remaningPackage || 0,
-capUsedPercent:totalTradingPackage > 0? Number(((activeTradingPackage / totalTradingPackage) * 100).toFixed(3)): 0,
+    capUsedPercent: totalTradingPackage > 0 ? Number(((activeTradingPackage / totalTradingPackage) * 100).toFixed(3)) : 0,
   };
 
   // QUZO price
@@ -482,9 +482,6 @@ capUsedPercent:totalTradingPackage > 0? Number(((activeTradingPackage / totalTra
 
         {/* Trading Packages */}
         <section aria-labelledby="trading-package-heading">
-          <h2 id="trading-package-heading" className="mb-3 text-lg font-semibold text-gray-900 dark:text-white">
-            Trading package
-          </h2>
           <div className="grid gap-4 xl:grid-cols-2">
             <article className="flex flex-col items-center gap-4 rounded-2xl border border-gray-200 dark:border-[#1E293B] bg-white dark:bg-[#0B1021] p-4 sm:p-5 shadow-sm">
               <div className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300">
@@ -522,9 +519,9 @@ capUsedPercent:totalTradingPackage > 0? Number(((activeTradingPackage / totalTra
               </div>
               <div className="grid grid-cols-3 gap-2 w-full">
                 {[
-                  { label: "Investment", value: money(packageInfo.investment) },
-                  { label: "Total income cap", value: money(packageInfo.totalIncomeCap) },
-                  { label: "Remaining cap", value: money(packageInfo.remainingCap) },
+                  { label: "Deployed Amount", value: money(packageInfo.investment) },
+                  { label: "Total Income Cap", value: money(packageInfo.totalIncomeCap) },
+                  { label: "Remaining Cap", value: money(packageInfo.remainingCap) },
                 ].map((item) => (
                   <div key={item.label} className="rounded-xl bg-gray-50 dark:bg-[#1E293B] p-3">
                     <p className="text-[10px] leading-4 text-gray-500 dark:text-gray-400">{item.label}</p>
@@ -552,9 +549,7 @@ capUsedPercent:totalTradingPackage > 0? Number(((activeTradingPackage / totalTra
                   {quzoPrice.value}{" "}
                   <span className="text-base font-medium text-gray-500 dark:text-gray-400">{quzoPrice.unit}</span>
                 </p>
-                <p className="mt-1 text-xs text-green-600 dark:text-green-400">
-                  ▲ {quzoPrice.change} · {quzoPrice.period}
-                </p>
+
               </div>
               <div className="mt-5">
                 <Sparkline
