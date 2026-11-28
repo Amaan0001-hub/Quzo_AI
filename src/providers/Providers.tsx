@@ -29,7 +29,7 @@ export function Providers({ children }: { children: ReactNode }) {
   const isAdminRoute = pathname?.startsWith("/spr-admin");
 
   return (
-    <ThemeProvider attribute="class" defaultTheme="light" storageKey="fyntix-theme">
+    <ThemeProvider attribute="class" defaultTheme="dark" storageKey="fyntix-theme">
       <QueryProvider>
         {isAdminRoute ? children : <AuthProvider>{children}</AuthProvider>}
       </QueryProvider>
