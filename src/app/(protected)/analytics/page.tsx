@@ -185,6 +185,9 @@ interface AnalyticsAPIResponseItem {
   IdleAgent?: number;
   GPUUsage?: number;
   CPUUsage?: number;
+  TodayCPUUsage?: number;
+  TodayGPUUsage?: number;
+  TodayMemoryUsage?: number;
   PeakGPUUsage?: number;
   PeakCPUUsage?: number;
   TodayYieldIncome?: number;
@@ -1507,6 +1510,9 @@ const MyAgentPage: React.FC = () => {
             IdleAgent: item.IdleAgent || 0,
             GPUUsage: item.GPUUsage || 0,
             CPUUsage: item.CPUUsage || 0,
+            TodayCPUUsage: item.TodayCPUUsage || 0,
+            TodayGPUUsage: item.TodayGPUUsage || 0,
+            TodayMemoryUsage: item.TodayMemoryUsage || 0,
             PeakGPUUsage: item.PeakGPUUsage || 0,
             PeakCPUUsage: item.PeakCPUUsage || 0,
             RuntimeHours: item.RuntimeHours || 0,

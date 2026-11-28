@@ -363,6 +363,7 @@ export default function RankPage() {
           <Award className="h-4 w-4" />
           Performance Reward
         </button>
+        {/* Revenue Club tab temporarily commented out.
         <button
           onClick={() => setActiveTab("dao")}
           className={`flex items-center gap-2 rounded-lg px-4 py-2.5 text-sm font-semibold transition-all ${activeTab === "dao"
@@ -373,6 +374,7 @@ export default function RankPage() {
           <Users className="h-4 w-4" />
           Revenue Club
         </button>
+        */}
       </div>
 
       {/* Rank Progress Tab */}
@@ -507,7 +509,7 @@ export default function RankPage() {
                                 {formatBusinessVolume(row.RequiredBusiness)}
                               </td>
                               <td className="whitespace-nowrap px-4 py-3">
-                                ${row.RewardAmt}
+                                {row.RewardAmt || "-"}
                               </td>
                               <td className="whitespace-nowrap px-4 py-3">
                                 {row.MonthlySalary}

@@ -617,9 +617,6 @@ function IncomeOverviewSection() {
   );
 }
 
-/* ---------------------------------------------------------------
-   LicenseCredits — now API-driven via walletData
-   --------------------------------------------------------------- */
 function LicenseCredits({ walletData }: { walletData: WalletData }) {
   const licenseValue = Number(walletData.AIAgentLicense ?? 0);
   const creditsPurchased = Number(walletData.PurchaseCredit ?? 0);
@@ -723,11 +720,11 @@ function LicenseCredits({ walletData }: { walletData: WalletData }) {
 }
 
 function RevenueProfit({ walletData }: { walletData: WalletData }) {
-  const serviceRevenue = Number(walletData.Aiservice ?? 0);
-  const vendorRevenue = Number(walletData.VendorDeployment ?? 0);
-  const total = Number(walletData.Revenueprofit ?? 0);
-  const netProfit = Number(walletData.netprofit ?? 0);
-  const pendingPayout = Number(walletData.Pendingpayout ?? 0);
+  const serviceRevenue = Number(walletData.Aiservicerevenue ?? 0);
+  const vendorRevenue = Number(walletData.VendorRevenue ?? 0);
+  const total = Number(walletData.RevenueGenerated ?? 0);
+  const netProfit = Number(walletData.NetProfit ?? 0);
+  const pendingPayout = Number(walletData.PendingPayout ?? 0);
 
   return (
     <div className="rounded-3xl border border-slate-100 bg-white p-5 shadow-sm dark:border-[#153747] dark:bg-[#07242e] sm:p-6">
@@ -1346,15 +1343,21 @@ export function MemberHomeDashboard() {
             </p>
 
             <div className="mt-1 flex w-full flex-wrap items-center gap-2 sm:mt-0">
-              <button className="flex items-center gap-1.5 rounded-lg bg-gradient-to-r from-[#12a594] to-[#35d6c0] px-3.5 py-2 text-xs font-semibold text-white shadow-[0_0_16px_rgba(18,165,148,0.3)] transition hover:opacity-90 sm:text-[13px]">
+              <Link
+                href="/investment-amount"
+                className="flex items-center gap-1.5 rounded-lg bg-gradient-to-r from-[#12a594] to-[#35d6c0] px-3.5 py-2 text-xs font-semibold text-white shadow-[0_0_16px_rgba(18,165,148,0.3)] transition hover:opacity-90 sm:text-[13px]"
+              >
                 <Bot className="h-3.5 w-3.5" />
                 Explore AI Marketplace
                 <ArrowRight className="h-3.5 w-3.5" />
-              </button>
-              <button className="flex items-center gap-1.5 rounded-lg border border-[#12a594]/30 bg-white/5 px-3 py-2 text-xs font-semibold text-white transition hover:bg-white/10 sm:text-[13px]">
+              </Link>
+              <Link
+                href="/ai-tools"
+                className="flex items-center gap-1.5 rounded-lg border border-[#12a594]/30 bg-white/5 px-3 py-2 text-xs font-semibold text-white transition hover:bg-white/10 sm:text-[13px]"
+              >
                 <Globe className="h-3.5 w-3.5 text-[#35d6c0]" />
                 Opportunities
-              </button>
+              </Link>
               <Link
                 href="/deploy-agents"
                 className="flex items-center gap-1.5 rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-xs font-semibold text-white transition hover:bg-white/10 sm:text-[13px]"
