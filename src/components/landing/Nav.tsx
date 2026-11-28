@@ -5,18 +5,8 @@ import { AnimatePresence, motion } from "framer-motion";
 import { ArrowUpRight, Menu, Moon, Sun, X } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
+import { useTheme } from "next-themes";
 
-/* ============================================================
-   TYPES
-   ============================================================ */
-type NavbarProps = {
-  theme?: "dark" | "light";
-  onToggleTheme?: () => void;
-};
-
-/* ============================================================
-   Inline Logo Component
-   ============================================================ */
 function Logo() {
   return (
     <span className="flex items-center gap-2 sm:gap-[11px]">
@@ -52,22 +42,21 @@ const NAV: [string, string, string][] = [
   ["Calculator", "#calculator", "calculator"],
 ];
 
-/* ============================================================
-   Main Component: Navbar
-   ============================================================ */
-export default function Navbar({ theme = "dark", onToggleTheme = () => {} }: NavbarProps) {
+export default function Navbar() {
   const [open, setOpen] = useState(false);
+  const { resolvedTheme, setTheme } = useTheme();
+  const theme = resolvedTheme ?? "dark";
   const nextTheme = theme === "dark" ? "light" : "dark";
-  
+
   return (
     <header className="fixed z-[100] top-0 left-0 w-full px-4 py-3 sm:px-6 sm:py-[14px]">
       <nav className="flex w-full max-w-[1370px] h-[60px] sm:h-[66px] items-center mx-auto px-3 sm:px-4 border border-white/[0.08] rounded-full bg-[rgba(7,9,16,0.72)] shadow-[0_20px_60px_rgba(0,0,0,0.35)] backdrop-blur-[24px] backdrop-saturate-150" aria-label="Main navigation">
-        
+
         {/* Brand */}
-        <Link 
-          href="/" 
-          className="flex items-center shrink-0" 
-          data-testid="nav-brand-logo" 
+        <Link
+          href="/"
+          className="flex items-center shrink-0"
+          data-testid="nav-brand-logo"
           aria-label="Velvora AI home"
         >
           <Logo />
@@ -76,9 +65,9 @@ export default function Navbar({ theme = "dark", onToggleTheme = () => {} }: Nav
         {/* Desktop Links (Visible on lg and above) */}
         <div className="hidden lg:flex items-center gap-4 xl:gap-[27px] mx-auto">
           {NAV.map(([label, href, id]) => (
-            <a 
-              key={id} 
-              href={href} 
+            <a
+              key={id}
+              href={href}
               className="relative whitespace-nowrap text-[#9aa8bc] text-[11px] xl:text-[12px] transition-colors duration-200 hover:text-[#f5f7ff] after:absolute after:right-0 after:-bottom-[9px] after:left-0 after:h-[1px] after:bg-[#65e7ff] after:content-[''] after:scale-x-0 after:origin-left after:transition-transform after:duration-250 hover:after:scale-x-100"
               data-testid={`nav-link-${id}`}
             >
@@ -89,18 +78,18 @@ export default function Navbar({ theme = "dark", onToggleTheme = () => {} }: Nav
 
         {/* Right Side Actions */}
         <div className="flex items-center gap-2 sm:gap-3 ml-auto lg:ml-[14px]">
-          
+
           {/* Theme Toggle - Always Visible */}
-          <button 
-            className="flex w-9 h-9 sm:w-10 sm:h-10 flex-none items-center justify-center border border-white/[0.08] rounded-full bg-[#121722] text-[#f5f7ff] cursor-pointer transition-all duration-200 hover:border-[#65e7ff] hover:rotate-[5deg]" 
-            onClick={onToggleTheme} 
-            aria-label={`Switch to ${nextTheme} theme`} 
-            title={`Switch to ${nextTheme} theme`} 
+          <button
+            className="flex w-9 h-9 sm:w-10 sm:h-10 flex-none items-center justify-center border border-white/[0.08] rounded-full bg-[#121722] text-[#f5f7ff] cursor-pointer transition-all duration-200 hover:border-[#65e7ff] hover:rotate-[5deg]"
+            onClick={() => setTheme(nextTheme)}
+            aria-label={`Switch to ${nextTheme} theme`}
+            title={`Switch to ${nextTheme} theme`}
             data-testid="theme-toggle-button"
           >
-            <motion.span 
-              key={theme} 
-              initial={{ rotate: -35, opacity: 0 }} 
+            <motion.span
+              key={theme}
+              initial={{ rotate: -35, opacity: 0 }}
               animate={{ rotate: 0, opacity: 1 }}
               className="flex"
             >
@@ -110,16 +99,16 @@ export default function Navbar({ theme = "dark", onToggleTheme = () => {} }: Nav
 
           {/* Desktop Auth Buttons (Hidden on mobile) */}
           <div className="hidden lg:flex items-center gap-3 xl:gap-[19px]">
-            <a 
-              className="text-[#9aa8bc] text-[12px] transition-colors duration-200 hover:text-[#f5f7ff]" 
-              href={LINKS.signIn} 
+            <a
+              className="text-[#9aa8bc] text-[12px] transition-colors duration-200 hover:text-[#f5f7ff]"
+              href={LINKS.signIn}
               data-testid="nav-signin-button"
             >
               Sign In
             </a>
-            <a 
-              className="inline-flex min-h-[36px] sm:min-h-[40px] items-center justify-center gap-2 rounded-full bg-[#e8f4f8] px-4 sm:px-[18px] text-[11px] sm:text-[12px] font-semibold text-[#070910] transition-all duration-300 hover:-translate-y-0.5 hover:bg-[#65e7ff] hover:text-[#071015] shadow-[0_8px_30px_rgba(101,231,255,0.08)] whitespace-nowrap" 
-              href={LINKS.getStarted} 
+            <a
+              className="inline-flex min-h-[36px] sm:min-h-[40px] items-center justify-center gap-2 rounded-full bg-[#e8f4f8] px-4 sm:px-[18px] text-[11px] sm:text-[12px] font-semibold text-[#070910] transition-all duration-300 hover:-translate-y-0.5 hover:bg-[#65e7ff] hover:text-[#071015] shadow-[0_8px_30px_rgba(101,231,255,0.08)] whitespace-nowrap"
+              href={LINKS.getStarted}
               data-testid="nav-get-started-button"
             >
               Get Started <ArrowUpRight size={14} className="hidden sm:block" />
@@ -127,11 +116,11 @@ export default function Navbar({ theme = "dark", onToggleTheme = () => {} }: Nav
           </div>
 
           {/* Mobile Menu Toggle (Visible on mobile and tablet) */}
-          <button 
-            className="flex lg:hidden w-9 h-9 sm:w-10 sm:h-10 flex-none items-center justify-center border border-white/[0.08] rounded-full bg-[#121722] text-[#f5f7ff] cursor-pointer transition-all duration-200 hover:border-[#65e7ff]" 
-            onClick={() => setOpen(!open)} 
-            aria-expanded={open} 
-            aria-label={open ? "Close navigation" : "Open navigation"} 
+          <button
+            className="flex lg:hidden w-9 h-9 sm:w-10 sm:h-10 flex-none items-center justify-center border border-white/[0.08] rounded-full bg-[#121722] text-[#f5f7ff] cursor-pointer transition-all duration-200 hover:border-[#65e7ff]"
+            onClick={() => setOpen(!open)}
+            aria-expanded={open}
+            aria-label={open ? "Close navigation" : "Open navigation"}
             data-testid="mobile-menu-toggle"
           >
             {open ? <X size={18} /> : <Menu size={18} />}
@@ -142,34 +131,34 @@ export default function Navbar({ theme = "dark", onToggleTheme = () => {} }: Nav
       {/* Mobile Menu Overlay */}
       <AnimatePresence>
         {open && (
-          <motion.div 
-            className="absolute top-[72px] sm:top-[88px] left-3 right-3 sm:left-4 sm:right-4 p-5 rounded-2xl border border-white/[0.08] bg-[rgba(7,9,16,0.95)] backdrop-blur-xl shadow-[0_20px_60px_rgba(0,0,0,0.35)] flex flex-col gap-4" 
-            initial={{ opacity: 0, y: -12 }} 
-            animate={{ opacity: 1, y: 0 }} 
-            exit={{ opacity: 0, y: -12 }} 
+          <motion.div
+            className="absolute top-[72px] sm:top-[88px] left-3 right-3 sm:left-4 sm:right-4 p-5 rounded-2xl border border-white/[0.08] bg-[rgba(7,9,16,0.95)] backdrop-blur-xl shadow-[0_20px_60px_rgba(0,0,0,0.35)] flex flex-col gap-4"
+            initial={{ opacity: 0, y: -12 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -12 }}
             data-testid="mobile-navigation-menu"
           >
             {NAV.map(([label, href, id]) => (
-              <a 
-                key={id} 
-                href={href} 
-                onClick={() => setOpen(false)} 
-                className="text-[#9aa8bc] text-[14px] font-medium hover:text-[#f5f7ff] transition-colors" 
+              <a
+                key={id}
+                href={href}
+                onClick={() => setOpen(false)}
+                className="text-[#9aa8bc] text-[14px] font-medium hover:text-[#f5f7ff] transition-colors"
                 data-testid={`mobile-nav-link-${id}`}
               >
                 {label}
               </a>
             ))}
-            <a 
-              href={LINKS.signIn} 
-              className="text-[#9aa8bc] text-[14px] font-medium hover:text-[#f5f7ff] transition-colors" 
+            <a
+              href={LINKS.signIn}
+              className="text-[#9aa8bc] text-[14px] font-medium hover:text-[#f5f7ff] transition-colors"
               data-testid="mobile-nav-signin"
             >
               Sign In
             </a>
-            <a 
-              className="inline-flex min-h-[46px] items-center justify-center gap-2.5 rounded-full bg-[#e8f4f8] px-5 text-[13px] font-semibold text-[#070910] hover:bg-[#65e7ff] transition-all duration-300 mt-2" 
-              href={LINKS.getStarted} 
+            <a
+              className="inline-flex min-h-[46px] items-center justify-center gap-2.5 rounded-full bg-[#e8f4f8] px-5 text-[13px] font-semibold text-[#070910] hover:bg-[#65e7ff] transition-all duration-300 mt-2"
+              href={LINKS.getStarted}
               data-testid="mobile-nav-get-started"
             >
               Get Started <ArrowUpRight size={16} />

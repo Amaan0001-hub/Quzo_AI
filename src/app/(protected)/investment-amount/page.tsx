@@ -207,7 +207,7 @@ export default function InvestmentAmountPage() {
               />
             </div>
 
-            <div className="relative w-full sm:ml-2 sm:w-auto" ref={dropdownRef}>
+            {/* <div className="relative w-full sm:ml-2 sm:w-auto" ref={dropdownRef}>
               <button
                 className="flex w-full items-center justify-between rounded-full border border-slate-200 dark:border-white/10 bg-white dark:bg-white/[0.04] px-5 py-3 text-slate-900 dark:text-slate-100 outline-none backdrop-blur-xl transition-all duration-200 hover:border-[#65e7ff]/30 focus:border-[#65e7ff]/70 focus:ring-4 focus:ring-[#65e7ff]/15 sm:w-[300px]"
                 onClick={() => setShowDropdown((prev) => !prev)}
@@ -280,7 +280,7 @@ export default function InvestmentAmountPage() {
                   </div>
                 </div>
               )}
-            </div>
+            </div> */}
           </div>
         </div>
 
@@ -457,11 +457,10 @@ export default function InvestmentAmountPage() {
                               <div className="flex flex-wrap justify-between pt-2">
                                 <span className="text-slate-500 dark:text-slate-400">Status:</span>
                                 <span
-                                  className={`font-bold ${
-                                    agent.status === "Available"
-                                      ? "text-emerald-600 dark:text-emerald-400"
-                                      : "text-red-600 dark:text-red-400"
-                                  }`}
+                                  className={`font-bold ${agent.status === "Available"
+                                    ? "text-emerald-600 dark:text-emerald-400"
+                                    : "text-red-600 dark:text-red-400"
+                                    }`}
                                 >
                                   {agent.status}
                                 </span>
@@ -515,10 +514,10 @@ export default function InvestmentAmountPage() {
                               </button>
                               <button
                                 className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-full border border-cyan-600/40 dark:border-[#65e7ff]/40 bg-slate-50 dark:bg-white/[0.03] px-6 py-3 text-[12px] font-semibold text-slate-900 dark:text-white backdrop-blur-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-cyan-600 hover:bg-cyan-50 dark:hover:border-[#65e7ff] dark:hover:bg-[#65e7ff]/10 cursor-not-allowed"
-                                // onClick={(e) => {
-                                //   e.stopPropagation();
-                                //   handleCardClick(agent);
-                                // }}
+                              // onClick={(e) => {
+                              //   e.stopPropagation();
+                              //   handleCardClick(agent);
+                              // }}
                               >
                                 <RiEyeLine className="mr-2" />
                                 View Details
